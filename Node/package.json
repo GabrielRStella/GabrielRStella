@@ -4,7 +4,7 @@
   "description": "Node implementation of my website.",
   "main": "index.js",
   "scripts": {
-    "start": "cd app && node index.js",
+    "start": "cd app/src && nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Gabriel R Stella",
@@ -12,6 +12,7 @@
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
-    "handlebars": "^4.0.10"
+    "handlebars": "^4.0.10",
+    "nodemon": "^1.11.0"
   }
 }
