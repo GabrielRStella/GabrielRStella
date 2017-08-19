@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <title>{{{title}}}</title>
-    {{{head}}}
+  <meta charset="utf-8" />
+  <title>{{{title}}}</title>
+  {{{head}}}
 </head>
 <body>
-{{{body}}}
+  {{{body}}}
 </body>
 </html>
