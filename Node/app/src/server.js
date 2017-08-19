@@ -28,6 +28,7 @@ for(var idx in args) {
 var app = express();
 
 app.use('/static', express.static('../public'));
+app.use('/', express.static('../root'));
 
 routes(app, express);
 
