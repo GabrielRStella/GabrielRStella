@@ -1,6 +1,8 @@
 var bodyParser = require('body-parser');
 var templates = require('./hbtemplates.js');
 
+var headers = require('./headers.js');
+
 module.exports = function(app, express) {
 
   app.get('/page', function (req, res) {
@@ -12,23 +14,35 @@ module.exports = function(app, express) {
   });
 
   app.get('/', function (req, res) {
-    res.send(templates.html({
-      title: "Gabriel R Stella",
-      head: templates.external({
-        materialize: true
-      }),
-      body: `
-          <div class="container">
-            <div class="card-panel center-align blue">Gabriel Stella</div>
-            <div style="background: #ffffff">
-              <div class="center section">This site is a work in progress.</div>
-            </div>
-          </div>
-      `,
-      style: {
-        body: "background: #5f5f5f"
+    headers(function(path){
+      var bg = "#ffffff";
+      if(path) {
+        bg = "url(" + path + ")";
       }
-    }));
+
+
+      var body = `
+        <div class="container">
+          <div class="card-panel center-align blue">Gabriel Stella</div>
+          <div style="background: ${bg}">
+            <div class="center section">This site is a work in progress.</div>
+            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+          </div>
+        </div>
+      `;
+
+      res.send(templates.html({
+        title: "Gabriel R Stella",
+        head: templates.external({
+          materialize: true,
+          jquery: true
+        }),
+        body: body,
+        style: {
+          body: "background: #5f5f5f"
+        }
+      }));
+    });
   });
 
 };

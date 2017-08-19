@@ -6,7 +6,7 @@ var hbhelpers = require('./hbhelpers');
 
 hbhelpers(handlebars);
 
-//for reading files async
+//for reading files
 var fs = require('fs');
 
 var templates = {};
