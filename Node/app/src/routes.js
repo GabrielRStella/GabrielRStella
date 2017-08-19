@@ -30,9 +30,9 @@ module.exports = function(app, express) {
             </div>
           </div>
         </div>
-        <div class="container">
-          <div class="card-panel center-align blue">Gabriel Stella</div>
-          <div style="background: ${bg}">
+        <div class="row">
+          <div class="card-panel center-align blue z-depth-1" style="margin: 0px 0px"></div>
+          <div style="background: ${palette.foreground}">
             <div class="center section">This site is a work in progress.</div>
             <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
           </div>
