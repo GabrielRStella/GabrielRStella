@@ -8,6 +8,7 @@ var routes = require('./routes');
 //parse command-line args
 
 var args = process.argv.slice(2);
+console.log(args);
 
 var options = {
   port: 80,
@@ -16,9 +17,11 @@ var options = {
 for(var idx in args) {
   var arg = args[idx];
   var split = arg.split("=");
-  var key = split[0];
-  var value = split.slice(1).join("=");
-  options[key] = JSON.parse(value);
+  if(split.length >= 2) {
+    var key = split[0];
+    var value = split.slice(1).join("=");
+    options[key] = JSON.parse(value);
+  }
 }
 
 //begin server
