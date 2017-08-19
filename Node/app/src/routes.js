@@ -26,7 +26,7 @@ module.exports = function(app, express) {
         <div style="background: ${bg}" class="blue">
           <div style="height: 150px" class="valign-wrapper">
             <div style="margin-left: 20px" class="center-align">
-              <span class="black white-text">hi</span>
+              <h1 style="font-size: 72px">Gabriel R Stella</h1>
             </div>
           </div>
         </div>
