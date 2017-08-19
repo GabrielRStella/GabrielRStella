@@ -5,7 +5,7 @@
   <title>{{{title}}}</title>
   {{{head}}}
 </head>
-<body>
+<body {{#if style}}{{#if style.body}}style="{{style.body}}"{{/if}}{{/if}}>
   {{{body}}}
 </body>
 </html>

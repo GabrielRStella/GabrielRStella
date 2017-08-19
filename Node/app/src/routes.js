@@ -17,12 +17,17 @@ module.exports = function(app, express) {
       head: templates.external({
         materialize: true
       }),
-      body: templates.body({
-        text: `
-          <div class="card-panel center-align blue">Gabriel Stella</div>
-          <div class="center section">This site is a work in progress.</div>
-        `
-      })
+      body: `
+          <div class="container">
+            <div class="card-panel center-align blue">Gabriel Stella</div>
+            <div style="background: #ffffff">
+              <div class="center section">This site is a work in progress.</div>
+            </div>
+          </div>
+      `,
+      style: {
+        body: "background: #5f5f5f"
+      }
     }));
   });
 
