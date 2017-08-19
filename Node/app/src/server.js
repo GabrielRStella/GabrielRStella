@@ -1,10 +1,17 @@
+//require
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var handlebars = require('handlebars');
 var hbhelpers = require('./hbhelpers.js');
+var hbtemplates = require('./hbtemplates.js');
 
 //for reading files async
 //var fs = require('fs');
+
+//console.log(hbtemplates);
+
+//
 
 hbhelpers(handlebars);
 
@@ -19,5 +26,14 @@ app.get('/', function (req, res) {
 })
 
 app.listen(3000, function () {
-  console.log('Started on port 3000. TODO: command line ports')
+  //just for fun
+  var source = "Server started on port {{port}}.{{#if todo}} TODO: {{todo}}{{/if}}";
+
+  var template = handlebars.compile(source);
+  var data = {
+    port: 3000,
+    todo: "command line ports"
+  };
+  var result = template(data);
+  console.log(result);
 })
