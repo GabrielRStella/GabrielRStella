@@ -26,7 +26,6 @@ templates.loadAsync = function(name) {
 
 
 templates.loadSync('html');
-templates.loadSync('body');
 templates.loadSync('list');
 templates.loadSync('external');
 
