@@ -8,7 +8,6 @@ var routes = require('./routes');
 //parse command-line args
 
 var args = process.argv.slice(2);
-console.log(args);
 
 var options = {
   port: 80,
