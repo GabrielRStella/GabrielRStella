@@ -1,0 +1,3 @@
+{{#each content}}
+  {{{this}}}
+{{/each}}

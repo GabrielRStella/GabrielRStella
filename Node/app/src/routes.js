@@ -1,7 +1,7 @@
 var bodyParser = require('body-parser');
 var templates = require('./hbtemplates.js');
 
-module.exports = function(app, express, handlebars) {
+module.exports = function(app, express) {
 
   app.get('/page', function (req, res) {
     res.send('speshul page');
@@ -12,7 +12,15 @@ module.exports = function(app, express, handlebars) {
   });
 
   app.get('/', function (req, res) {
-    res.send('Hello World!');
+    res.send(templates.html({
+      title: "Gabriel R Stella",
+      head: templates.external({
+        materialize: true
+      }),
+      body: templates.body({
+        text: "hi!"
+      })
+    }));
   });
 
 };

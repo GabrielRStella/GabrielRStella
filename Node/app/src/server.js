@@ -1,16 +1,9 @@
 //require
 
 var express = require('express');
-
-//TODO: may move handlebars to routes
 var handlebars = require('handlebars');
-var hbhelpers = require('./hbhelpers');
 
 var routes = require('./routes');
-
-//
-
-hbhelpers(handlebars);
 
 //parse command-line args
 
@@ -34,7 +27,7 @@ var app = express();
 
 app.use('/static', express.static('../public'));
 
-routes(app, express, handlebars);
+routes(app, express);
 
 app.listen(options.port, function () {
   //just for fun
@@ -43,7 +36,7 @@ app.listen(options.port, function () {
   var template = handlebars.compile(source);
   var data = {
     port: options.port,
-    todo: "command line ports"
+    todo: null
   };
   var result = template(data);
   console.log(result);

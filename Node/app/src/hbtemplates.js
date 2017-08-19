@@ -1,22 +1,33 @@
+//TODO: may move handlebars to routes
+var handlebars = require('handlebars');
+var hbhelpers = require('./hbhelpers');
+
+//
+
+hbhelpers(handlebars);
+
 //for reading files async
 var fs = require('fs');
 
 var templates = {};
 
 templates.loadPath = './hbtemplates/';
+templates.loadType = '.hb';
 
 templates.loadSync = function(name, errCb) {
-  templates[name] = fs.readFileSync(templates.loadPath + name, 'utf8');
+  templates[name] = handlebars.compile(fs.readFileSync(templates.loadPath + name + templates.loadType, 'utf8'));
 };
 templates.loadAsync = function(name) {
-  fs.readFile(templates.loadPath + name, 'utf8', function(err, data) {  
+  fs.readFile(templates.loadPath + name + templates.loadType, 'utf8', function(err, data) {  
     if (err && errCb) errCb(err);
-    else if(!err) templates[name] = data;
+    else if(!err) templates[name] = handlebars.compile(data);
   });
 };
 
 
-templates.loadSync('page.hb', function(err) {console.log(err);});
-templates.loadSync('body.hb', function(err) {console.log(err);});
+templates.loadSync('html');
+templates.loadSync('body');
+templates.loadSync('list');
+templates.loadSync('external');
 
 module.exports = templates;
