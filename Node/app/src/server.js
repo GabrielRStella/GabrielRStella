@@ -1,10 +1,12 @@
 //require
 
 var express = require('express');
-var bodyParser = require('body-parser');
+
+//TODO: may move handlebars to routes
 var handlebars = require('handlebars');
 var hbhelpers = require('./hbhelpers.js');
-var hbtemplates = require('./hbtemplates.js');
+
+var routes = require('./routes');
 
 //for reading files async
 //var fs = require('fs');
@@ -21,9 +23,7 @@ var app = express();
 
 app.use('/static', express.static('../public'));
 
-app.get('/', function (req, res) {
-  res.send('Hello World!')
-})
+routes(app, express, handlebars);
 
 app.listen(3000, function () {
   //just for fun
@@ -36,4 +36,4 @@ app.listen(3000, function () {
   };
   var result = template(data);
   console.log(result);
-})
+});
