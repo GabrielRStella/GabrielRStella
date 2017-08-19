@@ -30,13 +30,18 @@ module.exports = function(app, express) {
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="card-panel center-align blue z-depth-1" style="margin: 0px 0px"></div>
+          <div style="background-color: ${palette.primary}; color: ${palette.foreground}; padding: 10px; font-size: 24px">
+            Navigation
+            <div style="float: right; display: inline-block; align-content: right; text-align: right">
+              <a href="#"><div style="display: inline-block">1</div></a>
+              <a href="#">b</a>
+              <a href="#">sea</a>
+            </div>
+          </div>
           <div style="background: ${palette.foreground}">
             <div class="center section">This site is a work in progress.</div>
             <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
           </div>
-        </div>
       `;
 
       res.send(templates.html({
