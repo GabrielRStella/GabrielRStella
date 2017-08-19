@@ -3,6 +3,8 @@ var templates = require('./hbtemplates.js');
 
 var headers = require('./headers.js');
 
+var palette = require('./palette.js');
+
 module.exports = function(app, express) {
 
   app.get('/page', function (req, res) {
@@ -15,13 +17,19 @@ module.exports = function(app, express) {
 
   app.get('/', function (req, res) {
     headers(function(path){
-      var bg = "#ffffff";
+      var bg = palette.primary;
       if(path) {
-        bg = "url(" + path + ")";
+        bg = path;
       }
 
-
       var body = `
+        <div style="background: ${bg}" class="blue">
+          <div style="height: 150px" class="valign-wrapper">
+            <div class="center-align">
+              <span class="black white-text">hi</span>
+            </div>
+          </div>
+        </div>
         <div class="container">
           <div class="card-panel center-align blue">Gabriel Stella</div>
           <div style="background: ${bg}">
@@ -39,7 +47,7 @@ module.exports = function(app, express) {
         }),
         body: body,
         style: {
-          body: "background: #5f5f5f"
+          body: "background: " + palette.background
         }
       }));
     });
