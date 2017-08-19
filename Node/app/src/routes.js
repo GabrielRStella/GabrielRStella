@@ -4,11 +4,11 @@ var templates = require('./hbtemplates.js');
 module.exports = function(app, express) {
 
   app.get('/page', function (req, res) {
-    res.send('speshul page');
+    res.send('page');
   });
 
   app.get('/page/:id', function (req, res) {
-    res.send('speshul page 2: ' + req.params.id);
+    res.send('page: ' + req.params.id);
   });
 
   app.get('/', function (req, res) {
@@ -18,7 +18,10 @@ module.exports = function(app, express) {
         materialize: true
       }),
       body: templates.body({
-        text: "hi!"
+        text: `
+          <div class="card-panel center-align blue">Gabriel Stella</div>
+          <div class="center section">This site is a work in progress.</div>
+        `
       })
     }));
   });
