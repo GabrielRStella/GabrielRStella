@@ -30,13 +30,33 @@ module.exports = function(app, express) {
         }),
         body: templates.list({ content: [
           templates.header({
-            palette: palette,
+            palette: {
+              color: palette.primary
+            },
             background: bg,
             title: "Gabriel R Stella"
           }),
           templates.navbar({
-            palette: palette,
-            
+            palette: {
+              color: palette.primary,
+              text: palette.foreground,
+              hover: palette.secondary
+            },
+            title: "Navigation",
+            links: [
+              {
+                to: "#",
+                title: "1"
+              },
+              {
+                to: "#",
+                title: "b"
+              },
+              {
+                to: "#",
+                title: "sea"
+              }
+            ]
           }),
           templates.body({
             palette: palette,
