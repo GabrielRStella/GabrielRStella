@@ -1,7 +1,7 @@
 module.exports = {
   background: "#5f5f5f",
   foreground: "#ffffff",
-  primary: "#000080",
-  secondary: "#ff0040",
+  primary: "#000000",
+  secondary: "#ff0000",
   tertiary: "#ffab00",
 };

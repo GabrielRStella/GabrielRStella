@@ -23,23 +23,28 @@ module.exports = function(app, express) {
       }
 
       var body = `
-        <div style="background: ${bg}" class="blue">
+        <div style="background: ${bg}">
           <div style="height: 150px" class="valign-wrapper">
             <div style="margin-left: 20px" class="center-align">
-              <h1 style="font-size: 72px">Gabriel R Stella</h1>
+              <h1 style="color: ${palette.primary}; font-size: 72px">Gabriel R Stella</h1>
             </div>
           </div>
         </div>
-          <div style="background-color: ${palette.primary}; color: ${palette.foreground}; padding: 10px; font-size: 24px">
-            Navigation
+          <div style="background-color: ${palette.primary}; color: ${palette.foreground}; font-size: 24px">
+            <div style="padding: 10px; display: inline-block">Navigation</div>
             <div style="float: right; display: inline-block; align-content: right; text-align: right">
-              <a href="#"><div style="display: inline-block">1</div></a>
-              <a href="#">b</a>
-              <a href="#">sea</a>
+              <style>
+                .navbar-link {color: ${palette.foreground};}
+                .navbar-link:hover {background-color: ${palette.secondary};}
+              </style>
+              <a href="#"><div class="navbar-link" style="display: inline-block; padding: 10px">1</div></a>
+              <a href="#"><div class="navbar-link" style="display: inline-block; padding: 10px">b</div></a>
+              <a href="#"><div class="navbar-link" style="display: inline-block; padding: 10px">sea</div></a>
             </div>
           </div>
           <div style="background: ${palette.foreground}">
             <div class="center section">This site is a work in progress.</div>
+              <a href="#">12312</a>
             <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
           </div>
       `;
