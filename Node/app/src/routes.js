@@ -22,40 +22,27 @@ module.exports = function(app, express) {
         bg = path;
       }
 
-      var body = `
-        <div style="background: ${bg}">
-          <div style="height: 150px" class="valign-wrapper">
-            <div style="margin-left: 20px" class="center-align">
-              <h1 style="color: ${palette.primary}; font-size: 72px">Gabriel R Stella</h1>
-            </div>
-          </div>
-        </div>
-          <div style="background-color: ${palette.primary}; color: ${palette.foreground}; font-size: 24px">
-            <div style="padding: 10px; display: inline-block">Navigation</div>
-            <div style="float: right; display: inline-block; align-content: right; text-align: right">
-              <style>
-                .navbar-link {color: ${palette.foreground};}
-                .navbar-link:hover {background-color: ${palette.secondary};}
-              </style>
-              <a href="#"><div class="navbar-link" style="display: inline-block; padding: 10px">1</div></a>
-              <a href="#"><div class="navbar-link" style="display: inline-block; padding: 10px">b</div></a>
-              <a href="#"><div class="navbar-link" style="display: inline-block; padding: 10px">sea</div></a>
-            </div>
-          </div>
-          <div style="background: ${palette.foreground}">
-            <div class="center section">This site is a work in progress.</div>
-              <a href="#">12312</a>
-            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-          </div>
-      `;
-
       res.send(templates.html({
         title: "Gabriel R Stella",
         head: templates.external({
           materialize: true,
           jquery: true
         }),
-        body: body,
+        body: templates.list({ content: [
+          templates.header({
+            palette: palette,
+            background: bg,
+            title: "Gabriel R Stella"
+          }),
+          templates.navbar({
+            palette: palette,
+            
+          }),
+          templates.body({
+            palette: palette,
+            
+          })
+        ]}),
         style: {
           body: "background: " + palette.background
         }

@@ -24,9 +24,12 @@ templates.loadAsync = function(name) {
   });
 };
 
+//auto-load templates
 
-templates.loadSync('html');
-templates.loadSync('list');
-templates.loadSync('external');
+var files = fs.readdirSync("./hbtemplates");
+for(var index in files) {
+  var file = files[index];
+  templates.loadSync(file.substring(0, file.length - 3));
+}
 
 module.exports = templates;
