@@ -4,6 +4,8 @@ var page = require('./page');
 var templates = require('./hbtemplates.js');
 var palette = require('./palette.js');
 
+var fs = require('fs');
+
 module.exports = function(app, express) {
 
   app.get('/page', function (req, res) {
@@ -25,6 +27,11 @@ module.exports = function(app, express) {
   });
 
   app.get('/games', function (req, res) {
+
+    fs.readdir('./games', function(err, files) {
+      console.log(files);
+    });
+
     var content = templates.games({
       palette: {
         background: palette.foreground
