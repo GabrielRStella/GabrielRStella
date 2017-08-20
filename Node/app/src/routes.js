@@ -1,8 +1,7 @@
 var bodyParser = require('body-parser');
+var page = require('./page');
+
 var templates = require('./hbtemplates.js');
-
-var headers = require('./headers.js');
-
 var palette = require('./palette.js');
 
 module.exports = function(app, express) {
@@ -16,58 +15,33 @@ module.exports = function(app, express) {
   });
 
   app.get('/', function (req, res) {
-    headers(function(path){
-      var bg = palette.primary;
-      if(path) {
-        bg = path;
-      }
-
-      res.send(templates.html({
-        title: "Gabriel R Stella",
-        head: templates.external({
-          materialize: true,
-          jquery: true
-        }),
-        body: templates.list({ content: [
-          templates.header({
-            palette: {
-              color: palette.primary
-            },
-            background: bg,
-            title: "Gabriel R Stella"
-          }),
-          templates.navbar({
-            palette: {
-              color: palette.primary,
-              text: palette.foreground,
-              hover: palette.secondary
-            },
-            title: "Navigation",
-            links: [
-              {
-                to: "#",
-                title: "1"
-              },
-              {
-                to: "#",
-                title: "b"
-              },
-              {
-                to: "#",
-                title: "sea"
-              }
-            ]
-          }),
-          templates.body({
-            palette: palette,
-            
-          })
-        ]}),
-        style: {
-          body: "background: " + palette.background
-        }
-      }));
+    var content = templates.body({
+      palette: {
+        background: palette.foreground
+      },
     });
+
+    page(content, res.send.bind(res));
+  });
+
+  app.get('/games', function (req, res) {
+    var content = templates.games({
+      palette: {
+        background: palette.foreground
+      },
+    });
+
+    page(content, res.send.bind(res));
+  });
+
+  app.get('/projects', function (req, res) {
+    var content = templates.projects({
+      palette: {
+        background: palette.foreground
+      },
+    });
+
+    page(content, res.send.bind(res));
   });
 
 };

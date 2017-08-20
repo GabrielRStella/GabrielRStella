@@ -2,7 +2,7 @@
   <div class="center section">
     This site is a work in progress.
     <br/>
-    <a href="#">12312</a>
+    (Games)
   </div>
   <br/><br/>
 </div>
