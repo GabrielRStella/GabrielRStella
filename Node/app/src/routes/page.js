@@ -1,6 +1,7 @@
-var headers = require('./headers.js');
-var templates = require('./hbtemplates.js');
-var palette = require('./palette.js');
+var headers = require('../headers.js');
+
+var templates = require('../hbtemplates.js');
+var palette = require('../palette.js');
 
 module.exports = function(content, callback) {
 

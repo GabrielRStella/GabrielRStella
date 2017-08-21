@@ -29,7 +29,12 @@ templates.loadAsync = function(name) {
 var files = fs.readdirSync("./hbtemplates");
 for(var index in files) {
   var file = files[index];
-  templates.loadSync(file.substring(0, file.length - 3));
+  if(fs.lstatSync('./hbtemplates/' + file).isDirectory()) {
+    templates[file] = {};
+    //fill subdir
+  } else {
+    templates.loadSync(file.substring(0, file.length - 3));
+  }
 }
 
 module.exports = templates;
