@@ -2,6 +2,7 @@ var bodyParser = require('body-parser');
 
 var route_index = require('./routes/index');
 var route_games = require('./routes/games');
+var route_game = require('./routes/game');
 var route_projects = require('./routes/projects');
 
 module.exports = function(app, express) {
@@ -17,6 +18,8 @@ module.exports = function(app, express) {
   app.get('/', route_index);
 
   app.get('/games', route_games);
+  app.get('/games/:game', route_game);
+
   app.get('/projects', route_projects);
 
 };

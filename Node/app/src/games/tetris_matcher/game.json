@@ -1,7 +1,7 @@
 {
-  script: 'tetris.js',
-  title: 'Tetris Matcher',
-  description: 'A block matching game based on Mozilla's Gamedev Canvas Workshop',
-  caption: 'Click the button above to switch between the three game input modes! Match 4 blocks of the same color to create a solid piece. Line up a row of solid pieces to erase the row. Match more than 4 blocks of the same color to instantly remove them. Match a bunch for a surprise!',
-  img: 'TODO'
+  "script": "tetris.js",
+  "title": "Tetris Matcher",
+  "description": "A block matching game based on Mozilla's Gamedev Canvas Workshop",
+  "caption": "Click the button above to switch between the three game input modes! Match 4 blocks of the same color to create a solid piece. Line up a row of solid pieces to erase the row. Match more than 4 blocks of the same color to instantly remove them. Match a bunch for a surprise!",
+  "img": "TODO"
 }
