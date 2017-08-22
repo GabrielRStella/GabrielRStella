@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>Tetris Matcher, based on Mozilla's Gamedev Canvas Workshop</title>
-    <style>* { padding: 0; margin: 0; } canvas { background: #fff; display: block; margin: 0 auto; }</style>
-</head>
-<body>
-
 <div style="height: 5px"></div>
 
-<canvas id="gameCanvas"></canvas>
+<canvas id="gameCanvas" style="background: #fff; display: block; margin: 0 auto;"></canvas>
 
 <script src="game_tetris.js">
 </script>
@@ -25,6 +16,3 @@
     </p>
   </div>
 </div>
-
-</body>
-</html>
