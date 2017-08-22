@@ -1,10 +1,12 @@
-var templates = require('../hbtemplates.js');
-var palette = require('../palette.js');
+var templates = require('../util/hbtemplates.js');
+var palette = require('../util/palette.js');
+
+var page = require('../util/page');
 
 var fs = require('fs');
 
-module.exports = function() {
-    var content = templates.projects({
+module.exports = function(req, res) {
+    var content = templates.content.projects({
       palette: {
         background: palette.foreground
       },

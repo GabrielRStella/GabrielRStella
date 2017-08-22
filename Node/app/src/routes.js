@@ -1,8 +1,8 @@
 var bodyParser = require('body-parser');
 
-var route_index = require('./index');
-var route_games = require('./games');
-var route_projects = require('./projects');
+var route_index = require('./routes/index');
+var route_games = require('./routes/games');
+var route_projects = require('./routes/projects');
 
 module.exports = function(app, express) {
 

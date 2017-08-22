@@ -3,7 +3,7 @@
 var express = require('express');
 var handlebars = require('handlebars');
 
-var routes = require('./routes/routes');
+var routes = require('./routes');
 
 //parse command-line args
 

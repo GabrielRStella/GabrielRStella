@@ -1,7 +1,7 @@
-var headers = require('../headers.js');
+var headers = require('./headers.js');
 
-var templates = require('../hbtemplates.js');
-var palette = require('../palette.js');
+var templates = require('./hbtemplates.js');
+var palette = require('./palette.js');
 
 module.exports = function(content, callback) {
 
@@ -19,20 +19,15 @@ module.exports = function(content, callback) {
           jquery: true
         }),
         body: templates.list({ content: [
-          templates.header({
-            palette: {
-              color: palette.primary
-            },
+          templates.page({
             background: bg,
-            title: "Gabriel R Stella"
-          }),
-          templates.navbar({
+            title: "Gabriel R Stella",
+            nav: "Navigation",
             palette: {
               color: palette.primary,
               text: palette.foreground,
               hover: palette.light.primary
             },
-            title: "Navigation",
             links: [
               {
                 to: "/",
