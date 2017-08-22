@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Tetris Matcher, based on Mozilla's Gamedev Canvas Workshop</title>
+    <style>* { padding: 0; margin: 0; } canvas { background: #fff; display: block; margin: 0 auto; }</style>
+</head>
+<body>
+
+<div style="height: 5px"></div>
+
+<canvas id="gameCanvas"></canvas>
+
+<script src="game_tetris.js">
+</script>
+<div style="align-content: center; text-align: center; margin: 0 auto">
+  <div style="display: inline-block">
+    <div style="height: 10px"></div>
+    <input id="game_mode_btn" type="button" value="Click Me!" onclick="clickCallback();" />
+    <p>
+      Match 4 blocks of the same color to create a solid piece.<br/>
+      Line up row of solid pieces to erase the row.<br/>
+      Match more than 4 blocks of the same color to instantly remove them.<br/>
+      Match a bunch for a surprise!
+    </p>
+  </div>
+</div>
+
+</body>
+</html>
