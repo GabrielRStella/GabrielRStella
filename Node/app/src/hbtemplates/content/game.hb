@@ -4,5 +4,4 @@
     <br/>
     {{game.caption}}
   </div>
-  <br/><br/>
 </div>

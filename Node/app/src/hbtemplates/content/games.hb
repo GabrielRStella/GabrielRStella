@@ -1,8 +1,8 @@
 <div style="background: {{palette.background}}">
   <div class="center section">
-    This site is a work in progress.
-    <br/>
-    (Games)
+    {{#each games}}
+      <a href="/games/{{this.path}}">{{this.title}}</a>
+      <br/>
+    {{/each}}
   </div>
-  <br/><br/>
 </div>
