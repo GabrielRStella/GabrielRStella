@@ -4,6 +4,7 @@ var palette = require('../util/palette.js');
 var page = require('../util/page');
 
 var fs = require('fs');
+var handlebars = require('handlebars');
 
 module.exports = function(req, res) {
 
@@ -19,6 +20,12 @@ module.exports = function(req, res) {
         });
       } else {
         var gameData = require('.' + path + '/game.json');
+        if(fs.existsSync(path + '/game.hb')) {
+          var template = handlebars.compile(fs.readFileSync(path + '/game.hb', 'utf8'));
+          gameData.template = template({
+            //nothing yet
+          });
+        }
         content = templates.content.game({
           palette: {
             background: palette.foreground
