@@ -348,7 +348,8 @@ function getEnemyImg(type) {
 }
 
 function getEnemy(bb, type, lives, hitPoints, deathPoints) {
-  var enemy = {type: type || 1, lives: lives || 1, bb: bb, dead: false, hitPoints: hitPoints || 1, deathPoints: deathPoints || 0};
+  lives = lives || 1;
+  var enemy = {type: type || 1, lives: lives, max_lives: lives, bb: bb, dead: false, hitPoints: hitPoints || 1, deathPoints: deathPoints || 0};
   enemy.onHit = enemyHitBasic.bind(enemy);
   return enemy;
 }
@@ -768,6 +769,15 @@ function drawEnemies() {
 function drawEnemy(enemy) {
   var bb = enemy.bb;
   ctx.drawImage(document.getElementById(getEnemyImg(enemy.type)), bb.x, bb.y, bb.dx, bb.dy);
+
+  var alpha = ctx.globalAlpha;
+  ctx.globalAlpha = 1.0 - (enemy.lives / enemy.max_lives);
+  ctx.fillStyle = "#000000";
+  ctx.beginPath();
+  ctx.rect(bb.x, bb.y, bb.dx, bb.dy);
+  ctx.fill();
+  ctx.closePath();
+  ctx.globalAlpha = alpha;
 }
 
 //
@@ -831,10 +841,10 @@ function draw() {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.translate(padding, padding);
 
+  drawEnemies();
   drawBounces();
   drawPaddle();
   drawBalls();
-  drawEnemies();
 
   if(!GAME_OVER) drawHud();
 

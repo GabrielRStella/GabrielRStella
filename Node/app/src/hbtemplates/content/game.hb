@@ -2,7 +2,9 @@
   <div class="center section">
     <a href="#game_top">{{game.title}}</a>
     <br/>
+    <br/>
     <div id="game_top"></div>
+    <div style="height: 5px"></div>
     <canvas id="gameCanvas" style="background: {{#if game.background}}{{game.background}}{{else}}#fff{{/if}}; display: block; margin: 0 auto;"></canvas>
     <script>
       var pre_canvas = document.getElementById("gameCanvas");
