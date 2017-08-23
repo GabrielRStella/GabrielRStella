@@ -1,11 +1,13 @@
 <div style="background: {{palette.background}}">
   <div class="center section">
-    <a href="#game_top">{{game.title}}</a>
+    <a href="#game_top" style="color: black"><h2>{{game.title}}</h2></a>
     <br/>
     <br/>
     <div id="game_top"></div>
     <div style="height: 5px"></div>
-    <canvas id="gameCanvas" style="background: {{#if game.background}}{{game.background}}{{else}}#fff{{/if}}; display: block; margin: 0 auto;"></canvas>
+    <div style="border: {{#if game.background}}0{{else}}1{{/if}}px solid black; padding: 0px; display: inline-block">
+      <canvas id="gameCanvas" style="background: {{#if game.background}}{{game.background}}{{else}}#fff{{/if}}; display: block; margin: 0 auto;"></canvas>
+    </div>
     <script>
       var pre_canvas = document.getElementById("gameCanvas");
       pre_canvas.height = window.innerHeight - 10;

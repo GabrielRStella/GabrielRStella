@@ -1,1 +1,0 @@
-<input id="game_mode_btn" type="button" value="Click Me!" onclick="clickCallback();" />
