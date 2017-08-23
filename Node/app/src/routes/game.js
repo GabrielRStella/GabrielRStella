@@ -20,6 +20,7 @@ module.exports = function(req, res) {
         });
       } else {
         var gameData = require('.' + path + '/game.json');
+        gameData.template_after = !gameData.template_before;
         if(fs.existsSync(path + '/game.hb')) {
           var template = handlebars.compile(fs.readFileSync(path + '/game.hb', 'utf8'));
           gameData.template = template({

@@ -3,5 +3,7 @@
   "title": "Spaced Out",
   "description": "A combination of Space Invaders and Breakout. 100% better than both, guaranteed.",
   "caption": "The physics engine was hastily made in javascript. Anyways, have fun trying to get a high score!",
-  "img": "TODO"
+  "img": "TODO",
+  "background": "#000000",
+  "template_before": "true"
 }

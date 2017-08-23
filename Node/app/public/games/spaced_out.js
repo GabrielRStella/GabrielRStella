@@ -98,8 +98,11 @@ function resetCanvas() {
   var oldWidth = width;
   var oldHeight = height;
 
+/*
   canvas.width = window.innerWidth - 10;
   canvas.height = window.innerHeight - 10;
+*/
+
   width = canvas.width - padding * 2;
   height = canvas.height - padding * 2;
 
@@ -588,6 +591,7 @@ document.addEventListener("keypress", function(e) {
   if(e.keyCode == KEY_PAUSE && !GAME_OVER) {
     GAME_PAUSED = !GAME_PAUSED;
   } else if(e.keyCode == KEY_LAUNCH && !GAME_PAUSED) {
+    e.preventDefault();
     launchBalls();
   } else if(e.keyCode == KEY_RESET) {
     resetGame();
@@ -768,20 +772,24 @@ function drawEnemy(enemy) {
 
 //
 
+/*
 var prevWindowWidth = window.innerWidth;
 var prevWindowHeight = window.innerHeight;
+*/
 
 function draw() {
 
   var ms = new Date().getTime();
   var part = (ms - prevTickMs) / MS_PER_TICK;
 
+/*
   //resize
   if(prevWindowWidth != window.innerWidth || prevWindowHeight != window.innerHeight) {
     prevWindowWidth = window.innerWidth;
     prevWindowHeight = window.innerHeight;
     resetCanvas();
   }
+*/
 
   if(!GAME_PAUSED) {
     updateTick(part);

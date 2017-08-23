@@ -1,6 +1,6 @@
 var canvas = document.getElementById("gameCanvas");
-canvas.width = window.innerWidth - 10;
-canvas.height = window.innerHeight - 100;
+//canvas.width = window.innerWidth - 10;
+//canvas.height = window.innerHeight - 100;
 
 //padding is annoying and not worth
 var width = canvas.width;

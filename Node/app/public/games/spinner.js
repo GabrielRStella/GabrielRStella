@@ -14,10 +14,12 @@ var padding = 10;
 
 //window stuff
 
+/*
 var windowWidth = 0;
 var windowHeight = 0;
 canvas.width = -1;
 canvas.height = -1;
+*/
 var width = 0;
 var height = 0;
 
@@ -61,10 +63,12 @@ var markerAngleNext = 0;
 //TODO: for resizing and score and restarting and such
 
 function resetCanvas() {
+/*
   windowWidth = window.innerWidth;
   windowHeight = window.innerHeight;
   canvas.width = windowWidth - 10;
   canvas.height = windowHeight - 40;
+*/
   width = canvas.width - padding * 2;
   height = canvas.height - padding * 2;
   MAX_RADIUS = Math.min(width, height) / 3;
@@ -182,17 +186,21 @@ function createCircle(color) {
 
 function updateTick() {
   //resize game
+/*
   if(window.innerWidth != windowWidth || window.innerHeight != windowHeight) {
     windowWidth = window.innerWidth;
     windowHeight = window.innerHeight;
     resetCanvas();
   }
+*/
 
   var amt = 4;
   markerAnglePrev = (currentAngle + markerAnglePrev * (amt - 1)) / amt;
   markerAngleNext = (nextAngle + markerAngleNext * (amt - 1)) / amt;
   amt = 10;
   circleSizeMod = (1 + circleSizeMod * (amt - 1)) / amt;
+
+/*
 
   var r = 1 + Math.floor(Math.random() * (ringCount - 1));
   var color = rings[r];
@@ -219,6 +227,7 @@ function updateTick() {
     //replace
     rings[r] = Math.random();
   }
+*/
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -361,7 +370,7 @@ function draw() {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.translate(padding, padding);
 
-  drawRings(centerX, centerY);
+  //drawRings(centerX, centerY);
 
   var radius = 1;
   drawCircle(x, y, radius, COLOR_ON, COLOR_OUTLINE);
