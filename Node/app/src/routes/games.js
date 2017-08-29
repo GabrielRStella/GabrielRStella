@@ -19,9 +19,7 @@ module.exports = function(req, res) {
       }
 
       var content = templates.content.games({
-        palette: {
-          background: palette.foreground
-        },
+        palette: palette,
         games: games
       });
 

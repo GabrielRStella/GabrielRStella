@@ -5,5 +5,6 @@
   "caption": "The physics engine was hastily made in javascript. Anyways, have fun trying to get a high score!",
   "img": "TODO",
   "background": "#000000",
+  "foreground": "#ffffff",
   "template_before": "true"
 }
