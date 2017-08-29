@@ -15,6 +15,7 @@ module.exports = function(content, callback) {
       callback(templates.html({
         title: "Gabriel R Stella",
         head: templates.external({
+          icons: true,
           materialize: true,
           jquery: true
         }),

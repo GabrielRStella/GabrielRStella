@@ -10,6 +10,16 @@ module.exports = function(req, res) {
     palette: {
       background: palette.foreground
     },
+    sections: [
+      {
+        background: "",
+        content: templates.content.main['1']({palette: palette})
+      },
+      {
+        background: palette.background,
+        content: templates.content.main['end']({palette: palette})
+      },
+    ]
   });
 
   page(content, res.send.bind(res));

@@ -1,8 +1,7 @@
 <div style="background: {{palette.background}}">
-  <div class="center section">
-    This site is a work in progress.
-    <br/>
-    <a href="#">Don't click me</a>
-  </div>
-  <br/><br/>
+  {{#each sections}}
+    <div class="center section"style="background: {{this.background}}">
+      {{{this.content}}}
+    </div>
+  {{/each}}
 </div>

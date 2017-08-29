@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+  <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="128" height="128" viewBox="-64 -64 128 128">
+    SVG here
+    <polygon id="resume-path" style="stroke-width:2"
+      points="-16,-37 16,-37 16,5 32,5 0,43 -32,5 -16,5" />
+  </svg>
