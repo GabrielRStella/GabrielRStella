@@ -49,7 +49,9 @@ module.exports = function(content, callback) {
               }
             ]
           }),
-          content
+          content,
+          templates.footer({
+          })
         ]}),
         style: {
           body: "background: " + palette.background

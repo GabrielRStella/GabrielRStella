@@ -14,11 +14,7 @@ module.exports = function(req, res) {
       {
         background: "",
         content: templates.content.main['1']({palette: palette})
-      },
-      {
-        background: palette.background,
-        content: templates.content.main['end']({palette: palette})
-      },
+      }
     ]
   });
 
