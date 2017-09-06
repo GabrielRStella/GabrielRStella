@@ -11,15 +11,29 @@
     <style>
       .navbar-link {
         color: {{palette.text}};
-        {{#if palette.button}}background-color: {{palette.button}};{{/if}}
+        {{#if palette.button}}background-color: {{palette.button}};{{else}}background-color: {{palette.color}};{{/if}}
         transition: background-color 0.25s ease;
         display: inline-block;
         padding: 10px
       }
       .navbar-link:hover {background-color: {{palette.hover}};}
+      .navbar-dropdown {
+        position: absolute;
+        display: none;
+      }
+      .navbar-link:hover .navbar-dropdown {
+        display: block;
+      }
     </style>
     {{#each links}}
-      <a href="{{this.to}}"><div class="navbar-link">{{this.title}}</div></a>
+      <div class="navbar-link">
+        <a href="{{this.to}}">{{this.title}}</a>
+        <div class="navbar-dropdown">
+          <div class="navbar-link" style="display: block">1</div>
+          <div class="navbar-link" style="display: block">2</div>
+          <div class="navbar-link" style="display: block">sea</div>
+        </div>
+      </div>
     {{/each}}
   </div>
 </div>
