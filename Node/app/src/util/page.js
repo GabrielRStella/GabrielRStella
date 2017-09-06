@@ -37,7 +37,6 @@ module.exports = function(content, callback) {
               {
                 to: "/games",
                 title: "Games"
-                //todo: sub links (dropdown)
               },
               {
                 to: "/projects",
@@ -45,7 +44,17 @@ module.exports = function(content, callback) {
               },
               {
                 to: "#",
-                title: "Links"
+                title: "Links",
+                sub: [
+                  {
+                    title: "Github",
+                    to: "https://github.com/GabrielRStella/"
+                  },
+                  {
+                    title: "LinkedIn",
+                    to: "#"
+                  }
+                ]
               }
             ]
           }),
