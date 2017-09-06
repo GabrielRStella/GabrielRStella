@@ -16,6 +16,9 @@
         display: inline-block;
         padding: 10px
       }
+      .navbar-link a {
+        color: {{palette.text}};
+      }
       .navbar-link:hover {background-color: {{palette.hover}};}
       .navbar-dropdown {
         position: absolute;
