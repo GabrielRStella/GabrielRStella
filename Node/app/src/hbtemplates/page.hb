@@ -28,11 +28,13 @@
     {{#each links}}
       <div class="navbar-link">
         <a href="{{this.to}}">{{this.title}}</a>
-        <div class="navbar-dropdown">
-          <div class="navbar-link" style="display: block">1</div>
-          <div class="navbar-link" style="display: block">2</div>
-          <div class="navbar-link" style="display: block">sea</div>
-        </div>
+        {{#if this.sub}}
+          <div class="navbar-dropdown">
+            {{#each this.sub}}
+              <div class="navbar-link" style="display: block">{{this.title}}</div>
+            {{/each}}
+          </div>
+        {{/if}}
       </div>
     {{/each}}
   </div>
