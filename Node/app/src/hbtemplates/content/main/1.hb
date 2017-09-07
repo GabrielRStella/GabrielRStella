@@ -29,3 +29,6 @@ You can click on the circle below to view a PDF copy of my current resume.
 <br/>
 <div class="divider"></div>
 <br/>
+<div class="container">
+  I'm building this site completely from scratch, so please bear with me while everything is in progress :)
+</div>
