@@ -3,7 +3,7 @@ var headers = require('./headers.js');
 var templates = require('./hbtemplates.js');
 var palette = require('./palette.js');
 
-module.exports = function(content, callback) {
+module.exports = function(content, callback, args) {
 
     headers(function(path){
 
@@ -12,13 +12,21 @@ module.exports = function(content, callback) {
         bg = path;
       }
 
+      var argsExternal = {
+        icons: true,
+        materialize: true,
+        jquery: true
+      };
+      if(args) {
+        //argsExternal = {};
+        for(var i = 0; i < args.length; i++) {
+          argsExternal[args[i]] = true;
+        }
+      }
+
       callback(templates.html({
         title: "Gabriel R Stella",
-        head: templates.external({
-          icons: true,
-          materialize: true,
-          jquery: true
-        }),
+        head: templates.external(argsExternal),
         body: templates.list({ content: [
           templates.page({
             background: bg,
