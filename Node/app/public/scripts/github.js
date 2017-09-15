@@ -13,12 +13,30 @@ class Commit extends React.Component {
     var author = commit.author.name;
     var date = new Date(commit.author.date);
     var dateString = days[date.getDay()] + ", " + date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear();
+
+    var hoursString = date.getHours();
+    var hourPartString = "AM";
+    if(hoursString > 12) {
+      hoursString -= 12;
+      hourPartString = "PM";
+    }
+    if(hoursString == 0) {
+      hoursString = 12;
+    }
+    var timeString = hoursString + ":" + date.getMinutes().toString().padStart(2, '0') + ":" + date.getSeconds().toString().padStart(2, '0') + " " + hourPartString;
+
     var msg = commit.message.replace("\n\n", " || ");
+    var lenLimit = 50;
+    if(msg.length > lenLimit) {
+      msg = msg.substring(0, lenLimit - 3) + "...";
+    }
 
     return React.createElement('tr', {},
       React.createElement('td', {}, author),
-      React.createElement('td', {}, msg),
-      React.createElement('td', {}, dateString));
+      React.createElement('td', {}, React.createElement('a', {href: url}, msg)),
+      React.createElement('td', {style: {textAlign: "right"}}, dateString),
+      React.createElement('td', {style: {textAlign: "right"}}, timeString)
+    );
   }
 }
 
@@ -29,18 +47,24 @@ class Commits extends React.Component {
 table {
   border: solid 1px black;
 }
+td, th {
+  padding-left: 10px;
+  padding-right: 10px;
+}
 tr:nth-child(even) {
   background-color: #dddddd;
 }
       `),
       React.createElement('table', {},
-        React.createElement('col', {width: "10%"}),
-        React.createElement('col', {width: "50%"}),
-        React.createElement('col', {width: "30%"}),
+        React.createElement('col', {width: "15%"}),
+        React.createElement('col', {width: "45%"}),
+        React.createElement('col', {width: "25%"}),
+        React.createElement('col', {width: "15%"}),
         React.createElement('tr', {},
           React.createElement('th', {}, "Author"),
           React.createElement('th', {}, "Message"),
-          React.createElement('th', {}, "Date")
+          React.createElement('th', {style: {textAlign: "right"}}, "Date"),
+          React.createElement('th', {style: {textAlign: "right"}}, "Time")
         ),
         this.props.commits.map((commit) => {return React.createElement(Commit, {commit: commit});})
       )
