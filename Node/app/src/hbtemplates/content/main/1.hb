@@ -7,10 +7,10 @@
 You can click on the circle below to view a PDF copy of my current resume.
 <br/>
 <br/>
-<div id="resume-path" style="border: solid {{palette.primary}} 2px; display: inline-block; border-radius: 50%; cursor: pointer"
+<div id="resume-path" style="width: 128px; height: 128px; border: solid {{palette.primary}} 2px; display: inline-block; border-radius: 50%; cursor: pointer"
   onclick="window.open('/static/Resume.pdf', '_blank')"
   title="Click here to view my resume.">
-  <svg width="128" height="128" viewBox="-64 -64 128 128">
+  <svg width="124" height="124" viewBox="-64 -64 128 128">
     Download
     <style>
       #resume-path {
@@ -30,5 +30,5 @@ You can click on the circle below to view a PDF copy of my current resume.
 <div class="divider"></div>
 <br/>
 <div class="container">
-  I'm building this site completely from scratch, so please bear with me while everything is in progress :)
+  I'm building this site completely from scratch, so please bear with me while everything is under construction :)
 </div>
