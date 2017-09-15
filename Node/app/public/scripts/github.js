@@ -13,8 +13,7 @@ class Commit extends React.Component {
     var author = commit.author.name;
     var date = new Date(commit.author.date);
     var dateString = days[date.getDay()] + ", " + date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear();
-    var msg = commit.message;
-
+    var msg = commit.message.replace("\n\n", " || ");
 
     return React.createElement('tr', {},
       React.createElement('td', {}, author),
@@ -35,6 +34,9 @@ tr:nth-child(even) {
 }
       `),
       React.createElement('table', {},
+        React.createElement('col', {width: "10%"}),
+        React.createElement('col', {width: "50%"}),
+        React.createElement('col', {width: "30%"}),
         React.createElement('tr', {},
           React.createElement('th', {}, "Author"),
           React.createElement('th', {}, "Message"),
@@ -136,11 +138,13 @@ class Page extends React.Component {
     };
 
     this.load = this.load.bind(this);
+
+    //this.load("GabrielRStella", "GabrielRStella");
   }
 
   load(user, repo) {
     if(!user || !repo) {
-      thisFake.setState({commits: null, error: null});
+      this.setState({commits: null, error: null});
       return;
     }
 
@@ -172,10 +176,12 @@ class Page extends React.Component {
       body = React.createElement(Placeholder, {message: "Hi! Please enter a github user and repository name, then press the button to load commits."});
     }
 
-    return React.createElement('div', {className: "container"}, 
+    return React.createElement('div', {className: "container"},
+      React.createElement('h4', {}, "GitHub Commit Tracker"),
       React.createElement(Options, {onSearch: this.load}),
       React.createElement('div', {style: {alignContent: "center", textAlign: "center"}},
-        body
+        body,
+        React.createElement('p', {style: {fontSize: "10px"}}, "This page uses jQuery to make connections directly to the GitHub api.")
       )
     );
   }
