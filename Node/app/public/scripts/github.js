@@ -1,14 +1,36 @@
 class Commit extends React.Component {
   render() {
-    return React.createElement('p', {}, "commit: " + this.props.commit,
-      React.createElement('br', {}));
+    var commit = this.props.commit;
+    var url = commit.html_url;
+    commit = commit.commit;
+    var author = commit.author.name;
+    var date = commit.author.date;
+    var msg = commit.message;
+
+    return React.createElement('tr', {},
+      React.createElement('td', {}, author),
+      React.createElement('td', {}, msg),
+      React.createElement('td', {}, date));
   }
 }
 
 class Commits extends React.Component {
   render() {
-    return React.createElement('p', {}, "commits: " + this.props.commits.length,
-      this.props.commits.map((commit) => {return React.createElement(Commit, {commit: commit});}));
+    return React.createElement('div', {},
+      React.createElement('style', {}, `
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+      `),
+      React.createElement('table', {},
+        React.createElement('tr', {},
+          React.createElement('th', {}, "Author"),
+          React.createElement('th', {}, "Message"),
+          React.createElement('th', {}, "Date")
+        ),
+        this.props.commits.map((commit) => {return React.createElement(Commit, {commit: commit});})
+      )
+    );
   }
 }
 
