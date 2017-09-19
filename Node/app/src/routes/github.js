@@ -7,7 +7,8 @@ var fs = require('fs');
 var handlebars = require('handlebars');
 
 module.exports = function(req, res) {
-  page(templates.content.github({
+  page(templates.react({
     palette: palette,
+    script: "github"
   }), res.send.bind(res), ["react"]);
 }
