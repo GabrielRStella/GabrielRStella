@@ -1,4 +1,4 @@
-<div style="background: {{palette.foreground}}">
+<div style="background: {{palette.background}}">
   <br/>
   <div id="{{#if id}}{{id}}{{else}}react-app{{/if}}"></div>
   <script src="static/scripts/{{script}}.js"></script>

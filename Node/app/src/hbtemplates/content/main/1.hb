@@ -14,7 +14,7 @@ You can click on the circle below to view a PDF copy of my current resume.
     Download
     <style>
       #resume-path {
-        fill: {{palette.foreground}};
+        fill: {{palette.background}};
         stroke: {{palette.primary}};
       }
       #resume-path:hover {

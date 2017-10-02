@@ -3,9 +3,6 @@ var palette = require('../util/palette.js');
 
 var page = require('../util/page');
 
-var fs = require('fs');
-var handlebars = require('handlebars');
-
 var loadGames = require('../util/loadgames');
 
 module.exports = function(req, res) {

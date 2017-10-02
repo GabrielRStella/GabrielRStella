@@ -1,4 +1,4 @@
-<div style="background: {{palette.foreground}}">
+<div style="background: {{palette.background}}">
   <div class="center section">
     <a href="#game_top" style="color: black"><h2>{{game.title}}</h2></a>
     <br/>
