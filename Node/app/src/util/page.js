@@ -35,7 +35,7 @@ module.exports = function(content, callback, args) {
             palette: {
               color: palette.primary,
               text: palette.foreground,
-              hover: palette.light.primary
+              hover: "#404040"
             },
             links: [
               {
@@ -74,7 +74,7 @@ module.exports = function(content, callback, args) {
           })
         ]}),
         style: {
-          body: "background: " + palette.background
+          body: "background: " + palette.negative
         }
       }));
     });

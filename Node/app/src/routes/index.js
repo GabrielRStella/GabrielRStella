@@ -7,9 +7,7 @@ var fs = require('fs');
 
 module.exports = function(req, res) {
   var content = templates.content.index({
-    palette: {
-      background: palette.foreground
-    },
+    palette: palette,
     sections: [
       {
         background: "",
