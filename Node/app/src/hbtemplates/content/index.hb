@@ -1,4 +1,5 @@
 <div style="background: {{palette.background}}">
+<div class="center section">
 
 <div class="container">
   Hi! I'm a second-year junior at Texas A&M University. I'm getting a bachelor's degree in computer science with a minor in mathematics. I like to experiment with AI and other random programming things. Please check out my games and other projects!

@@ -10,7 +10,7 @@
   <div style="float: right; display: inline-block; align-content: right; text-align: right">
     <style>
       .navbar-link {
-        color: {{palette.text}};
+        color: {{palette.color}};
         {{#if palette.button}}background-color: {{palette.button}};{{else}}background-color: {{palette.color}};{{/if}}
         transition: background-color 0.25s ease;
         display: inline-block;
