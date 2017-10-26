@@ -13,28 +13,32 @@
         color: {{palette.color}};
         {{#if palette.button}}background-color: {{palette.button}};{{else}}background-color: {{palette.color}};{{/if}}
         transition: background-color 0.25s ease;
-        display: inline-block;
-        padding: 10px
+        display: block;
+        padding: 10px;
       }
       .navbar-link a {
         color: {{palette.text}};
       }
       .navbar-link:hover {background-color: {{palette.hover}};}
       .navbar-dropdown {
-        position: absolute;
         display: none;
       }
-      .navbar-link:hover .navbar-dropdown {
+      .nabvar-holder {
+        display: inline-block;
+      }
+      .navbar-holder:hover .navbar-dropdown {
         display: block;
       }
     </style>
     {{#each links}}
-      <div class="navbar-link">
-        <a href="{{this.to}}">{{this.title}}</a>
+      <div class="navbar-holder">
+        <div class="navbar-link">
+          <a href="{{this.to}}">{{this.title}}</a>
+        </div>
         {{#if this.sub}}
           <div class="navbar-dropdown">
             {{#each this.sub}}
-              <div class="navbar-link" style="display: block">{{this.title}}</div>
+              <div class="navbar-link" style="display: block"><a href="{{this.to}}">{{this.title}}</a></div>
             {{/each}}
           </div>
         {{/if}}

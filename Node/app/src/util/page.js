@@ -53,8 +53,6 @@ module.exports = function(content, callback, args) {
               {
                 to: "#",
                 title: "Links",
-/*
-//temporarily out of order
                 sub: [
                   {
                     title: "Github",
@@ -65,7 +63,6 @@ module.exports = function(content, callback, args) {
                     to: "#"
                   }
                 ]
-*/
               }
             ]
           }),
