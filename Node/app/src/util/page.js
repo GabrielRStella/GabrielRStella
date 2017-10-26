@@ -1,11 +1,11 @@
 var headers = require('./headers.js');
 
-var templates = require('./hbtemplates.js');
+var hbt = require('./hbtemplates.js');
 var palette = require('./palette.js');
 
 module.exports = function(content, callback, args) {
 
-    headers(function(path){
+    headers(function(path) {
 
       var bg = palette.primary;
       if(path) {
@@ -24,17 +24,17 @@ module.exports = function(content, callback, args) {
         }
       }
 
-      callback(templates.html({
+      callback(hbt.html({
         title: "Gabriel R Stella",
-        head: templates.external(argsExternal),
-        body: templates.list({ content: [
-          templates.page({
+        head: hbt.external(argsExternal),
+        body: hbt.list({ content: [
+          hbt.page({
             background: bg,
             title: "Gabriel R Stella",
             nav: "Navigation",
             palette: {
               color: palette.primary,
-              text: palette.foreground,
+              text: palette.background,
               hover: "#404040"
             },
             links: [
@@ -70,7 +70,7 @@ module.exports = function(content, callback, args) {
             ]
           }),
           content,
-          templates.footer({
+          hbt.footer({
           })
         ]}),
         style: {

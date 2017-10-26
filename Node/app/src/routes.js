@@ -5,6 +5,7 @@ var route_games = require('./routes/games');
 var route_game = require('./routes/game');
 var route_projects = require('./routes/projects');
 var route_github = require('./routes/github');
+var route_test = require('./routes/test');
 
 module.exports = function(app, express) {
 
@@ -24,5 +25,7 @@ module.exports = function(app, express) {
   app.get('/projects', route_projects);
 
   app.get('/github', route_github);
+
+  app.get('/test', route_test);
 
 };
