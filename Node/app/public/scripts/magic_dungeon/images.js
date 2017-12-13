@@ -1,6 +1,9 @@
 //helper to load images
 //http://www.williammalone.com/articles/create-html5-canvas-javascript-game-character/1/
 
+//TODO: dynamic images
+//https://stackoverflow.com/a/20285053
+
 var IMAGE_CACHE = {};
 
 function getImage(name) {
