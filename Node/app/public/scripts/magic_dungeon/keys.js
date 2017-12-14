@@ -4,6 +4,7 @@ var KEY_LEFT = 37;
 var KEY_RIGHT = 39;
 var KEY_SPACE = 32;
 var KEY_P = 80;
+var KEY_P_PRESS = 112;
 var KEY_R = 82;
 var KEY_C = 67;
 
@@ -22,56 +23,92 @@ class KeyDual {
   }
 }
 
-KEYS_DOWN = [];
-KEYS_UP = [];
-KEYS_PRESS = [];
+class Keys {
+  constructor() {
+    this.KEYS_DOWN = [];
+    this.KEYS_UP = [];
+    this.KEYS_PRESS = [];
+    this.KEYS_DUAL = [];
 
-KEYS_DUAL = [];
+    this.eventKeydownB = this.eventKeydown.bind(this);
+    this.eventKeyupB = this.eventKeyup.bind(this);
+    this.eventKeypressB = this.eventKeypress.bind(this);
+  }
 
-function addKeyListenerDown(key) {
-  KEYS_DOWN.push(key);
+  addKeyListenerDown(key) {
+    return this.KEYS_DOWN.push(key) - 1;
+  }
+
+  addKeyListenerUp(key) {
+    return this.KEYS_UP.push(key) - 1;
+  }
+
+  addKeyListenerPress(key) {
+    return this.KEYS_PRESS.push(key) - 1;
+  }
+
+  addKeyListenerDual(key) {
+    return this.KEYS_DUAL.push(key) - 1;
+  }
+
+  removeKeyListenerDown(key) {
+    this.KEYS_DOWN.splice(key, 1);
+  }
+
+  removeKeyListenerUp(key) {
+    this.KEYS_UP.splice(key, 1);
+  }
+
+  removeKeyListenerPress(key) {
+    this.KEYS_PRESS.splice(key, 1);
+  }
+
+  removeKeyListenerDual(key) {
+    this.KEYS_DUAL.splice(key, 1);
+  }
+
+  register() {
+    document.addEventListener("keydown", this.eventKeydownB, false);
+    document.addEventListener("keyup", this.eventKeyupB, false);
+    document.addEventListener("keypress", this.eventKeypressB, false);
+  }
+
+  unregister() {
+    document.removeEventListener("keydown", this.eventKeydownB);
+    document.removeEventListener("keyup", this.eventKeyupB);
+    document.removeEventListener("keypress", this.eventKeypressB);
+  }
+
+  eventKeydown(e) {
+    var keyCode = e.keyCode;
+    for(var i = 0; i < this.KEYS_DOWN.length; i++) {
+      var key = this.KEYS_DOWN[i];
+      if(key.keyCode == keyCode) key.callBack(e);
+    }
+    for(var i = 0; i < this.KEYS_DUAL.length; i++) {
+      var key = this.KEYS_DUAL[i];
+      if(key.keyCode == keyCode) key.callBackDown(e);
+    }
+  }
+
+  eventKeyup(e) {
+    var keyCode = e.keyCode;
+    for(var i = 0; i < this.KEYS_UP.length; i++) {
+      var key = this.KEYS_UP[i];
+      if(key.keyCode == keyCode) key.callBack(e);
+    }
+    for(var i = 0; i < this.KEYS_DUAL.length; i++) {
+      var key = this.KEYS_DUAL[i];
+      if(key.keyCode == keyCode) key.callBackUp(e);
+    }
+  }
+
+  eventKeypress(e) {
+    var keyCode = e.keyCode;
+    for(var i = 0; i < this.KEYS_PRESS.length; i++) {
+      var key = this.KEYS_PRESS[i];
+      if(key.keyCode == keyCode) key.callBack(e);
+    }
+  }
+
 }
-
-function addKeyListenerUp(key) {
-  KEYS_UP.push(key);
-}
-
-function addKeyListenerPress(key) {
-  KEYS_PRESS.push(key);
-}
-
-function addKeyListenerDual(key) {
-  KEYS_DUAL.push(key);
-}
-
-document.addEventListener("keydown", function(e) {
-  var keyCode = e.keyCode;
-  for(var i = 0; i < KEYS_DOWN.length; i++) {
-    var key = KEYS_DOWN[i];
-    if(key.keyCode == keyCode) key.callBack(e);
-  }
-  for(var i = 0; i < KEYS_DUAL.length; i++) {
-    var key = KEYS_DUAL[i];
-    if(key.keyCode == keyCode) key.callBackDown(e);
-  }
-}, false);
-
-document.addEventListener("keyup", function(e) {
-  var keyCode = e.keyCode;
-  for(var i = 0; i < KEYS_UP.length; i++) {
-    var key = KEYS_UP[i];
-    if(key.keyCode == keyCode) key.callBack(e);
-  }
-  for(var i = 0; i < KEYS_DUAL.length; i++) {
-    var key = KEYS_DUAL[i];
-    if(key.keyCode == keyCode) key.callBackUp(e);
-  }
-}, false);
-
-document.addEventListener("keypress", function(e) {
-  var keyCode = e.keyCode;
-  for(var i = 0; i < KEYS_PRESS.length; i++) {
-    var key = KEYS_PRESS[i];
-    if(key.keyCode == keyCode) key.callBack(e);
-  }
-}, false);
