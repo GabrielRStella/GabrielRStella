@@ -1,3 +1,13 @@
+//various generic utility stuff
+
+function loop(x, max) {
+  if(x < 0) {
+    x %= max;
+    x += max;
+  }
+  return x % max;
+}
+
 class Point {
   constructor(x, y) {
     this.x = x || 0;
@@ -98,3 +108,28 @@ class Rectangle {
   merge(r) {
   }
 }
+
+class Direction {
+  constructor(id, p) {
+    this.id = id;
+    this.delta = p;
+  }
+
+  get next() {
+    return DIRS[(this.id + 1) % 4];
+  }
+
+  get prev() {
+    return DIRS[loop(this.id - 1, 4)];
+  }
+
+  get opposite() {
+    return DIRS[(this.id + 2) % 4];
+  }
+}
+
+var DIR_UP = new Direction(0, new Point(0, 1));
+var DIR_RIGHT = new Direction(1, new Point(1, 0));
+var DIR_DOWN = new Direction(2, new Point(0, -1));
+var DIR_LEFT = new Direction(3, new Point(-1, 0));
+var DIRS = [DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT];

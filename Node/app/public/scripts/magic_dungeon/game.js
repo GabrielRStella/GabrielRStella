@@ -2,11 +2,8 @@
 TODO:
 
 splash screen?
-various utilities
 
 classes:
-Direction
-Element
 Monster
 Player
 Render
