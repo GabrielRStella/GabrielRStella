@@ -84,6 +84,28 @@ class Rectangle {
     return this.point.y + this.height;
   }
 
+  set center(p) {
+    this.point = p.copy();
+    this.point.x -= this.width / 2;
+    this.point.y -= this.height / 2;
+  }
+
+  set minX(x) {
+    this.point.x = x;
+  }
+
+  set minY(y) {
+    this.point.y = y;
+  }
+
+  set maxX(x) {
+    this.point.x = x - this.width;
+  }
+
+  set maxY(y) {
+    this.point.y = y - this.height;
+  }
+
   contains(p) {
     return (p.x >= this.minX) && (p.x <= this.maxX) && (p.y >= this.minY) && (p.y <= this.maxY);
   }
