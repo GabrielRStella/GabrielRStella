@@ -2,6 +2,8 @@ class Game {
   constructor() {
     this.tick = 0;
     this.lastTick = 0;
+
+    this.world = new World(this);
   }
 
   register(keys) {

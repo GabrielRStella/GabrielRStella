@@ -12,9 +12,12 @@ function ROOM_GATE_FUNC(p, w, h) {
 }
 
 class Room {
-  constructor(width, height, style) {
+  constructor(world, width, height, style) {
+    this.world = world;
     this.width = width || 32;
-    this.height = height || 16;
+    this.height = height || 32;
+    this.style = style || THE_STYLE;
+    this.difficulty = -1;
 
     this.states = [];
     for(var i = 0; i < width; i++) {
@@ -33,9 +36,6 @@ class Room {
     }
     this.connections = {};
 
-    this.style = style || THE_STYLE;
-    this.difficulty = -1;
-
     this.monsters = [];
     this.spells = [];
     this.spellParts = [];
@@ -43,6 +43,16 @@ class Room {
 
   isOpen(dir) {
     return this.open[dir];
+  }
+
+  setOpen(dir, open) {
+    this.open[dir] = open;
+  }
+
+  setOpenAll() {
+    for(var i = 0; i < DIRS.length; i++) {
+      this.open[DIRS[i]] = true;
+    }
   }
 
   getConnection(dir) {
@@ -104,6 +114,38 @@ class Room {
     //TODO
   }
 
+  makeBoxes() {
+    this.boxes = [];
+    var width = bounds.width / this.width;
+    var height = bounds.height / this.height;
+    for(var i = 0; i < this.width; i++) {
+      for(var j = 0; j < this.height; j++) {
+        if(!this.states[i][j].walkable) {
+          this.boxes.push(this.toWorldBounds(new Rectangle(i, j, 1, 1)));
+        }
+      }
+    }
+  }
+
+  //draw
+
+  //bounds = the rectangle in which to draw the room
+  draw(canvas, bounds) {
+    var width = bounds.width / this.width;
+    var height = bounds.height / this.height;
+    for(var i = 0; i < this.width; i++) {
+      for(var j = 0; j < this.height; j++) {
+        var x = width * i;
+        var y = height * j;
+        this.drawBlock(canvas, i, j, new Rectangle(new Point(x, y), width, height));
+      }
+    }
+  }
+
+  drawBlock(canvas, x, y, rect) {
+    this.style.draw(canvas, rect, this.states[x][y]);
+  }
+
   //---helpers
 
   fireSpell() {
@@ -114,13 +156,20 @@ class Room {
     this.spellParts = [];
   }
 
-  draw() {
+  toBlockCoords(p) {
+    return new Point(p.x / 16, p.y / 16);
   }
 
-  drawBlock(x, y) {
-    
+  toWorldCoords(p) {
+    return new Point(p.x * 16, p.y * 16);
   }
 
-  
+  toBlockBounds(r) {
+    return new Rectangle(toBlockCoords(r.point), (r.maxX - r.minX) / 16, (r.maxY - r.minY) / 16);
+  }
+
+  toWorldBounds(r) {
+    return new Rectangle(toWorldCoords(r.point), r.width * 16, r.height * 16);
+  }
   
 }

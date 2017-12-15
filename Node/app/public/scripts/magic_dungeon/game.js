@@ -7,7 +7,6 @@ classes:
 Monster
 Player
 Render
-Room
 Rune
 Spell
 SpellPart
