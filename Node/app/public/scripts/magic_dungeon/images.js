@@ -33,4 +33,8 @@ function loadImage(name) {
   while(!loaded) {}
   IMAGE_CACHE[name] = img;
 */
+
+/*
+  TODO: if image could not load, return false
+*/
 }
