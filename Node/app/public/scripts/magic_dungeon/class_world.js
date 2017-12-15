@@ -23,6 +23,9 @@ class World {
   }
 
   draw(canvas, bounds) {
-    this.currentRoom.draw(canvas, bounds);
+    var room = this.currentRoom;
+    var bounds2 = new Rectangle(new Point(0, 0), room.width, room.height);
+    Gui.scale(bounds, bounds2);
+    room.draw(canvas, bounds2);
   }
 }

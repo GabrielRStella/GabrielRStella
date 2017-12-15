@@ -23,9 +23,6 @@ class Room {
     this.style = style;
     this.difficulty = -1;
 
-    this.blockWidth = 16;
-    this.blockHeight = 16;
-
     this.states = [];
     for(var i = 0; i < width; i++) {
       var arr = [];
@@ -128,7 +125,7 @@ class Room {
     for(var i = 0; i < this.width; i++) {
       for(var j = 0; j < this.height; j++) {
         if(!this.states[i][j].walkable) {
-          this.boxes.push(this.toWorldBounds(new Rectangle(new Point(i, j), 1, 1)));
+          this.boxes.push(new Rectangle(new Point(i, j), 1, 1));
         }
       }
     }
@@ -161,22 +158,6 @@ class Room {
   clearSpells() {
     this.spells = [];
     this.spellParts = [];
-  }
-
-  toBlockCoords(p) {
-    return new Point(p.x / this.blockWidth, p.y / this.blockHeight);
-  }
-
-  toWorldCoords(p) {
-    return new Point(p.x * this.blockWidth, p.y * this.blockHeight);
-  }
-
-  toBlockBounds(r) {
-    return new Rectangle(toBlockCoords(r.point), (r.maxX - r.minX) / this.blockWidth, (r.maxY - r.minY) / this.blockHeight);
-  }
-
-  toWorldBounds(r) {
-    return new Rectangle(toWorldCoords(r.point), r.width * this.blockWidth, r.height * this.blockHeight);
   }
   
 }
