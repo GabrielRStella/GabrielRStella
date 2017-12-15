@@ -138,7 +138,7 @@ var KEY_RESTART = new Key(KEY_R, RESTART_GAME);
 KEY_OBJ.addKeyListenerDown(KEY_RESTART);
 
 THE_GAME = new Game();
-THE_GAME.register();
+THE_GAME.register(KEY_OBJ);
 
 RESET_CANVAS();
 RESET_GAME();

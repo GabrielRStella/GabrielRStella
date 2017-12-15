@@ -59,8 +59,14 @@ class Room {
     }
   }
 
-  getConnection(dir) {
+  hasConnection(dir) {
     return this.connections[dir];
+  }
+
+  getConnection(dir) {
+    if(!this.open[dir]) return null;
+    if(this.connections[dir]) return this.connections[dir];
+    return this.world.connect(this, dir);
   }
 
   setConnection(dir, room) {
@@ -118,10 +124,8 @@ class Room {
     //TODO
   }
 
-  makeBoxes(bounds) {
+  makeBoxes() {
     this.boxes = [];
-    var width = bounds.width / this.width;
-    var height = bounds.height / this.height;
     for(var i = 0; i < this.width; i++) {
       for(var j = 0; j < this.height; j++) {
         if(!this.states[i][j].walkable) {

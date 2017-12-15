@@ -10,6 +10,7 @@ class World {
     room.generateWalls();
     room.generateDoors();
     room.generateMonsters(this.difficulty);
+    room.makeBoxes();
 
     this.rooms.push(room);
     this.currentRoom = room;
@@ -52,5 +53,54 @@ class World {
     this.player.draw(canvas);
 
     canvas.restore();
+  }
+
+  connect(room, dir) {
+    var dir2 = dir.opposite;
+    for(var i = 0; i < this.rooms.length; i++) {
+      var r = this.rooms[i];
+      if((r != room) && (r.isOpen(dir2)) && (!r.hasConnection(dir2))) {
+        var chance = 1.0 / Math.abs(room.difficulty - r.difficulty);
+        if(Math.random() < chance) {
+          //rooms with similar difficulty are more likely to be connected
+          room.setConnection(dir, r);
+          r.setConnection(dir2, room);
+          return r;
+        }
+      }
+    }
+    return this.connectNew(room, dir);
+  }
+
+  connectNew(r, dir) {
+    this.difficulty++;
+
+    var room = new Room(this, 16 + Math.floor(Math.random() * 16), 16 + Math.floor(Math.random() * 16));
+    for(var i = 0; i < DIRS.length; i++) {
+      room.open[DIRS[i]] = (Math.random() < 0.4); //40% chance of an open door
+    }
+    room.setOpen(dir.opposite, true);
+    room.generateWalls();
+    room.generateDoors();
+    room.generateObstacles();
+    room.generateMonsters(this.difficulty);
+    room.makeBoxes();
+
+    r.setConnection(dir, room);
+    room.setConnection(dir.opposite, r);
+    this.rooms.push(room);
+
+    return room;
+  }
+
+  go(dir) {
+    var room = this.currentRoom;
+    if(room.isOpen(dir)) {
+      room.clearSpells();
+      room = room.getConnection(dir);
+      this.currentRoom = room;
+
+      //TODO: set player bounds to be on the corresponding wall
+    }
   }
 }
