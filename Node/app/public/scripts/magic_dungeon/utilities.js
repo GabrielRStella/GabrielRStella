@@ -126,6 +126,10 @@ class Direction {
   get opposite() {
     return DIRS[(this.id + 2) % 4];
   }
+
+  toString() {
+    return this.id.toString();
+  }
 }
 
 var DIR_UP = new Direction(0, new Point(0, 1));

@@ -39,7 +39,7 @@ class ArrayImageStyle extends Style {
       canvas.drawImage(dImg, r.minX, r.minY, r.width, r.height);
       return true;
     }
-    return false; 
+    return false;
   }
 }
 
