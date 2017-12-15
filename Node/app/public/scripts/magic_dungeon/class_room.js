@@ -139,8 +139,8 @@ class Room {
     var height = bounds.height / this.height;
     for(var i = 0; i < this.width; i++) {
       for(var j = 0; j < this.height; j++) {
-        var x = width * i;
-        var y = height * j;
+        var x = bounds.minX + width * i;
+        var y = bounds.minY + height * j;
         this.drawBlock(canvas, i, j, new Rectangle(new Point(x, y), width, height));
       }
     }

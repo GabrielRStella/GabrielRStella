@@ -25,7 +25,7 @@ class World {
   draw(canvas, bounds) {
     var room = this.currentRoom;
     var bounds2 = new Rectangle(new Point(0, 0), room.width, room.height);
-    Gui.scale(bounds, bounds2);
+    Gui.align(bounds, bounds2, [Gui.fit, Gui.center], 0);
     room.draw(canvas, bounds2);
   }
 }
