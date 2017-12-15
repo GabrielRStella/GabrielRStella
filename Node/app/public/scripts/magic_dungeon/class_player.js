@@ -1,3 +1,5 @@
+var PLAYER_SPELL_COOLDOWN = 10;
+
 class Player {
   constructor(world, bounds, health) {
     this.world = world;
@@ -8,6 +10,12 @@ class Player {
     this.element = ELEMENT_LIGHTNING; //arbitrary default
     this.elementDamage = [1, 1, 1, 1];
     this.elementTraits = [new Trait(), new Trait(), new Trait(), new Trait()];
+
+    this.spellCooldown = 0;
+  }
+
+  update(tickPart) {
+    this.spellCooldown -= tickPart;
   }
 
   draw(canvas) {
@@ -26,7 +34,10 @@ class Player {
   }
 
   fireSpell(dir) {
-    var e = this.element;
-    this.world.currentRoom.fireSpell(this, e, this.elementDamage[e.id], this.elementTraits[e.id], this.bounds.center, dir);
+    if(this.spellCooldown <= 0) {
+      var e = this.element;
+      this.world.currentRoom.fireSpell(this, e, this.elementDamage[e.id], this.elementTraits[e.id], dir);
+      this.spellCooldown = PLAYER_SPELL_COOLDOWN;
+    }
   }
 }

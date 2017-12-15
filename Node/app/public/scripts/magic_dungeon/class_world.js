@@ -55,6 +55,9 @@ class World {
 
     //physics
 
+    this.player.update(tickPart);
+    this.currentRoom.update(tickPart);
+
     //increment ticker
 
     this.tick += tickPart;

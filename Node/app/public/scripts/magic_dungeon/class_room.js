@@ -167,13 +167,20 @@ class Room {
 
   //---helpers
 
-  fireSpell(srcEntity, element, damage, trait, src, direction) {
-    this.spells.push(new Spell(this, srcEntity, element, damage, trait, src, direction));
+  fireSpell(srcEntity, element, damage, trait, direction) {
+    this.spells.push(new Spell(this, srcEntity, element, damage, trait, direction));
   }
 
   clearSpells() {
     this.spells = [];
     this.spellParts = [];
+  }
+
+  update(tickPart) {
+    var g = function(x) { x.update(tickPart); return x.active; };
+    this.spells.filter(g);
+    this.spells.filter(g);
+    this.spells.filter(g);
   }
   
 }

@@ -1,7 +1,10 @@
 class Monster {
-  constructor(world, room, bounds, element, damage, trait) {
+  constructor(world, room, health, bounds, element, damage, trait) {
     this.world = world;
     this.room = room;
+
+    this.maxhealth = health;
+    this.health = health;
 
     this.bounds = bounds;
     this.element = element;
@@ -9,10 +12,19 @@ class Monster {
     this.trait = trait;
   }
 
+  get active() {
+    //if there are traits left...
+
+    return health > 0;
+  }
+
+  update(tickPart) {
+  }
+
   draw(canvas) {
   }
 
   fireSpell(dir) {
-    this.room.fireSpell(this, this.element, this.damage, this.trait, this.bounds.center, dir);
+    this.room.fireSpell(this, this.element, this.damage, this.trait, dir);
   }
 }
