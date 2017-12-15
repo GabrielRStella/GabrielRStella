@@ -7,19 +7,6 @@ class Game {
 
   register(keys) {
     this.keys = keys;
-
-    keys.addKeyListenerDown(new Key(KEY_UP, function(e) {
-        this.world.go(DIR_UP);
-      }.bind(this)));
-    keys.addKeyListenerDown(new Key(KEY_DOWN, function(e) {
-        this.world.go(DIR_DOWN);
-      }.bind(this)));
-    keys.addKeyListenerDown(new Key(KEY_LEFT, function(e) {
-        this.world.go(DIR_LEFT);
-      }.bind(this)));
-    keys.addKeyListenerDown(new Key(KEY_RIGHT, function(e) {
-        this.world.go(DIR_RIGHT);
-      }.bind(this)));
   }
 
   unregister(keys) {

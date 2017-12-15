@@ -1,7 +1,7 @@
 class World {
   constructor(game) {
     this.game = game;
-    this.player = new Player(this, new Rectangle(new Point(12, 12), 1, 1), 10); //TODO: implement player
+    this.player = new Player(this, new Rectangle(new Point(11.5, 11.5), 1, 1), 10); //TODO: implement player
     this.difficulty = 0;
     this.rooms = [];
 
@@ -99,10 +99,31 @@ class World {
     var room = this.currentRoom;
     if(room.isOpen(dir)) {
       room.clearSpells();
-      room = room.getConnection(dir);
-      this.currentRoom = room;
+      this.currentRoom = room.getConnection(dir);
 
-      //TODO: set player bounds to be on the corresponding wall
+      //fix player bounds
+
+      var bounds = this.player.bounds;
+
+      //re-center
+      var center = bounds.center;
+      if(dir == DIR_LEFT || dir == DIR_RIGHT) {
+        center.y *= this.currentRoom.height / room.height;
+      } else if(dir == DIR_DOWN || dir == DIR_UP) {
+        center.x *= this.currentRoom.width / room.width;
+      }
+      bounds.center = center;
+
+      //align on wall
+      if(dir == DIR_LEFT) {
+        bounds.maxX = this.currentRoom.width;
+      } else if(dir == DIR_RIGHT) {
+        bounds.minX = 0;
+      } else if(dir == DIR_DOWN) {
+        bounds.maxY = this.currentRoom.height;
+      } else if(dir == DIR_UP) {
+        bounds.minY = 0;
+      }
     }
   }
 }
