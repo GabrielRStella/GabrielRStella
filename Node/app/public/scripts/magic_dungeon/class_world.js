@@ -46,6 +46,8 @@ class World {
 
     //robots in disguise
     canvas.translate(bounds2.minX, bounds2.minY);
+    canvas.translate(0, bounds2.height);
+    canvas.scale(1, -1);
     canvas.scale(bounds2.width / room.width, bounds2.height / room.height);
 
     //le drawing
@@ -60,8 +62,8 @@ class World {
     for(var i = 0; i < this.rooms.length; i++) {
       var r = this.rooms[i];
       if((r != room) && (r.isOpen(dir2)) && (!r.hasConnection(dir2))) {
-        var chance = 1.0 / Math.abs(room.difficulty - r.difficulty);
-        if(Math.random() < chance) {
+        var chance = 1.0 / (Math.abs(room.difficulty - r.difficulty) + 2);
+        if(Math.random() < (chance * chance)) {
           //rooms with similar difficulty are more likely to be connected
           room.setConnection(dir, r);
           r.setConnection(dir2, room);
