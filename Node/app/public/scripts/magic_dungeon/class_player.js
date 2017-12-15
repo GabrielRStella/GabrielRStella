@@ -4,6 +4,10 @@ class Player {
     this.bounds = bounds;
     this.maxhealth = health;
     this.health = health;
+
+    this.element = ELEMENT_LIGHTNING; //arbitrary default
+    this.elementDamage = [1, 1, 1, 1];
+    this.elementTraits = [new Trait(), new Trait(), new Trait(), new Trait()];
   }
 
   draw(canvas) {
@@ -19,5 +23,10 @@ class Player {
     canvas.scale(1, -1);
     canvas.drawImage(getImage("player"), 0, 0, this.bounds.width, this.bounds.height);
     canvas.restore();
+  }
+
+  fireSpell(dir) {
+    var e = this.element;
+    this.world.currentRoom.fireSpell(this, e, this.elementDamage[e.id], this.elementTraits[e.id], this.bounds.center, dir);
   }
 }

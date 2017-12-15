@@ -28,7 +28,7 @@ class World {
   update(tickPart) {
     //TODO: physics and all that crap... and io
 
-    //IO
+    //IO (movement)
     var io = this.game.io;
     var playerMove = io.playerMove;
     playerMove.multiply(0.1);
@@ -44,6 +44,13 @@ class World {
       this.go(DIR_DOWN);
     } else if(bounds.minY > this.currentRoom.height) {
       this.go(DIR_UP);
+    }
+
+    //more IO (spells)
+    var playerSpell = io.playerSpell;
+    if(!playerSpell.zero) {
+      playerSpell.multiply(0.1);
+      this.player.fireSpell(playerSpell);
     }
 
     //physics
@@ -106,6 +113,11 @@ class World {
     room.generateWalls();
     room.generateDoors();
     room.generateObstacles();
+    room.filter(function(state){
+        if((state == STATE_WALL) && (Math.random() < 0.5))
+          return (Math.random() < 0.5 ? STATE_WALL_BROKEN : STATE_WALL_BRICK);
+      });
+
     room.generateMonsters(this.difficulty);
     room.makeBoxes();
 

@@ -89,6 +89,16 @@ class Room {
 
   //---generators
 
+  //used to dynamically replace all le blocks (eg. to randomize floor type)
+  filter(func) {
+    for(var i = 0; i < this.width; i++) {
+      var arr = this.states[i];
+      for(var j = 0; j < this.height; j++) {
+        arr[j] = func(arr[j]) || arr[j];
+      }
+    }
+  }
+
   generateWalls() {
     for(var i = 0; i < this.width; i++) {
       var arr = this.states[i];
@@ -157,7 +167,8 @@ class Room {
 
   //---helpers
 
-  fireSpell() {
+  fireSpell(srcEntity, element, damage, trait, src, direction) {
+    this.spells.push(new Spell(this, srcEntity, element, damage, trait, src, direction));
   }
 
   clearSpells() {
