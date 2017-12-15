@@ -1,7 +1,6 @@
 class Game {
   constructor() {
     this.tick = 0;
-    this.lastTick = 0;
 
     this.world = new World(this);
   }
@@ -15,11 +14,11 @@ class Game {
   }
 
   update(tickPart, paused) {
-    this.lastTick = tickPart;
     if(paused) {
       //...?
     } else {
       this.tick += tickPart;
+      this.world.update(tickPart);
     }
   }
 
@@ -32,16 +31,17 @@ class Game {
   }
 
   drawGame(canvas, width, height) {
+    this.world.draw(canvas, new Rectangle(new Point(0, 0), width, height));
+  }
+
+  drawHUD(canvas, width, height) {
+    canvas.drawImage(getImage("box"), 0, 0, width - (this.tick % width), height - (this.tick % height));
     canvas.fillStyle = "#ffffff";
     canvas.beginPath();
     canvas.arc(this.tick % width, this.tick % height, 10, 0, Math.PI*2);
     canvas.fill();
     canvas.stroke();
     canvas.closePath();
-  }
-
-  drawHUD(canvas, width, height) {
-    canvas.drawImage(getImage("box"), 0, 0, width - (this.tick % width), height - (this.tick % height));
   }
 
   drawPaused(canvas, width, height) {

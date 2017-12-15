@@ -16,7 +16,13 @@ class World {
     this.tick = 0;
   }
 
+  update(tickPart) {
+    //TODO: physics and all that crap... also io
+
+    this.tick += tickPart;
+  }
+
   draw(canvas, bounds) {
-    this.room.draw(canvas, bounds);
+    this.currentRoom.draw(canvas, bounds);
   }
 }

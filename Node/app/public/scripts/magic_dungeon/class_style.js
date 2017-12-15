@@ -33,7 +33,7 @@ class ArrayImageStyle extends Style {
 
   //draws a block with the given state on the given canvas in the given rectangle
   draw(canvas, r, state) {
-    var img = styles[state] || ("blocks/" + state.name);
+    var img = this.styles[state] || ("blocks/" + state.name);
     var dImg = getImage(img);
     if(dImg) {
       canvas.drawImage(dImg, r.minX, r.minY, r.width, r.height);

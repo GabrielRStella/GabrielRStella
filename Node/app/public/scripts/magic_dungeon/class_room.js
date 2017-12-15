@@ -13,11 +13,18 @@ function ROOM_GATE_FUNC(p, w, h) {
 
 class Room {
   constructor(world, width, height, style) {
+    width = width || 32;
+    height = height || 32;
+    style = style || THE_STYLE;
+
     this.world = world;
-    this.width = width || 32;
-    this.height = height || 32;
-    this.style = style || THE_STYLE;
+    this.width = width;
+    this.height = height;
+    this.style = style;
     this.difficulty = -1;
+
+    this.blockWidth = 16;
+    this.blockHeight = 16;
 
     this.states = [];
     for(var i = 0; i < width; i++) {
@@ -25,7 +32,7 @@ class Room {
       for(var j = 0; j < height; j++) {
         arr.push(STATE_EMPTY);
       }
-      states.push(arr);
+      this.states.push(arr);
     }
     //bounding boxes of the wall blocks
     this.boxes = [];
@@ -93,10 +100,10 @@ class Room {
   generateDoors() {
     var midx = Math.floor(this.width / 2);
     var midy = Math.floor(this.height / 2);
-    for(d in this.open) {
+    for(var d in this.open) {
       if(this.open[d]) {
         var dir = DIRS[d];
-        var src = ROOM_GATE_FUNC(dir, this.width, this.height);
+        var src = ROOM_GATE_FUNC(dir.delta, this.width, this.height);
         var dx = (dir.delta.x == 0) ? 1 : 0;
         var dy = (dir.delta.y == 0) ? 1 : 0;
         this.states[src.x][src.y] = STATE_EMPTY;
@@ -114,14 +121,14 @@ class Room {
     //TODO
   }
 
-  makeBoxes() {
+  makeBoxes(bounds) {
     this.boxes = [];
     var width = bounds.width / this.width;
     var height = bounds.height / this.height;
     for(var i = 0; i < this.width; i++) {
       for(var j = 0; j < this.height; j++) {
         if(!this.states[i][j].walkable) {
-          this.boxes.push(this.toWorldBounds(new Rectangle(i, j, 1, 1)));
+          this.boxes.push(this.toWorldBounds(new Rectangle(new Point(i, j), 1, 1)));
         }
       }
     }
@@ -157,19 +164,19 @@ class Room {
   }
 
   toBlockCoords(p) {
-    return new Point(p.x / 16, p.y / 16);
+    return new Point(p.x / this.blockWidth, p.y / this.blockHeight);
   }
 
   toWorldCoords(p) {
-    return new Point(p.x * 16, p.y * 16);
+    return new Point(p.x * this.blockWidth, p.y * this.blockHeight);
   }
 
   toBlockBounds(r) {
-    return new Rectangle(toBlockCoords(r.point), (r.maxX - r.minX) / 16, (r.maxY - r.minY) / 16);
+    return new Rectangle(toBlockCoords(r.point), (r.maxX - r.minX) / this.blockWidth, (r.maxY - r.minY) / this.blockHeight);
   }
 
   toWorldBounds(r) {
-    return new Rectangle(toWorldCoords(r.point), r.width * 16, r.height * 16);
+    return new Rectangle(toWorldCoords(r.point), r.width * this.blockWidth, r.height * this.blockHeight);
   }
   
 }
