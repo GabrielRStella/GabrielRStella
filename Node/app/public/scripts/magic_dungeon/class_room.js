@@ -13,8 +13,8 @@ function ROOM_GATE_FUNC(p, w, h) {
 
 class Room {
   constructor(world, width, height, style) {
-    width = width || 32;
-    height = height || 32;
+    width = width || 24;
+    height = height || 24;
     style = style || THE_STYLE;
 
     this.world = world;

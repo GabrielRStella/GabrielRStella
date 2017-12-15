@@ -6,7 +6,7 @@ class Game {
   }
 
   register(keys) {
-    
+    this.keys = keys;
   }
 
   unregister(keys) {
@@ -35,20 +35,47 @@ class Game {
   }
 
   drawHUD(canvas, width, height) {
-    canvas.drawImage(getImage("box"), 0, 0, width - (this.tick % width), height - (this.tick % height));
+
+    //white outline
+/*
+    canvas.strokeStyle = "#ffffff";
+    var sz = 2;
+    canvas.lineWidth = sz * 2;
+    canvas.beginPath();
+    canvas.rect(-sz, -sz, width + sz * 2, height + sz * 2);
+    canvas.stroke();
+    canvas.closePath();
+*/
+
+    //ball
+/*
     canvas.fillStyle = "#ffffff";
+    canvas.strokeStyle = "#000000";
+    canvas.lineWidth = 1;
     canvas.beginPath();
     canvas.arc(this.tick % width, this.tick % height, 10, 0, Math.PI*2);
     canvas.fill();
     canvas.stroke();
     canvas.closePath();
+*/
   }
 
   drawPaused(canvas, width, height) {
+    //overlay
+    canvas.fillStyle = "#00000070";
+    canvas.strokeStyle = "#ffffff";
+    canvas.lineWidth = 4;
+    canvas.beginPath();
+    canvas.rect(0, 0, width, height);
+    canvas.fill();
+    canvas.stroke();
+    canvas.closePath();
+
+    //text
     canvas.font = '24px sans-serif';
     canvas.fillStyle = "#ffffff";
     canvas.strokeStyle = "#000000";
     canvas.lineWidth = 1;
-    canvas.fillText("Paused", 200, 50);
+    canvas.fillText("Paused", 50, 50);
   }
 }

@@ -110,7 +110,9 @@ function UPDATE() {
   CANVAS.setTransform(1, 0, 0, 1, 0, 0);
   CANVAS.clearRect(0, 0, CANVAS_ELEMENT.width, CANVAS_ELEMENT.height);
   CANVAS.translate(EDGE_PADDING, EDGE_PADDING);
-  CANVAS.drawImage(getImage("box"), 0, 0, WIDTH, HEIGHT);
+
+  //testing
+  //CANVAS.drawImage(getImage("box"), 0, 0, WIDTH, HEIGHT);
 
   THE_GAME.draw(CANVAS, WIDTH, HEIGHT, GAME_PAUSED);
 
