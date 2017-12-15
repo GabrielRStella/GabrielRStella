@@ -98,7 +98,7 @@ class World {
   connectNew(r, dir) {
     this.difficulty++;
 
-    var room = new Room(this, 16 + Math.floor(Math.random() * 16), 16 + Math.floor(Math.random() * 16));
+    var room = new Room(this, 16 + Math.floor(Math.random() * 10) * 2, 16 + Math.floor(Math.random() * 10) * 2);
     for(var i = 0; i < DIRS.length; i++) {
       room.open[DIRS[i]] = (Math.random() < 0.4); //40% chance of an open door
     }
