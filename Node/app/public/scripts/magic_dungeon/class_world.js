@@ -32,9 +32,21 @@ class World {
     var io = this.game.io;
     var playerMove = io.playerMove;
     playerMove.multiply(0.1);
-    this.player.bounds.point.add(playerMove);
+    var bounds = this.player.bounds;
+    bounds.point.add(playerMove);
 
-    //phyisics
+    //swap room
+    if(bounds.maxX < 0) {
+      this.go(DIR_LEFT);
+    } else if(bounds.minX > this.currentRoom.width) {
+      this.go(DIR_RIGHT);
+    } else if(bounds.maxY < 0) {
+      this.go(DIR_DOWN);
+    } else if(bounds.minY > this.currentRoom.height) {
+      this.go(DIR_UP);
+    }
+
+    //physics
 
     //increment ticker
 
