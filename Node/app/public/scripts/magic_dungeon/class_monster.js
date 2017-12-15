@@ -3,4 +3,7 @@ class Monster {
     this.world = world;
     this.room = room;
   }
+
+  draw(canvas) {
+  }
 }

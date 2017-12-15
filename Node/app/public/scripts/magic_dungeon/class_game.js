@@ -71,12 +71,14 @@ class Game {
     canvas.stroke();
     canvas.closePath();
 
-    //text
+    //title text
     canvas.font = '36px sans-serif';
     canvas.fillStyle = "#ffffff";
     canvas.strokeStyle = "#000000";
     canvas.lineWidth = 1;
     canvas.fillText("Paused", 20, 50);
+
+    //info text
 
     canvas.font = '24px sans-serif';
     var x = 40;

@@ -134,19 +134,20 @@ class Room {
   //draw
 
   //bounds = the rectangle in which to draw the room
-  draw(canvas, bounds) {
-    var width = bounds.width / this.width;
-    var height = bounds.height / this.height;
+  draw(canvas) {
     for(var i = 0; i < this.width; i++) {
       for(var j = 0; j < this.height; j++) {
-        var x = bounds.minX + width * i;
-        var y = bounds.minY + height * j;
-        this.drawBlock(canvas, i, j, new Rectangle(new Point(x, y), width, height));
+        this.drawBlock(canvas, i, j);
       }
     }
+    var f = function(x) { x.draw(canvas); };
+    this.monsters.map(f);
+    this.spells.map(f);
+    this.spellParts.map(f);
   }
 
   drawBlock(canvas, x, y, rect) {
+    rect = rect || new Rectangle(new Point(x, y), 1, 1);
     this.style.draw(canvas, rect, this.states[x][y]);
   }
 

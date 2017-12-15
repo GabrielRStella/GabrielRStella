@@ -1,11 +1,11 @@
 class World {
   constructor(game) {
     this.game = game;
-    this.player = new Player(this); //TODO: implement player
+    this.player = new Player(this, new Rectangle(new Point(12, 12), 1, 1), 10); //TODO: implement player
     this.difficulty = 0;
     this.rooms = [];
 
-    var room = new Room(this); //TODO: non-default constructor (width, height, style)
+    var room = new Room(this, 24, 24); //TODO: non-default constructor (width, height, style)
     room.setOpenAll();
     room.generateWalls();
     room.generateDoors();
@@ -25,15 +25,32 @@ class World {
   }
 
   update(tickPart) {
-    //TODO: physics and all that crap... also io
+    //TODO: physics and all that crap... also io?
+    
 
     this.tick += tickPart;
   }
 
   draw(canvas, bounds) {
+    canvas.save();
+
     var room = this.currentRoom;
     var bounds2 = new Rectangle(new Point(0, 0), room.width, room.height);
     Gui.align(bounds, bounds2, [Gui.fit, Gui.center], 0);
-    room.draw(canvas, bounds2);
+
+    //prevent game rendering from exiting the world drawing bounds
+    canvas.beginPath();
+    canvas.rect(bounds2.minX, bounds2.minY, bounds2.width, bounds2.height);
+    canvas.clip();
+
+    //robots in disguise
+    canvas.translate(bounds2.minX, bounds2.minY);
+    canvas.scale(bounds2.width / room.width, bounds2.height / room.height);
+
+    //le drawing
+    room.draw(canvas);
+    this.player.draw(canvas);
+
+    canvas.restore();
   }
 }
