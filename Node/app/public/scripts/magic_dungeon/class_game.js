@@ -72,10 +72,24 @@ class Game {
     canvas.closePath();
 
     //text
-    canvas.font = '24px sans-serif';
+    canvas.font = '36px sans-serif';
     canvas.fillStyle = "#ffffff";
     canvas.strokeStyle = "#000000";
     canvas.lineWidth = 1;
-    canvas.fillText("Paused", 50, 50);
+    canvas.fillText("Paused", 20, 50);
+
+    canvas.font = '24px sans-serif';
+    var x = 40;
+    var y = 80;
+    var dy = 30;
+
+    //TODO: keybind info
+
+    var pauseInfo = this.world.pauseInfo;
+
+    for(var i = 0; i < pauseInfo.length; i++) {
+      canvas.fillText(pauseInfo[i], x, y);
+      y += dy;
+    }
   }
 }

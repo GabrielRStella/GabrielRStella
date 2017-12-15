@@ -9,11 +9,19 @@ class World {
     room.setOpenAll();
     room.generateWalls();
     room.generateDoors();
+    room.generateMonsters(this.difficulty);
 
     this.rooms.push(room);
     this.currentRoom = room;
 
     this.tick = 0;
+  }
+
+  get pauseInfo() {
+    var ret = [];
+    ret.push("Difficulty: " + this.currentRoom.difficulty);
+    //TODO: traits and such
+    return ret;
   }
 
   update(tickPart) {
