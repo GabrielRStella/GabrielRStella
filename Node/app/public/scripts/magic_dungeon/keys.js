@@ -11,6 +11,10 @@ var KEY_P_PRESS = 112;
 var KEY_R = 82;
 var KEY_C = 67;
 
+function getKeyCode(keyChar) {
+  return keyChar.toUpperCase().charCodeAt(0);
+}
+
 class Key {
   constructor(keyCode, callBack) {
     this.keyCode = keyCode;
@@ -36,6 +40,16 @@ class Keys {
     this.eventKeydownB = this.eventKeydown.bind(this);
     this.eventKeyupB = this.eventKeyup.bind(this);
     this.eventKeypressB = this.eventKeypress.bind(this);
+
+    this.keyStates = {};
+  }
+
+  checkKey(key) {
+    return this.keyStates[getKeyCode(key)];
+  }
+
+  checkKeyCode(key) {
+    return this.keyStates[key];
   }
 
   addKeyListenerDown(key) {
@@ -92,6 +106,7 @@ class Keys {
       var key = this.KEYS_DUAL[i];
       if(key.keyCode == keyCode) key.callBackDown(e);
     }
+    this.keyStates[keyCode] = true;
   }
 
   eventKeyup(e) {
@@ -104,6 +119,7 @@ class Keys {
       var key = this.KEYS_DUAL[i];
       if(key.keyCode == keyCode) key.callBackUp(e);
     }
+    this.keyStates[keyCode] = false;
   }
 
   eventKeypress(e) {

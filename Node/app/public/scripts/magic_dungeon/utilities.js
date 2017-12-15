@@ -19,6 +19,18 @@ class Point {
     return Math.sqrt(m);
   }
 
+  set magnitude(len) {
+    var m = this.magnitude;
+    if(m == 0) return;
+    len /= m;
+    this.x *= len;
+    this.y *= len;
+  }
+
+  get zero() {
+    return (this.x == 0) && (this.y == 0);
+  }
+
   distance(other) {
     var dx = this.x - other.x;
     var dy = this.y - other.y;
@@ -26,11 +38,9 @@ class Point {
     return Math.sqrt(m);
   }
 
-  scale(len) {
-    var m = this.magnitude;
-    len /= m;
-    this.x *= len;
-    this.y *= len;
+  multiply(d) {
+    this.x *= d;
+    this.y *= d;
   }
 
   add(other) {

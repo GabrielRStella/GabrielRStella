@@ -7,6 +7,7 @@ class Game {
 
   register(keys) {
     this.keys = keys;
+    this.io = new IO(keys);
   }
 
   unregister(keys) {

@@ -26,8 +26,17 @@ class World {
   }
 
   update(tickPart) {
-    //TODO: physics and all that crap... also io?
-    
+    //TODO: physics and all that crap... and io
+
+    //IO
+    var io = this.game.io;
+    var playerMove = io.playerMove;
+    playerMove.multiply(0.1);
+    this.player.bounds.point.add(playerMove);
+
+    //phyisics
+
+    //increment ticker
 
     this.tick += tickPart;
   }
