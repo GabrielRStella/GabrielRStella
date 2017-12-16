@@ -26,6 +26,11 @@ class Element {
 
   //draw this element's symbol on the given canvas inside the given rectangle
   drawSymbol(canvas, r) {
+    canvas.save();
+    canvas.translate(r.minX, r.maxY);
+    canvas.scale(1, -1);
+    canvas.drawImage(getImage("elements/" + this.name.toLowerCase()), 0, 0, r.width, r.height);
+    canvas.restore();
   }
 }
 

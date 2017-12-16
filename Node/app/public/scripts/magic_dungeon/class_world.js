@@ -55,6 +55,12 @@ class World {
       player.fireSpell(playerSpell);
     }
 
+    //more IO (select element)
+    var playerElem = io.playerElement;
+    if(playerElem >= 0) {
+      player.element = ELEMENTS[playerElem];
+    }
+
     //physics
 
     player.update(tickPart);

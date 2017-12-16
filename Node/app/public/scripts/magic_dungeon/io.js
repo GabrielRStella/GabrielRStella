@@ -42,4 +42,13 @@ class IO {
     p.magnitude = 1;
     return p;
   }
+
+  get playerElement() {
+    for(var i = 0; i < ELEMENT_COUNT; i++) {
+      if(this.keys.checkKeyCode(KEY_1 + i)) {
+        return i;
+      }
+    }
+    return -1;
+  }
 }
