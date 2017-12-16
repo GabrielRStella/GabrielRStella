@@ -38,8 +38,8 @@ class TraitPart {
   }
 
   getBounds(srcEntity, damage) {
-    var sz = damage / 8;
-    var bounds = new Rectangle(0, 0, sz, sz);
+    var sz = damage / 2;
+    var bounds = new Rectangle(new Point(), sz, sz);
     bounds.center = srcEntity.bounds.center;
     return bounds;
   }
@@ -59,7 +59,7 @@ class TraitPartBasic extends TraitPart {
 
   fireSpell(room, srcEntity, element, damage, direction) {
     var launcher = super.fireSpell(room, srcEntity, element, damage);
-    launcher.launch(this.getBounds(srcEntity, damage), direction);
+    launcher.launch(this.getBounds(srcEntity, damage), direction.copy);
   }
 }
 

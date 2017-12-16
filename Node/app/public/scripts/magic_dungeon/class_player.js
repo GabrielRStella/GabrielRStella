@@ -41,7 +41,7 @@ class Player {
   fireSpell(dir) {
     if(this.spellCooldown <= 0) {
       var e = this.element;
-      this.world.currentRoom.fireSpell(this, e, this.elementDamage[e.id], this.elementTraits[e.id], dir);
+      this.world.currentRoom.fireSpell(this, e, this.elementDamage[e.id], this.elementTraits[e.id].copy(), dir);
       this.spellCooldown = PLAYER_SPELL_COOLDOWN;
     }
   }
