@@ -1,6 +1,14 @@
 var TRAITS = [];
 var TRAIT_COUNT = 0;
 
+function getAllTraits(element) {
+  var arr = [];
+  for(var i = 0; i < TRAIT_COUNT; i++) {
+    if(traits[i].appliesToElement(element)) arr.push(traits[i]);
+  }
+  return new Trait(arr);
+}
+
 class Trait {
   constructor(traits) {
     this.inner = traits || [];
@@ -37,6 +45,11 @@ class TraitPart {
     }
   }
 
+  //overridable
+  appliesToElement(e) {
+    return true;
+  }
+
   getBounds(srcEntity, damage) {
     var sz = damage / 2;
     var bounds = new Rectangle(new Point(), sz, sz);
@@ -71,10 +84,38 @@ class TraitPartRandom extends TraitPart {
   fireSpell(room, srcEntity, element, damage, direction) {
     var launcher = super.fireSpell(room, srcEntity, element, damage);
     var dir = new Point(Math.random() - Math.random(), Math.random() - Math.random());
-    dir.magnitude = 1;
+    dir.magnitude = direction.magnitude;
     launcher.launch(this.getBounds(srcEntity, damage), dir);
   }
 }
 
+class TraitPartHoming extends TraitPart {
+  constructor() {
+    super();
+  }
+
+  fireSpell(room, srcEntity, element, damage, direction) {
+    var launcher = super.fireSpell(room, srcEntity, element, damage);
+    var dir;
+    if(srcEntity.isPlayer) {
+      var monsters = room.monsters;
+      if(monsters.length > 0) {
+        var monster = monsters[Math.floor(Math.random() * monsters.length)];
+        dir = monster.bounds.center;
+        dir.sub(srcEntity.bounds.center);
+      } else {
+        dir = direction.copy();
+      }
+    } else {
+      dir = room.world.player.bounds.center;
+      dir.sub(srcEntity.bounds.center);
+    }
+    dir.magnitude = direction.magnitude;
+    launcher.launch(this.getBounds(srcEntity, damage), dir);
+  }
+}
+
+//generic traits
 var TRAIT_BASIC = new TraitPartBasic();
 var TRAIT_RANDOM = new TraitPartRandom();
+var TRAIT_HOMING = new TraitPartHoming();

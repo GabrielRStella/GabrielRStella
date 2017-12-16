@@ -132,14 +132,14 @@ class Room {
   generateMonsters(difficulty) {
     this.difficulty = difficulty;
     while(difficulty > 0) {
-      this.generateMonster(difficulty);
+      if(Math.random() < (1 / difficulty)) this.generateMonster(difficulty);
       difficulty--;
     }
     //TODO
   }
 
   generateMonster(difficulty) {
-    var health = 10 + difficulty;
+    var health = 5 + Math.floor(Math.random() * difficulty);
     var bounds = new Rectangle(
       this.getRandomPoint(),
       1, 1);

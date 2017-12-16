@@ -1,4 +1,4 @@
-var MONSTER_SPELL_COOLDOWN = 35;
+var MONSTER_SPELL_COOLDOWN = 40;
 
 class Monster {
   constructor(world, room, difficulty, health, bounds, element, damage, trait) {
@@ -14,7 +14,7 @@ class Monster {
     this.damage = damage;
     this.trait = trait;
 
-    this.spellCooldown = 0;
+    this.spellCooldown = MONSTER_SPELL_COOLDOWN * Math.random();
 
     this.tick = 0;
   }
