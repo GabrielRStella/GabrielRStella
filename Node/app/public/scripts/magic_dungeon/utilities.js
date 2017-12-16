@@ -62,7 +62,21 @@ class Point {
       return this.y > 0 ? DIR_UP : DIR_DOWN;
     } else {
       //literally exact corner... que
-      
+      if(this.x < 0) {
+        //left
+        if(this.y < 0) {
+          return (Math.random() < 0.5) ? (DIR_LEFT) : (DIR_DOWN);
+        } else {
+          return (Math.random() < 0.5) ? (DIR_LEFT) : (DIR_UP);
+        }
+      } else {
+        //right
+        if(this.y < 0) {
+          return (Math.random() < 0.5) ? (DIR_RIGHT) : (DIR_DOWN);
+        } else {
+          return (Math.random() < 0.5) ? (DIR_RIGHT) : (DIR_UP);
+        }
+      }
     }
   }
 
@@ -71,11 +85,18 @@ class Point {
   }
 
   set angle(r) {
-l
+    var m = this.magnitude;
+    this.x = Math.cos(r) * m;
+    this.y = Math.sin(r) * m;
   }
 
   rotate(dr) {
-a
+    var cos = Math.cos(dr);
+    var sin = Math.sin(dr);
+    var xP = cos * this.x - sin * this.y;
+    var yP = sin * this.y + cos * this.y;
+    this.x = xP;
+    this.y = yP;
   }
 
   angleTo(other) {
