@@ -47,6 +47,8 @@ class Game {
 
   drawHUD(canvas, width, height, world) {
 
+    var player = this.world.player;
+
     var bounds = new Rectangle(new Point(), world.minX, height);
     if(world.minX == 0) {
       bounds = new Rectangle(new Point(), width, world.minY);
@@ -62,7 +64,7 @@ class Game {
     var elemHeight = elemWidth;
     var x = bounds.minX;
     var y = bounds.minY;
-    var element = this.world.player.element;
+    var element = player.element;
     for(var i = 0; i < ELEMENT_COUNT; i++) {
       if(element == ELEMENTS[i]) {
         canvas.fillStyle = "#606060";
@@ -74,6 +76,24 @@ class Game {
       ELEMENTS[i].drawSymbol(canvas, new Rectangle(new Point(x + padding, y + padding), elemWidth, elemHeight));
       x += elemWidth + padding;
     }
+
+    var delta = elemHeight + padding * 2;
+    bounds.point.y += delta;
+    bounds.height -= delta;
+
+    var hearts = new Rectangle(new Point(), player.maxhealth, 1);
+    Gui.align(bounds, hearts, [Gui.fit, Gui.center], 0);
+    var heartSize = hearts.height;
+    
+    for(var i = 0; i < player.maxhealth; i++) {
+      var heartBounds = new Rectangle(new Point(bounds.minX + i * heartSize, bounds.minY), heartSize, heartSize);
+      drawImage(i >= player.health ? "heartEmpty" : "heart", canvas, heartBounds);
+      x += elemWidth + padding;
+    }
+
+    delta = heartSize;
+    bounds.point.y += delta;
+    bounds.height -= delta;
   }
 
   drawPaused(canvas, width, height) {
