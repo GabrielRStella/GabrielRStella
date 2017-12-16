@@ -14,8 +14,14 @@ class Game {
     
   }
 
+  end(msg) {
+    //displays the given message then ends the game
+    
+  }
+
   restart() {
     this.world = new World(this);
+    GAME_PAUSED = true;
   }
 
   update(tickPart, paused) {

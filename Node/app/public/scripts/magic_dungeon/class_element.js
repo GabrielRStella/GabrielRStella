@@ -13,6 +13,7 @@ class Element {
       throw "ERROR: Invalid Element count";
     }
     this.name = name;
+    this.deathMessage = deathMessage;
   }
 
   beats(e) {

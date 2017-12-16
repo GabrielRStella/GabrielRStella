@@ -1,7 +1,8 @@
 var PLAYER_SPELL_COOLDOWN = 25;
 
 class Player {
-  constructor(world, bounds, health) {
+  constructor(game, world, bounds, health) {
+    this.game = game;
     this.world = world;
     this.bounds = bounds;
     this.maxhealth = health;
@@ -23,6 +24,10 @@ class Player {
     return true;
   }
 
+  get active() {
+    return this.health > 0;
+  }
+
   update(tickPart) {
     this.spellCooldown -= tickPart;
   }
@@ -40,6 +45,27 @@ class Player {
     canvas.scale(1, -1);
     canvas.drawImage(getImage("player"), 0, 0, this.bounds.width, this.bounds.height);
     canvas.restore();
+
+    //health bar (from monster)
+
+    var padding = 0.1;
+    var minX = this.bounds.minX + padding;
+    var delta = (this.bounds.maxX - padding) - minX;
+    var y = this.bounds.maxY + padding;
+    var height = 0.1;
+
+    canvas.fillStyle = "#000000";
+    canvas.beginPath();
+    canvas.rect(minX, y, delta, height);
+    canvas.fill();
+    canvas.closePath();
+
+    delta *= (this.health / this.maxhealth);
+    canvas.fillStyle = "#0000ff";
+    canvas.beginPath();
+    canvas.rect(minX, y, delta, height);
+    canvas.fill();
+    canvas.closePath();
   }
 
   fireSpell(dir) {
@@ -56,5 +82,9 @@ class Player {
 
   onHit(spellPart) {
     this.health -= spellPart.damage;
+  }
+
+  onDeath(spellPart, monster) {
+    this.game.end(spellPart.element.deathMessage);
   }
 }

@@ -123,6 +123,9 @@ class World {
         if(spell.bounds.intersects(bounds)) {
           spell.active = false;
           player.onHit(spell);
+          if(!player.active) {
+            player.onDeath(spell, spell.srcEntity);
+          }
         }
       }
     }
