@@ -48,29 +48,7 @@ class Game {
   }
 
   drawHUD(canvas, width, height) {
-
-    //white outline
-/*
-    canvas.strokeStyle = "#ffffff";
-    var sz = 2;
-    canvas.lineWidth = sz * 2;
-    canvas.beginPath();
-    canvas.rect(-sz, -sz, width + sz * 2, height + sz * 2);
-    canvas.stroke();
-    canvas.closePath();
-*/
-
-    //ball
-/*
-    canvas.fillStyle = "#ffffff";
-    canvas.strokeStyle = "#000000";
-    canvas.lineWidth = 1;
-    canvas.beginPath();
-    canvas.arc(this.tick % width, this.tick % height, 10, 0, Math.PI*2);
-    canvas.fill();
-    canvas.stroke();
-    canvas.closePath();
-*/
+    this.world.player.element.drawSymbol(canvas, new Rectangle(new Point(), 64, 64));
   }
 
   drawPaused(canvas, width, height) {

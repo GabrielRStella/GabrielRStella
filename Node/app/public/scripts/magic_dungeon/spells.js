@@ -16,11 +16,14 @@ class SpellPart {
   }
 
   draw(canvas) {
+    var padding = 0.05;
     canvas.fillStyle = "#000000";
     canvas.beginPath();
-    canvas.rect(this.bounds.minX, this.bounds.minY, this.bounds.width, this.bounds.height);
+    canvas.rect(this.bounds.minX - padding, this.bounds.minY - padding, this.bounds.width + padding * 2, this.bounds.height + padding * 2);
     canvas.fill();
     canvas.closePath();
+
+    this.element.drawSpellPart(canvas, this.bounds, this.velocity);
   }
 }
 

@@ -15,6 +15,19 @@ function getImage(name) {
   }
 }
 
+function drawImage(img, canvas, r, flipped) {
+  if(flipped) drawImageFlipped(img, canvas, r);
+  else canvas.drawImage(getImage(img), r.minX, r.minY, r.width, r.height);
+}
+
+function drawImageFlipped(img, canvas, r) {
+  canvas.save();
+  canvas.translate(r.minX, r.maxY);
+  canvas.scale(1, -1);
+  canvas.drawImage(getImage(img), 0, 0, r.width, r.height);
+  canvas.restore();
+}
+
 //todo - make sure it's loaded and such
 function loadImage(name) {
 

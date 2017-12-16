@@ -53,12 +53,8 @@ class Monster {
   }
 
   draw(canvas) {
-    //temporary...
-    canvas.save();
-    canvas.translate(this.bounds.minX, this.bounds.maxY);
-    canvas.scale(1, -1);
-    canvas.drawImage(getImage("monster"), 0, 0, this.bounds.width, this.bounds.height);
-    canvas.restore();
+    //drawImageFlipped("monster", canvas, this.bounds);
+    drawImageFlipped("monsters/", canvas, this.bounds);
 
     //health bar!
 
