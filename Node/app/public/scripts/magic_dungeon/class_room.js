@@ -143,7 +143,7 @@ class Room {
     var bounds = new Rectangle(
       this.getRandomPoint(),
       1, 1);
-    var element = chooseElement();
+    var element = ELEMENT_LIGHTNING; //chooseElement();
     var damage = 1;
     var trait = new Trait([TRAIT_BASIC]);
     var monster = new Monster(this.world, this, difficulty, health, bounds, element, damage, trait);

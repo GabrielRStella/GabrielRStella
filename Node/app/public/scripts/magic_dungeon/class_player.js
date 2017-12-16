@@ -11,7 +11,7 @@ class Player {
     this.element = ELEMENT_LIGHTNING; //arbitrary default
     this.elementDamage = [1, 1, 1, 1];
     this.elementTraits = [
-        new Trait([TRAIT_BASIC]),
+        new Trait(TRAITS),
         new Trait([TRAIT_BASIC]),
         new Trait([TRAIT_BASIC]),
         new Trait([TRAIT_BASIC])
@@ -86,5 +86,25 @@ class Player {
 
   onDeath(spellPart, monster) {
     this.game.end(spellPart.element.deathMessage);
+  }
+
+  getRandomNewTraitPart(elem) {
+    var trait = this.elementTraits[elem.id].copy();
+    trait.not(elem);
+    return trait.getRandomTrait();
+  }
+
+  applyTraitPart(elem, t) {
+    var trait = this.elementTraits[elem.id];
+    if(t) {
+      trait.add(t);
+    } else {
+      this.elementDamage[elem.id]++; //woo
+    }
+    //do some message... todo
+  }
+
+  awardTrait(elem) {
+    this.applyTraitPart(elem, this.getRandomNewTraitPart(elem));
   }
 }

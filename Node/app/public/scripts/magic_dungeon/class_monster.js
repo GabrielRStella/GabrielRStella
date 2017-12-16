@@ -108,5 +108,6 @@ class Monster {
 
   onDeath(player) {
     player.heal(1);
+    player.awardTrait(this.element);
   }
 }

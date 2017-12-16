@@ -4,7 +4,7 @@ var TRAIT_COUNT = 0;
 function getAllTraits(element) {
   var arr = [];
   for(var i = 0; i < TRAIT_COUNT; i++) {
-    if(traits[i].appliesToElement(element)) arr.push(traits[i]);
+    if(TRAITS[i].appliesToElement(element)) arr.push(TRAITS[i]);
   }
   return new Trait(arr);
 }
@@ -13,6 +13,10 @@ class Trait {
   constructor(traits) {
     this.inner = traits || [];
     this.counter = 0;
+  }
+
+  get empty() {
+    return this.inner.length == 0;
   }
 
   add(traitPart) {
@@ -38,14 +42,49 @@ class Trait {
   //the following are operations that can be used to generate new sets of traits
 
   and(t) {
+    this.inner = this.inner.filter(x => t.has(x));
   }
 
   or(t) {
+    for(var i = 0; i < t.inner.length; i++) {
+      if(!this.has(t.inner[i])) this.inner.push(t.inner[i]);
+    }
   }
 
   not(elem) {
-    var t = getAllTraits(element);
-    
+    var t = getAllTraits(elem).inner;
+    var arr = [];
+    for(var i = 0; i < t.length; i++) {
+      if(!this.has(t[i])) {
+        arr.push(t[i]);
+      }
+    }
+    this.inner = arr;
+  }
+
+  //other stuff
+
+  has(p) {
+    for(var i = 0; i < this.inner.length; i++) {
+      if(this.inner[i].id == p.id) return true;
+    }
+    return false;
+  }
+
+  //uses a weighted random distribution
+  getRandomTrait() {
+    var total = 0;
+    for(var i = 0; i < this.inner.length; i++) {
+      total += this.inner[i].rarity;
+    }
+    total *= Math.random();
+    for(var i = 0; i < this.inner.length; i++) {
+      total -= this.inner[i].rarity;
+      if(total <= 0) {
+        return this.inner[i];
+      }
+    }
+    return null; //what happen???
   }
 }
 
@@ -65,7 +104,8 @@ class TraitPart {
   }
 
   getBounds(srcEntity, damage) {
-    var sz = damage / 2;
+    var sz = (1 / 3) + (damage * 0.01);
+    if(sz > 1) sz = 1; //ez limit
     var bounds = new Rectangle(new Point(), sz, sz);
     bounds.center = srcEntity.bounds.center;
     return bounds;
