@@ -1,4 +1,4 @@
-var MONSTER_SPELL_COOLDOWN = 40;
+var MONSTER_SPELL_COOLDOWN = 35;
 
 class Monster {
   constructor(world, room, health, bounds, element, damage, trait) {
@@ -21,8 +21,6 @@ class Monster {
   }
 
   get active() {
-    //if there are traits left...
-
     return this.health > 0;
   }
 
@@ -34,7 +32,7 @@ class Monster {
     mov.magnitude = 0.1;
     this.bounds.point.add(mov);
 
-    if((this.spellCooldown <= 0) && (Math.random() < 0.2)) {
+    if((this.spellCooldown <= 0) && (Math.random() < 0.1)) {
       var player = this.world.player;
       var dir = player.bounds.center;
       dir.sub(this.bounds.center);
@@ -51,6 +49,27 @@ class Monster {
     canvas.scale(1, -1);
     canvas.drawImage(getImage("monster"), 0, 0, this.bounds.width, this.bounds.height);
     canvas.restore();
+
+    //health bar!
+
+    var padding = 0.1;
+    var minX = this.bounds.minX + padding;
+    var delta = (this.bounds.maxX - padding) - minX;
+    var y = this.bounds.maxY + padding;
+    var height = 0.1;
+
+    canvas.fillStyle = "#ff0000";
+    canvas.beginPath();
+    canvas.rect(minX, y, delta, height);
+    canvas.fill();
+    canvas.closePath();
+
+    delta *= (this.health / this.maxhealth);
+    canvas.fillStyle = "#00ff00";
+    canvas.beginPath();
+    canvas.rect(minX, y, delta, height);
+    canvas.fill();
+    canvas.closePath();
   }
 
   fireSpell(dir) {
@@ -58,5 +77,12 @@ class Monster {
   }
 
   onHit(spellPart) {
+    var dmg = spellPart.damage;
+    if(spellPart.element.beats(this.element)) {
+      dmg *= 2;
+    } else if(spellPart.element.loses(this.element)) {
+      dmg /= 2;
+    }
+    this.health -= dmg;
   }
 }

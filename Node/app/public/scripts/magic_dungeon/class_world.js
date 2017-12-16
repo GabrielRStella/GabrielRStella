@@ -128,6 +128,8 @@ class World {
     //increment ticker
 
     this.tick += tickPart;
+
+    return player.health > 0;
   }
 
   draw(canvas, bounds) {

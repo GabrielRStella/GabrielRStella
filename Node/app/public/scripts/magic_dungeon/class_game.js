@@ -14,12 +14,18 @@ class Game {
     
   }
 
+  restart() {
+    this.world = new World(this);
+  }
+
   update(tickPart, paused) {
     if(paused) {
       //...?
     } else {
       this.tick += tickPart;
-      this.world.update(tickPart);
+      if(!this.world.update(tickPart)) {
+        this.restart();
+      }
     }
   }
 
