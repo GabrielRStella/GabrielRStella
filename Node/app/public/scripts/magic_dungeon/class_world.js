@@ -1,7 +1,7 @@
 class World {
   constructor(game) {
     this.game = game;
-    this.player = new Player(this, new Rectangle(new Point(11.5, 11.5), 1, 1), 10); //TODO: implement player
+    this.player = new Player(game, this, new Rectangle(new Point(11.5, 11.5), 1, 1), 10); //TODO: implement player
     this.difficulty = 0;
     this.rooms = [];
 
