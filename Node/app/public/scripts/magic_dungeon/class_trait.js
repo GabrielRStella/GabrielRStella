@@ -63,4 +63,18 @@ class TraitPartBasic extends TraitPart {
   }
 }
 
-var TRAIT_BASIC = new TraitPartBasic(0);
+class TraitPartRandom extends TraitPart {
+  constructor() {
+    super();
+  }
+
+  fireSpell(room, srcEntity, element, damage, direction) {
+    var launcher = super.fireSpell(room, srcEntity, element, damage);
+    var dir = new Point(Math.random() - Math.random(), Math.random() - Math.random());
+    dir.magnitude = 1;
+    launcher.launch(this.getBounds(srcEntity, damage), dir);
+  }
+}
+
+var TRAIT_BASIC = new TraitPartBasic();
+var TRAIT_RANDOM = new TraitPartRandom();

@@ -12,6 +12,10 @@ class Monster {
     this.trait = trait;
   }
 
+  get isPlayer() {
+    return false;
+  }
+
   get active() {
     //if there are traits left...
 

@@ -18,7 +18,8 @@ World
 
 //general game handling...
 
-var MS_PER_TICK = 10;
+var MS_PER_TICK = 10; //100 ticks per s
+//var TICKS_PER_SEC = 1000 / MS_PER_TICK;
 
 var PREV_TICK_MS = new Date().getTime();
 

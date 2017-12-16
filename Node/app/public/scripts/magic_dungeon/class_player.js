@@ -1,4 +1,4 @@
-var PLAYER_SPELL_COOLDOWN = 10;
+var PLAYER_SPELL_COOLDOWN = 25;
 
 class Player {
   constructor(world, bounds, health) {
@@ -17,6 +17,10 @@ class Player {
       ];
 
     this.spellCooldown = 0;
+  }
+
+  get isPlayer() {
+    return true;
   }
 
   update(tickPart) {
