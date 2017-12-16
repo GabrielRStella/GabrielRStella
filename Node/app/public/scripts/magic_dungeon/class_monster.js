@@ -105,6 +105,17 @@ class Monster {
 
   onDeath(player) {
     player.heal(1);
+  }
+}
+
+class MonsterBoss extends Monster {
+
+  constructor(world, room, difficulty, health, bounds, element, damage, trait, cooldown) {
+    super(world, room, difficulty, health, bounds, element, damage, trait, cooldown);
+  }
+
+  onDeath(player) {
+    //super.onDeath(player);
     player.awardTrait(this.element);
   }
 }

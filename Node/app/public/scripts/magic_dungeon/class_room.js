@@ -148,7 +148,7 @@ class Room {
 
     var health = 5 + Math.floor(Math.random() * difficulty);
     var bounds = new Rectangle(
-      this.getRandomPoint(),
+      this.getRandomPoint(1),
       1, 1);
     var element = chooseElement();
     var damage = 1;
@@ -161,7 +161,7 @@ class Room {
   generateBoss(difficulty) {
     var health = 10 + Math.floor(Math.random() * difficulty);
     var bounds = new Rectangle(
-      this.getRandomPoint(),
+      this.getRandomPoint(2),
       2, 2);
     var element = chooseElement();
     var damage = 2 + Math.floor(Math.random() * 2);
@@ -176,7 +176,7 @@ class Room {
       counter *= Math.random();
     }
     var cooldown = MONSTER_SPELL_COOLDOWN * (1 - (Math.random() * Math.random()));
-    var monster = new Monster(this.world, this, difficulty, health, bounds, element, damage, trait, cooldown);
+    var monster = new MonsterBoss(this.world, this, difficulty, health, bounds, element, damage, trait, cooldown);
     return monster;
   }
 
@@ -226,8 +226,10 @@ class Room {
     this.spellParts = [];
   }
 
-  getRandomPoint() {
-    return new Point(1 + Math.random() * (this.width - 2), 1 + Math.random() * (this.height - 2));
+  getRandomPoint(pad) {
+    pad = pad || 0;
+    var pad2 = pad * 2;
+    return new Point(pad + Math.random() * (this.width - pad2), pad + Math.random() * pad2);
   }
 
   update(tickPart) {
