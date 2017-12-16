@@ -1,9 +1,10 @@
 var MONSTER_SPELL_COOLDOWN = 35;
 
 class Monster {
-  constructor(world, room, health, bounds, element, damage, trait) {
+  constructor(world, room, difficulty, health, bounds, element, damage, trait) {
     this.world = world;
     this.room = room;
+    this.difficulty = difficulty;
 
     this.maxhealth = health;
     this.health = health;
@@ -14,6 +15,8 @@ class Monster {
     this.trait = trait;
 
     this.spellCooldown = 0;
+
+    this.tick = 0;
   }
 
   get isPlayer() {
@@ -26,19 +29,26 @@ class Monster {
 
   update(tickPart) {
     this.spellCooldown -= tickPart;
+    this.tick += tickPart;
 
     //TODO: move
     var mov = new Point(Math.random() - Math.random(), Math.random() - Math.random());
-    mov.magnitude = 0.1;
+    if(this.goal) {
+      var delta = this.goal.copy();
+      delta.sub(this.bounds.center);
+      delta.magnitude = 1;
+      mov.add(delta);
+    }
+    mov.magnitude = 0.03;
     this.bounds.point.add(mov);
 
+    if(!this.goal || this.bounds.center.distance(this.goal) < (this.tick / 100)) {
+      this.goal = this.room.getRandomPoint();
+      this.tick = 0;
+    }
+
     if((this.spellCooldown <= 0) && (Math.random() < 0.1)) {
-      var player = this.world.player;
-      var dir = player.bounds.center;
-      dir.sub(this.bounds.center);
-      dir.magnitude = 0.1;
-      this.fireSpell(dir);
-      this.spellCooldown = MONSTER_SPELL_COOLDOWN;
+      this.fireSpellNaturally();
     }
   }
 
@@ -70,6 +80,16 @@ class Monster {
     canvas.rect(minX, y, delta, height);
     canvas.fill();
     canvas.closePath();
+  }
+
+  fireSpellNaturally() {
+    var player = this.world.player;
+    var dir = player.bounds.center;
+    dir.sub(this.bounds.center);
+    dir.magnitude = 0.1;
+    dir.rotate((Math.random() - Math.random()) * (0.5 / this.difficulty));
+    this.fireSpell(dir);
+    this.spellCooldown = MONSTER_SPELL_COOLDOWN;
   }
 
   fireSpell(dir) {

@@ -141,12 +141,12 @@ class Room {
   generateMonster(difficulty) {
     var health = 10 + difficulty;
     var bounds = new Rectangle(
-      new Point(1 + Math.random() * (this.width - 2), 1 + Math.random() * (this.height - 2)),
+      this.getRandomPoint(),
       1, 1);
     var element = chooseElement();
     var damage = 1;
     var trait = new Trait([TRAIT_BASIC]);
-    var monster = new Monster(this.world, this, health, bounds, element, damage, trait);
+    var monster = new Monster(this.world, this, difficulty, health, bounds, element, damage, trait);
     this.monsters.push(monster);
   }
 
@@ -194,6 +194,10 @@ class Room {
   clearSpells() {
     this.spells = [];
     this.spellParts = [];
+  }
+
+  getRandomPoint() {
+    return new Point(1 + Math.random() * (this.width - 2), 1 + Math.random() * (this.height - 2));
   }
 
   update(tickPart) {
