@@ -132,22 +132,52 @@ class Room {
   generateMonsters(difficulty) {
     this.difficulty = difficulty;
     while(difficulty > 0) {
-      if(Math.random() < (1 / difficulty)) this.generateMonster(difficulty);
+      if(Math.random() < (1 / difficulty)) this.monsters.push(this.generateMonster(difficulty));
       difficulty--;
     }
     //TODO
   }
 
   generateMonster(difficulty) {
+    //higher chance with higher difficulty
+    var bossChance = 1 - (1 / difficulty);
+    bossChance = bossChance * bossChance * 0.1;
+    if(Math.random() < bossChance) {
+      return this.generateBoss(difficulty);
+    }
+
     var health = 5 + Math.floor(Math.random() * difficulty);
     var bounds = new Rectangle(
       this.getRandomPoint(),
       1, 1);
-    var element = ELEMENT_LIGHTNING; //chooseElement();
+    var element = chooseElement();
     var damage = 1;
     var trait = new Trait([TRAIT_BASIC]);
     var monster = new Monster(this.world, this, difficulty, health, bounds, element, damage, trait);
-    this.monsters.push(monster);
+    return monster;
+  }
+
+  //TODO: different enemy class types (including better ai and such
+  generateBoss(difficulty) {
+    var health = 10 + Math.floor(Math.random() * difficulty);
+    var bounds = new Rectangle(
+      this.getRandomPoint(),
+      2, 2);
+    var element = chooseElement();
+    var damage = 2 + Math.floor(Math.random() * 2);
+    var trait = new Trait([TRAIT_BASIC]);
+    var counter = difficulty * Math.random();
+    while(counter > 1) {
+      var trait2 = trait.copy();
+      trait2.not(element);
+      trait2 = trait2.getRandomTrait();
+      if(!trait2) break;
+      trait.add(trait2);
+      counter *= Math.random();
+    }
+    var cooldown = MONSTER_SPELL_COOLDOWN * (1 - (Math.random() * Math.random()));
+    var monster = new Monster(this.world, this, difficulty, health, bounds, element, damage, trait, cooldown);
+    return monster;
   }
 
   makeBoxes() {

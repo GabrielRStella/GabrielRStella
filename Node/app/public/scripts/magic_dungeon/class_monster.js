@@ -1,7 +1,7 @@
 var MONSTER_SPELL_COOLDOWN = 40;
 
 class Monster {
-  constructor(world, room, difficulty, health, bounds, element, damage, trait) {
+  constructor(world, room, difficulty, health, bounds, element, damage, trait, cooldown) {
     this.world = world;
     this.room = room;
     this.difficulty = difficulty;
@@ -14,7 +14,8 @@ class Monster {
     this.damage = damage;
     this.trait = trait;
 
-    this.spellCooldown = MONSTER_SPELL_COOLDOWN * Math.random();
+    this.maxCooldown = cooldown || MONSTER_SPELL_COOLDOWN;
+    this.spellCooldown = this.maxCooldown * Math.random();
 
     this.tick = 0;
   }
@@ -54,7 +55,7 @@ class Monster {
 
   draw(canvas) {
     //drawImageFlipped("monster", canvas, this.bounds);
-    drawImageFlipped("monsters/", canvas, this.bounds);
+    drawImageFlipped("monsters/" + this.element.name.toLowerCase(), canvas, this.bounds);
 
     //health bar!
 
@@ -85,7 +86,7 @@ class Monster {
     dir.magnitude = 0.1;
     dir.rotate((Math.random() - Math.random()) * (0.5 / this.difficulty));
     this.fireSpell(dir);
-    this.spellCooldown = MONSTER_SPELL_COOLDOWN;
+    this.spellCooldown = this.maxCooldown;
   }
 
   fireSpell(dir) {

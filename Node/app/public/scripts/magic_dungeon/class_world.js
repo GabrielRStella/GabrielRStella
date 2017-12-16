@@ -192,7 +192,7 @@ class World {
 
     var room = new Room(this, 16 + Math.floor(Math.random() * 10) * 2, 16 + Math.floor(Math.random() * 10) * 2);
     for(var i = 0; i < DIRS.length; i++) {
-      room.open[DIRS[i]] = (Math.random() < 0.4); //40% chance of an open door
+      room.open[DIRS[i]] = (Math.random() < 0.7); //70% chance of an open door
     }
     room.setOpen(dir.opposite, true);
     room.generateWalls();
