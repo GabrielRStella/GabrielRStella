@@ -2,17 +2,11 @@
 TODO:
 
 splash screen?
-
-classes:
-Monster
-Player
-Render
-Rune
-Spell
-SpellPart
-Style
-Trait
-World
+physics
+more traits
+fancy element rendering
+actual good textures
+runes
 
 */
 
