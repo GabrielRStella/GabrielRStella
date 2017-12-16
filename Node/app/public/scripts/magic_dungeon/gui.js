@@ -13,6 +13,11 @@ var Gui = {
     inner.width *= minScale;
     inner.height *= minScale;
   },
+  fit2: function(outer, inner) {
+    var maxScale = Math.max(outer.width / inner.width, outer.height / inner.height);
+    inner.width *= maxScale;
+    inner.height *= maxScale;
+  },
   center: function(outer, inner) {
     inner.minX = outer.minX + (outer.width - inner.width) / 2;
     inner.minY = outer.minY + (outer.height - inner.height) / 2;

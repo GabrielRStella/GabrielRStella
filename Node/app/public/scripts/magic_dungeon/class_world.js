@@ -146,8 +146,7 @@ class World {
   }
 
   getDrawBounds(bounds) {
-    var room = this.currentRoom;
-    var bounds2 = new Rectangle(new Point(0, 0), room.width, room.height);
+    var bounds2 = new Rectangle(new Point(0, 0), 1, 1);
     Gui.align(bounds, bounds2, [Gui.fit, Gui.center], 0);
     return bounds2;
   }
@@ -157,9 +156,21 @@ class World {
 
     var room = this.currentRoom;
 
+    var bounds2 = bounds;
+    bounds = new Rectangle(new Point(), room.width, room.height);
+    Gui.align(bounds2, bounds, [Gui.fit, Gui.center], 0);
+
+    //TODO: zoom into player?
+/*
+    Gui.align(bounds2, bounds, [Gui.fit2, Gui.center], 0);
+    //make sure player is in view:
+    var pos = this.player.bounds.center;
+*/
+    
+
     //prevent game rendering from exiting the world drawing bounds
     canvas.beginPath();
-    canvas.rect(bounds.minX, bounds.minY, bounds.width, bounds.height);
+    canvas.rect(bounds2.minX, bounds2.minY, bounds2.width, bounds2.height);
     canvas.clip();
 
     //robots in disguise

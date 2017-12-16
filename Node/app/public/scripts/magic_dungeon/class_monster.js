@@ -86,7 +86,7 @@ class Monster {
     dir.magnitude = 0.1;
     dir.rotate((Math.random() - Math.random()) * (0.5 / this.difficulty));
     this.fireSpell(dir);
-    this.spellCooldown = this.maxCooldown;
+    this.spellCooldown = this.maxCooldown + (this.difficulty * Math.random());
   }
 
   fireSpell(dir) {

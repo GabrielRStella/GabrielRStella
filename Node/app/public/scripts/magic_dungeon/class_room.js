@@ -151,7 +151,7 @@ class Room {
       this.getRandomPoint(1),
       1, 1);
     var element = chooseElement();
-    var damage = 1;
+    var damage = 0.5;
     var trait = new Trait([TRAIT_BASIC]);
     var monster = new Monster(this.world, this, difficulty, health, bounds, element, damage, trait);
     return monster;
@@ -164,7 +164,7 @@ class Room {
       this.getRandomPoint(2),
       2, 2);
     var element = chooseElement();
-    var damage = 2 + Math.floor(Math.random() * 2);
+    var damage = 1 + Math.floor(Math.random() * 2);
     var trait = new Trait([TRAIT_BASIC]);
     var counter = difficulty * Math.random();
     while(counter > 1) {
@@ -173,9 +173,9 @@ class Room {
       trait2 = trait2.getRandomTrait();
       if(!trait2) break;
       trait.add(trait2);
-      counter *= Math.random();
+      counter = counter * Math.random() - 1;
     }
-    var cooldown = MONSTER_SPELL_COOLDOWN * (1 - (Math.random() * Math.random()));
+    var cooldown = MONSTER_SPELL_COOLDOWN * ((1 - (Math.random() * Math.random())) + 1) / 2;
     var monster = new MonsterBoss(this.world, this, difficulty, health, bounds, element, damage, trait, cooldown);
     return monster;
   }
@@ -229,7 +229,7 @@ class Room {
   getRandomPoint(pad) {
     pad = pad || 0;
     var pad2 = pad * 2;
-    return new Point(pad + Math.random() * (this.width - pad2), pad + Math.random() * pad2);
+    return new Point(pad + Math.random() * (this.width - pad2), pad + Math.random() * (this.height - pad2));
   }
 
   update(tickPart) {
