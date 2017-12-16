@@ -22,9 +22,9 @@ class Trait {
   }
 
   copy() {
-    //splice(0) does a shallow copy
-    //https://davidwalsh.name/javascript-clone-array
-    return new Trait(this.inner.splice(0));
+    var newArr = [];
+    for(var i = 0; i < this.inner.length; i++) newArr.push(this.inner[i]);
+    return new Trait(newArr);
   }
 }
 
