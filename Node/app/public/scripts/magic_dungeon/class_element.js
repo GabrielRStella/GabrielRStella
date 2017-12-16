@@ -1,6 +1,10 @@
 var ELEMENTS = [];
 var ELEMENT_COUNT = 0;
 
+function chooseElement() {
+  return ELEMENTS[Math.floor(Math.random() * ELEMENT_COUNT)];
+}
+
 class Element {
   constructor(name, deathMessage) {
     this.id = ELEMENT_COUNT;

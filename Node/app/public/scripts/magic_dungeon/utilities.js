@@ -53,8 +53,29 @@ class Point {
     this.y -= other.y;
   }
 
+  get direction() {
+    if(Math.abs(this.x) > Math.abs(this.y)) {
+      //left or right
+      return this.x > 0 ? DIR_RIGHT : DIR_LEFT;
+    } else if(Math.abs(this.x) < Math.abs(this.y)) {
+      //up or down
+      return this.y > 0 ? DIR_UP : DIR_DOWN;
+    } else {
+      //literally exact corner... que
+      
+    }
+  }
+
   get angle() {
     return Math.atan2(this.y, this.x);
+  }
+
+  set angle(r) {
+l
+  }
+
+  rotate(dr) {
+a
   }
 
   angleTo(other) {
@@ -126,12 +147,51 @@ class Rectangle {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
+  //https://gamedev.stackexchange.com/questions/586/what-is-the-fastest-way-to-work-out-2d-bounding-box-intersection
   //do the two rectangles intersect?
   intersects(r) {
+    var c = this.center;
+    var rc = r.center;
+    var x = c.x;
+    var y = c.y;
+    var rx = rc.x;
+    var ry = rc.y;
+    return (Math.abs(x - rx) * 2 < (this.width + r.width))
+      && (Math.abs(y - ry) * 2 < (this.height + r.height));
   }
 
   //push rectangle r out of this rectangle's bounds
   push(r) {
+    if(!this.intersects(r)) return;
+
+    var to = r.center;
+    to.sub(this.center);
+    to.x /= this.width;
+    to.y /= this.height;
+    var dir = to.direction;
+    var tmp = 0;
+
+    if(dir == DIR_UP) {
+      tmp = r.minY - this.maxY;
+      if(tmp < 0) {
+        r.point.y -= tmp;
+      }
+    } else if(dir == DIR_DOWN) {
+      tmp = r.maxY - this.minY;
+      if(tmp > 0) {
+        r.point.y -= tmp;
+      }
+    } else if(dir == DIR_LEFT) {
+      tmp = r.maxX - this.minX;
+      if(tmp > 0) {
+        r.point.x -= tmp;
+      }
+    } else if(dir == DIR_RIGHT) {
+      tmp = r.minX - this.maxX;
+      if(tmp < 0) {
+        r.point.x -= tmp;
+      }
+    }
   }
 
   //if the two rectangles can be merged exactly, without gaining or losing area,
