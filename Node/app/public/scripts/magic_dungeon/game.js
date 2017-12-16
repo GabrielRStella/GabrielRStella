@@ -2,7 +2,6 @@
 TODO:
 
 splash screen?
-physics
 more traits
 fancy element rendering
 actual good textures
