@@ -122,6 +122,20 @@ class Game {
     var dy = 30;
 
     //TODO: keybind info
+    var keybindInfo = [
+      "P to pause",
+      "R to restart",
+      "WASD to move",
+      "Arrow keys to shoot",
+      "1-4 to select element"
+      ];
+
+    for(var i = 0; i < keybindInfo.length; i++) {
+      canvas.fillText(keybindInfo[i], x, y);
+      y += dy;
+    }
+
+    y += dy;
 
     var pauseInfo = this.world.pauseInfo;
 

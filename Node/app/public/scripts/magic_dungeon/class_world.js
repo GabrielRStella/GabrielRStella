@@ -21,6 +21,7 @@ class World {
   get pauseInfo() {
     var ret = [];
     ret.push("Difficulty: " + this.currentRoom.difficulty);
+    ret.push("Health: " + this.player.health + "/" + this.player.maxhealth);
     //TODO: traits and such
     return ret;
   }
