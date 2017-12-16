@@ -171,6 +171,10 @@ class Room {
     this.spells.push(new Spell(this, srcEntity, element, damage, trait, direction));
   }
 
+  fireSpellPart(sp) {
+    this.spellParts.push(sp);
+  }
+
   clearSpells() {
     this.spells = [];
     this.spellParts = [];

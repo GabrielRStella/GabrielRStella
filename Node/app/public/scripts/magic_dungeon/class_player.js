@@ -9,7 +9,12 @@ class Player {
 
     this.element = ELEMENT_LIGHTNING; //arbitrary default
     this.elementDamage = [1, 1, 1, 1];
-    this.elementTraits = [new Trait(), new Trait(), new Trait(), new Trait()];
+    this.elementTraits = [
+        new Trait([TRAIT_BASIC]),
+        new Trait([TRAIT_BASIC]),
+        new Trait([TRAIT_BASIC]),
+        new Trait([TRAIT_BASIC])
+      ];
 
     this.spellCooldown = 0;
   }

@@ -27,6 +27,23 @@ class SpellPart {
   }
 }
 
+class SpellPartLauncher {
+  constructor(room, srcEntity, element, damage) {
+    this.room = room;
+    this.srcEntity = srcEntity;
+    this.element = element;
+    this.damage = damage;
+  }
+
+  create(bounds, velocity) {
+    return new SpellPart(this.room, this.srcEntity, this.element, this.damage, bounds, velocity);
+  }
+
+  launch(bounds, velocity) {
+    this.room.fireSpellPart(new SpellPart(this.room, this.srcEntity, this.element, this.damage, bounds, velocity));
+  }
+}
+
 class Spell {
   constructor(room, srcEntity, element, damage, traits, direction) {
     this.room = room;

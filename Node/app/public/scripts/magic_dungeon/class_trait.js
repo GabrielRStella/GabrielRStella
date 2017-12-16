@@ -1,3 +1,6 @@
+var TRAITS = [];
+var TRAIT_COUNT = 0;
+
 class Trait {
   constructor(traits) {
     this.inner = traits || [];
@@ -9,11 +12,11 @@ class Trait {
   }
 
   hasNext() {
-    return inner.length > this.counter;
+    return this.inner.length > this.counter;
   }
 
   get next() {
-    var ret = inner[this.counter];
+    var ret = this.inner[this.counter];
     this.counter++;
     return ret;
   }
@@ -26,11 +29,38 @@ class Trait {
 }
 
 class TraitPart {
-  constructor(id) {
-    this.id = id;
+  constructor() {
+    this.id = TRAIT_COUNT;
+    TRAIT_COUNT++;
+    if(TRAIT_COUNT != TRAITS.push(this)) {
+      throw "ERROR: Invalid TraitPart count";
+    }
+  }
+
+  getBounds(srcEntity, damage) {
+    var sz = damage / 8;
+    var bounds = new Rectangle(0, 0, sz, sz);
+    bounds.center = srcEntity.bounds.center;
+    return bounds;
   }
 
   fireSpell(room, srcEntity, element, damage, direction) {
-    
+    //base trait - empty
+
+    //for subclass use
+    return new SpellPartLauncher(room, srcEntity, element, damage);
   }
 }
+
+class TraitPartBasic extends TraitPart {
+  constructor() {
+    super();
+  }
+
+  fireSpell(room, srcEntity, element, damage, direction) {
+    var launcher = super.fireSpell(room, srcEntity, element, damage);
+    launcher.launch(this.getBounds(srcEntity, damage), direction);
+  }
+}
+
+var TRAIT_BASIC = new TraitPartBasic(0);
