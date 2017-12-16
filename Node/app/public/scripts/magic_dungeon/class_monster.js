@@ -38,7 +38,7 @@ class Monster {
       var player = this.world.player;
       var dir = player.bounds.center;
       dir.sub(this.bounds.center);
-      dir.magnitude = 1;
+      dir.magnitude = 0.1;
       this.fireSpell(dir);
       this.spellCooldown = MONSTER_SPELL_COOLDOWN;
     }
@@ -54,7 +54,7 @@ class Monster {
   }
 
   fireSpell(dir) {
-    this.room.fireSpell(this, this.element, this.damage, this.trait, dir);
+    this.room.fireSpell(this, this.element, this.damage, this.trait.copy(), dir);
   }
 
   onHit(spellPart) {

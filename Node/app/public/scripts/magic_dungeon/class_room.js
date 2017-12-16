@@ -202,9 +202,9 @@ class Room {
       x.update(tickPart);
       return x.active;
     };
-    this.monsters.filter(g);
-    this.spells.filter(g);
-    this.spellParts.filter(g);
+    this.monsters = this.monsters.filter(g);
+    this.spells = this.spells.filter(g);
+    this.spellParts = this.spellParts.filter(g);
   }
   
 }
