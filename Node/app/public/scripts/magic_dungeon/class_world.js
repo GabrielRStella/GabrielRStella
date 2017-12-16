@@ -26,13 +26,15 @@ class World {
   }
 
   update(tickPart) {
-    //TODO: physics and all that crap... and io
+    //physics and io
+
+    var player = this.player;
 
     //IO (movement)
     var io = this.game.io;
     var playerMove = io.playerMove;
     playerMove.multiply(0.1);
-    var bounds = this.player.bounds;
+    var bounds = player.bounds;
     bounds.point.add(playerMove);
 
     //swap room
@@ -50,13 +52,74 @@ class World {
     var playerSpell = io.playerSpell;
     if(!playerSpell.zero) {
       playerSpell.multiply(0.1);
-      this.player.fireSpell(playerSpell);
+      player.fireSpell(playerSpell);
     }
 
     //physics
 
-    this.player.update(tickPart);
+    player.update(tickPart);
     this.currentRoom.update(tickPart);
+
+    var boxes = this.currentRoom.boxes;
+    var monsters = this.currentRoom.monsters;
+    var spells = this.currentRoom.spellParts;
+
+    //push player out of monsters
+    for(var i = 0; i < monsters.length; i++) {
+      monsters[i].bounds.push(bounds);
+    }
+
+    //push monsters out of monsters
+    for(var i = 0; i < monsters.length; i++) {
+      for(var j = i + 1; j < monsters.length; j++) {
+        monsters[i].bounds.push(monsters[j].bounds);
+      }
+    }
+
+    //push monsters out of blocks
+    for(var i = 0; i < boxes.length; i++) {
+      for(var j = 0; j < monsters.length; j++) {
+        boxes[i].push(monsters[j].bounds);
+      }
+    }
+
+    //push player out of blocks
+    for(var i = 0; i < boxes.length; i++) {
+      boxes[i].push(bounds);
+    }
+
+    //push monsters out of player
+    for(var i = 0; i < monsters.length; i++) {
+      bounds.push(monsters[i].bounds);
+    }
+
+    //check spell collisions
+    for(var i = 0; i < spells.length; i++) {
+      var spell = spells[i]; //is actually a SpellPart but whatever
+      var doCont = false;
+      for(var j = 0; j < boxes.length; j++) {
+        if(boxes[j].intersects(spell.bounds)) {
+          spell.active = false;
+          doCont = true;
+          break;
+        }
+      }
+      if(doCont) continue;
+      if(spell.srcEntity.isPlayer) {
+        //check monster collisions
+        
+        
+        
+      } else {
+        //check player collision
+        if(spell.bounds.intersects(bounds)) {
+          spell.active = false;
+          player.onHit(spell);
+        }
+      }
+    }
+
+    //DONE WITH COLLISIONS
 
     //increment ticker
 

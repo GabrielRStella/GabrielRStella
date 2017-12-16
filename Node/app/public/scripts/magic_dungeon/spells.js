@@ -6,10 +6,7 @@ class SpellPart {
     this.damage = damage;
     this.bounds = bounds;
     this.velocity = velocity;
-  }
-
-  get active() {
-    return true;
+    this.active = true;
   }
 
   update(tickPart) {

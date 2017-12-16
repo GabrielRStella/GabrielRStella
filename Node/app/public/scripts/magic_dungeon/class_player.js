@@ -49,4 +49,7 @@ class Player {
       this.spellCooldown = PLAYER_SPELL_COOLDOWN;
     }
   }
+
+  onHit(spellPart) {
+  }
 }

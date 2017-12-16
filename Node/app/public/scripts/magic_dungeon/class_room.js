@@ -131,7 +131,23 @@ class Room {
 
   generateMonsters(difficulty) {
     this.difficulty = difficulty;
+    while(difficulty > 0) {
+      this.generateMonster(difficulty);
+      difficulty--;
+    }
     //TODO
+  }
+
+  generateMonster(difficulty) {
+    var health = 10 + difficulty;
+    var bounds = new Rectangle(
+      new Point(1 + Math.random() * (this.width - 2), 1 + Math.random() * (this.height - 2)),
+      1, 1);
+    var element = chooseElement();
+    var damage = 1;
+    var trait = new Trait([TRAIT_BASIC]);
+    var monster = new Monster(this.world, this, health, bounds, element, damage, trait);
+    this.monsters.push(monster);
   }
 
   makeBoxes() {

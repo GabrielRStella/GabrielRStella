@@ -7,6 +7,7 @@ more traits
 fancy element rendering
 actual good textures
 runes
+use octree for room bounding boxes
 
 */
 
