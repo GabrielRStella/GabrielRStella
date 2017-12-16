@@ -59,7 +59,7 @@ class TraitPartBasic extends TraitPart {
 
   fireSpell(room, srcEntity, element, damage, direction) {
     var launcher = super.fireSpell(room, srcEntity, element, damage);
-    launcher.launch(this.getBounds(srcEntity, damage), direction.copy);
+    launcher.launch(this.getBounds(srcEntity, damage), direction.copy());
   }
 }
 

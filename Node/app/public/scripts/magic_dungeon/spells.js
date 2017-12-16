@@ -13,7 +13,7 @@ class SpellPart {
   }
 
   update(tickPart) {
-    var vel = velocity.copy();
+    var vel = this.velocity.copy();
     vel.multiply(tickPart);
     this.bounds.point.add(vel);
   }
