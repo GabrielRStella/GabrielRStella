@@ -36,19 +36,44 @@ class Game {
   }
 
   draw(canvas, width, height, paused) {
-    this.drawGame(canvas, width, height);
-    this.drawHUD(canvas, width, height);
+    var bounds = new Rectangle(new Point(0, 0), width, height);
+    var worldBounds = this.world.getDrawBounds(bounds);
+    this.world.draw(canvas, worldBounds);
+    this.drawHUD(canvas, width, height, worldBounds);
     if(paused) {
       this.drawPaused(canvas, width, height);
     }
   }
 
-  drawGame(canvas, width, height) {
-    this.world.draw(canvas, new Rectangle(new Point(0, 0), width, height));
-  }
+  drawHUD(canvas, width, height, world) {
 
-  drawHUD(canvas, width, height) {
-    this.world.player.element.drawSymbol(canvas, new Rectangle(new Point(), 64, 64));
+    var bounds = new Rectangle(new Point(), world.minX, height);
+    if(world.minX == 0) {
+      bounds = new Rectangle(new Point(), width, world.minY);
+    }
+    var space = 10;
+    bounds.point.x += space;
+    bounds.point.y += space;
+    bounds.width -= space * 2;
+    bounds.height -= space * 2;
+
+    var padding = 10;
+    var elemWidth = (bounds.width - (padding * (ELEMENT_COUNT + 1))) / ELEMENT_COUNT;
+    var elemHeight = elemWidth;
+    var x = bounds.minX;
+    var y = bounds.minY;
+    var element = this.world.player.element;
+    for(var i = 0; i < ELEMENT_COUNT; i++) {
+      if(element == ELEMENTS[i]) {
+        canvas.fillStyle = "#606060";
+        canvas.beginPath();
+        canvas.rect(x, y, elemWidth + padding * 2, elemHeight + padding * 2);
+        canvas.fill();
+        canvas.closePath();
+      }
+      ELEMENTS[i].drawSymbol(canvas, new Rectangle(new Point(x + padding, y + padding), elemWidth, elemHeight));
+      x += elemWidth + padding;
+    }
   }
 
   drawPaused(canvas, width, height) {

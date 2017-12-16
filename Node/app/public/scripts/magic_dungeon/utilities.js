@@ -220,6 +220,10 @@ class Rectangle {
   //else do nothing and return false
   merge(r) {
   }
+
+  copy() {
+    return new Rectangle(this.point.copy(), this.width, this.height);
+  }
 }
 
 class Direction {

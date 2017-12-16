@@ -145,23 +145,28 @@ class World {
     return player.health > 0;
   }
 
+  getDrawBounds(bounds) {
+    var room = this.currentRoom;
+    var bounds2 = new Rectangle(new Point(0, 0), room.width, room.height);
+    Gui.align(bounds, bounds2, [Gui.fit, Gui.center], 0);
+    return bounds2;
+  }
+
   draw(canvas, bounds) {
     canvas.save();
 
     var room = this.currentRoom;
-    var bounds2 = new Rectangle(new Point(0, 0), room.width, room.height);
-    Gui.align(bounds, bounds2, [Gui.fit, Gui.center], 0);
 
     //prevent game rendering from exiting the world drawing bounds
     canvas.beginPath();
-    canvas.rect(bounds2.minX, bounds2.minY, bounds2.width, bounds2.height);
+    canvas.rect(bounds.minX, bounds.minY, bounds.width, bounds.height);
     canvas.clip();
 
     //robots in disguise
-    canvas.translate(bounds2.minX, bounds2.minY);
-    canvas.translate(0, bounds2.height);
+    canvas.translate(bounds.minX, bounds.minY);
+    canvas.translate(0, bounds.height);
     canvas.scale(1, -1);
-    canvas.scale(bounds2.width / room.width, bounds2.height / room.height);
+    canvas.scale(bounds.width / room.width, bounds.height / room.height);
 
     //le drawing
     room.draw(canvas);
