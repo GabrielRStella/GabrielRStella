@@ -85,4 +85,8 @@ class Monster {
     }
     this.health -= dmg;
   }
+
+  onDeath(player) {
+    player.heal(1);
+  }
 }

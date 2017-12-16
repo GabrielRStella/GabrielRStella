@@ -108,9 +108,13 @@ class World {
       if(spell.srcEntity.isPlayer) {
         //check monster collisions
         for(var j = 0; j < monsters.length; j++) {
-          if(spell.bounds.intersects(monsters[j].bounds)) {
+          var monster = monsters[j];
+          if(spell.bounds.intersects(monster.bounds)) {
             spell.active = false;
-            monsters[j].onHit(spell);
+            monster.onHit(spell);
+            if(!monster.active) {
+              monster.onDeath(player);
+            }
             break;
           }
         }

@@ -50,6 +50,11 @@ class Player {
     }
   }
 
+  heal(amt) {
+    this.health = Math.min(this.maxhealth, this.health + amt);
+  }
+
   onHit(spellPart) {
+    this.health -= spellPart.damage;
   }
 }
