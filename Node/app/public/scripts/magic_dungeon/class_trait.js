@@ -34,10 +34,24 @@ class Trait {
     for(var i = 0; i < this.inner.length; i++) newArr.push(this.inner[i]);
     return new Trait(newArr);
   }
+
+  //the following are operations that can be used to generate new sets of traits
+
+  and(t) {
+  }
+
+  or(t) {
+  }
+
+  not(elem) {
+    var t = getAllTraits(element);
+    
+  }
 }
 
 class TraitPart {
-  constructor() {
+  constructor(rarity) {
+    this.rarity = rarity || 1;
     this.id = TRAIT_COUNT;
     TRAIT_COUNT++;
     if(TRAIT_COUNT != TRAITS.push(this)) {
@@ -66,8 +80,8 @@ class TraitPart {
 }
 
 class TraitPartBasic extends TraitPart {
-  constructor() {
-    super();
+  constructor(rarity) {
+    super(rarity);
   }
 
   fireSpell(room, srcEntity, element, damage, direction) {
@@ -77,8 +91,8 @@ class TraitPartBasic extends TraitPart {
 }
 
 class TraitPartRandom extends TraitPart {
-  constructor() {
-    super();
+  constructor(rarity) {
+    super(rarity);
   }
 
   fireSpell(room, srcEntity, element, damage, direction) {
@@ -90,8 +104,8 @@ class TraitPartRandom extends TraitPart {
 }
 
 class TraitPartHoming extends TraitPart {
-  constructor() {
-    super();
+  constructor(rarity) {
+    super(rarity);
   }
 
   fireSpell(room, srcEntity, element, damage, direction) {
@@ -115,7 +129,60 @@ class TraitPartHoming extends TraitPart {
   }
 }
 
+class TraitPartCircle extends TraitPart {
+  constructor(rarity, angle) {
+    super(rarity);
+    this.angle = angle || 0;
+  }
+
+  fireSpell(room, srcEntity, element, damage, direction) {
+    var launcher = super.fireSpell(room, srcEntity, element, damage);
+    direction = direction.copy();
+    direction.rotate(this.angle);
+    var angle = Math.PI / 2;
+
+    launcher.launch(this.getBounds(srcEntity, damage), direction.copy());
+    direction.rotate(angle);
+    launcher.launch(this.getBounds(srcEntity, damage), direction.copy());
+    direction.rotate(angle);
+    launcher.launch(this.getBounds(srcEntity, damage), direction.copy());
+    direction.rotate(angle);
+    launcher.launch(this.getBounds(srcEntity, damage), direction.copy());
+  }
+}
+
+class TraitPartSpread extends TraitPart {
+  constructor(rarity) {
+    super(rarity);
+  }
+
+  fireSpell(room, srcEntity, element, damage, direction) {
+    var launcher = super.fireSpell(room, srcEntity, element, damage);
+    var direction1 = direction.copy();
+    var direction2 = direction.copy();
+    var angle = Math.PI / 8;
+    direction1.rotate(angle);
+    direction2.rotate(-angle);
+
+    launcher.launch(this.getBounds(srcEntity, damage), direction1);
+    launcher.launch(this.getBounds(srcEntity, damage), direction2);
+  }
+}
+
 //generic traits
-var TRAIT_BASIC = new TraitPartBasic();
-var TRAIT_RANDOM = new TraitPartRandom();
-var TRAIT_HOMING = new TraitPartHoming();
+var TRAIT_BASIC = new TraitPartBasic(1);
+var TRAIT_RANDOM = new TraitPartRandom(1);
+var TRAIT_HOMING = new TraitPartHoming(4);
+var TRAIT_CIRCLE = new TraitPartCircle(4);
+var TRAIT_CROSS = new TraitPartCircle(4, Math.PI / 4);
+var TRAIT_SPREAD = new TraitPartSpread(2);
+
+//specific traits-
+
+//lightning
+
+//water
+
+//fire
+
+//earth

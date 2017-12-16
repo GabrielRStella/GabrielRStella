@@ -94,7 +94,7 @@ class Point {
     var cos = Math.cos(dr);
     var sin = Math.sin(dr);
     var xP = cos * this.x - sin * this.y;
-    var yP = sin * this.y + cos * this.y;
+    var yP = sin * this.x + cos * this.y;
     this.x = xP;
     this.y = yP;
   }
