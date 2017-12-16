@@ -1,5 +1,11 @@
 class SpellPart {
   constructor(room, srcEntity, element, damage, bounds, velocity) {
+    this.room = room;
+    this.srcEntity = srcEntity;
+    this.element = element;
+    this.damage = damage;
+    this.bounds = bounds;
+    this.velocity = velocity;
   }
 
   get active() {
@@ -35,7 +41,6 @@ class Spell {
 
   get active() {
     //if there are traits left...
-
     return this.traits.hasNext();
   }
 
@@ -43,12 +48,13 @@ class Spell {
     if(this.tick >= 1) {
       this.tick--;
       //get next trait and fire it...
-      
+      this.traits.next.fireSpell(this.room, this.srcEntity, this.element, this.damage, this.direction);
     }
 
     this.tick += tickPart;
   }
 
   draw(canvas) {
+    //maybe add a cool animation but eh
   }
 }

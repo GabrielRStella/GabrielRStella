@@ -1,18 +1,21 @@
 class Trait {
   constructor(traits) {
     this.inner = traits || [];
+    this.counter = 0;
   }
 
-  add(trait) {
-    this.inner.push(trait);
+  add(traitPart) {
+    this.inner.push(traitPart);
   }
 
   hasNext() {
-    return inner.length > 0;
+    return inner.length > this.counter;
   }
 
   get next() {
-    return inner[0];
+    var ret = inner[this.counter];
+    this.counter++;
+    return ret;
   }
 
   copy() {
@@ -28,5 +31,6 @@ class TraitPart {
   }
 
   fireSpell(room, srcEntity, element, damage, direction) {
+    
   }
 }

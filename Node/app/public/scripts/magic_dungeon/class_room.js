@@ -177,7 +177,11 @@ class Room {
   }
 
   update(tickPart) {
-    var g = function(x) { x.update(tickPart); return x.active; };
+    var g = function(x) {
+      if(!x.active) return false;
+      x.update(tickPart);
+      return x.active;
+    };
     this.spells.filter(g);
     this.spells.filter(g);
     this.spells.filter(g);
