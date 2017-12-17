@@ -106,6 +106,12 @@ class ScreenTrait extends Screen {
   }
 }
 
+class ScreenDeath extends Screen {
+  constructor(game, msg) {
+    super(game, msg);
+  }
+}
+
 //TODO: map of rooms, can calculate path from room A to B
 class ScreenMap extends Screen {
   constructor(game) {
@@ -140,7 +146,7 @@ class ScreenMap extends Screen {
     var r_down = nameFunc(DIR_DOWN);
 
     var info = [
-      "Current Room: " + room.id + "/" + rooms.length,
+      "Current Room: " + room.name + "/" + rooms.length,
       "Left: " + r_left,
       "Right: " + r_right,
       "Up: " + r_up,
@@ -194,7 +200,7 @@ class ScreenMap extends Screen {
       canvas.save();
       canvas.textAlign = "center";
       canvas.textBaseline = "middle";
-      canvas.fillText(rooms[i].id, point.x, point.y);
+      canvas.fillText(rooms[i].name, point.x, point.y);
       canvas.restore();
     }
 

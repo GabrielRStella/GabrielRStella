@@ -57,7 +57,9 @@ class Game {
 
   end(msg) {
     //displays the given message then ends the game
-    
+    this.screen = new ScreenDeath(this, msg);
+    this.world = new World(this);
+    GAME_PAUSED = true;
   }
 
   restart() {
