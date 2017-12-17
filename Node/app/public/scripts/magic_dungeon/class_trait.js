@@ -93,7 +93,7 @@ class Trait {
     for(var i = 0; i < this.inner.length; i++) {
       if(space) ret += " ";
       space = true;
-      ret += this.inner[i].name;
+      ret += (this.inner[i] ? this.inner[i].name : "Damage");
     }
     return ret;
   }
@@ -116,7 +116,7 @@ class TraitPart {
   }
 
   getBounds(srcEntity, damage) {
-    var sz = (1 / 3) + (damage * 0.01);
+    var sz = (1 / 3) + (damage * 0.05);
     if(sz > 1) sz = 1; //ez limit
     var bounds = new Rectangle(new Point(), sz, sz);
     bounds.center = srcEntity.bounds.center;
