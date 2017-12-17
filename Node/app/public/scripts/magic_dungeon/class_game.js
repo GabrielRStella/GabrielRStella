@@ -64,6 +64,7 @@ class Game {
 
   restart() {
     this.world = new World(this);
+    this.score = 0;
     GAME_PAUSED = true;
   }
 
