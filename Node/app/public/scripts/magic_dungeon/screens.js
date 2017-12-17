@@ -120,6 +120,7 @@ class ScreenMap extends Screen {
 
   draw(canvas, width, height) {
     super.draw(canvas, width, height);
+    var mouse = THE_MOUSE;
 
     canvas.font = '24px sans-serif';
     canvas.fillStyle = "#ffffff";
@@ -172,7 +173,7 @@ class ScreenMap extends Screen {
     canvas.stroke();
     canvas.closePath();
 
-    var r2 = Math.max(radius * 0.1 - Math.sqrt(rooms.length), 25);
+    var r2 = Math.max(radius * 0.1 / Math.sqrt(rooms.length), 25);
     radius *= 0.85;
 
     var angleIncr = (Math.PI * 2) / rooms.length;
@@ -184,17 +185,25 @@ class ScreenMap extends Screen {
       return point;
     }
 
+    var roomSrc = room;
+    var roomDst = null;
+
     for(var i = 0; i < rooms.length; i++) {
       var point = getPoint(rooms[i]);
 
-      canvas.fillStyle = "#000000a0";
-      canvas.strokeStyle = "#ffffff";
-      canvas.lineWidth = 4;
-      canvas.beginPath();
-      canvas.arc(point.x, point.y, r2, 0, Math.PI*2);
-      canvas.fill();
-      canvas.stroke();
-      canvas.closePath();
+      var isCurrent = (rooms[i] == room);
+      var isDist = (mouse.distance(point) <= r2 + 2); //2 = half of line width
+      if(isDist) roomDst = rooms[i]; //for later
+      if(isCurrent || isDist) {
+        canvas.fillStyle = isDist ? "#800000c0" : "#000000a0";
+        canvas.strokeStyle = "#ffffff";
+        canvas.lineWidth = 4;
+        canvas.beginPath();
+        canvas.arc(point.x, point.y, r2, 0, Math.PI*2);
+        canvas.fill();
+        canvas.stroke();
+        canvas.closePath();
+      }
 
       canvas.fillStyle = "#ffffff";
       canvas.save();
@@ -204,38 +213,82 @@ class ScreenMap extends Screen {
       canvas.restore();
     }
 
+    var drawLine = function(room2, room3) {
+      var src = getPoint(room2);
+      var dst = getPoint(room3);
+
+      //adjust points to be outside of the circles
+      var delta = dst.copy();
+      delta.sub(src);
+      delta.magnitude = r2;
+
+      var delta2 = src.copy();
+      delta2.sub(dst);
+      delta2.magnitude = r2;
+
+      src.add(delta);
+      dst.add(delta2);
+
+      canvas.save();
+
+      canvas.lineWidth = 4;
+      canvas.beginPath();
+      canvas.moveTo(src.x, src.y);
+      canvas.lineTo(dst.x, dst.y);
+      canvas.stroke();
+      canvas.closePath();
+
+      canvas.restore();
+    };
+
+    canvas.strokeStyle = "#ffffff";
     for(var i = 0; i < rooms.length; i++) {
       var room2 = rooms[i];
       for(var j = 0; j < DIRS.length; j++) {
         if(room2.hasConnection(DIRS[j])) {
           var room3 = room2.getConnection(DIRS[j]);
-          var src = getPoint(room2);
-          var dst = getPoint(room3);
-
-          //adjust points to be outside of the circles
-          var delta = dst.copy();
-          delta.sub(src);
-          delta.magnitude = r2;
-
-          var delta2 = src.copy();
-          delta2.sub(dst);
-          delta2.magnitude = r2;
-
-          src.add(delta);
-          dst.add(delta2);
-
-          canvas.save();
-
-          canvas.strokeStyle = "#ffffff";
-          canvas.lineWidth = 4;
-          canvas.beginPath();
-          canvas.moveTo(src.x, src.y);
-          canvas.lineTo(dst.x, dst.y);
-          canvas.stroke();
-          canvas.closePath();
-
-          canvas.restore();
+          drawLine(room2, room3);
         }
+      }
+    }
+
+    //draw path
+
+    if(roomDst && (roomDst != roomSrc)) {
+      var checked = [roomSrc];
+      var frontier = [roomSrc];
+      var sources = {};
+
+      var path = [];
+
+      while(frontier.length > 0) {
+        var roomCurr = frontier[0];
+        frontier.splice(0, 1);
+
+        for(var j = 0; j < DIRS.length; j++) {
+          if(roomCurr.hasConnection(DIRS[j])) {
+            var roomNext = roomCurr.getConnection(DIRS[j]);
+            sources[roomNext.id] = roomCurr;
+            if(roomNext == roomDst) {
+              while(roomNext) {
+                path.push(roomNext);
+                roomNext = sources[roomNext.id];
+              }
+              frontier = []; //to make it end
+              break;
+            } else if(!checked.includes(roomNext)) {
+              checked.push(roomCurr);
+              frontier.push(roomNext);
+            }
+          }
+        }
+      }
+
+      canvas.strokeStyle = "#ff0000";
+      for(var i = 0; i < path.length - 1; i++) {
+        var room2 = path[i];
+        var room3 = path[i + 1];
+        drawLine(room2, room3);
       }
     }
   }
