@@ -56,7 +56,7 @@ class ScreenPause extends Screen {
 
     y += dy;
 
-    var pauseInfo = this.game.world.pauseInfo;
+    var pauseInfo = this.game.world.pauseInfo();
 
     for(var i = 0; i < pauseInfo.length; i++) {
       canvas.fillText(pauseInfo[i], x, y);
@@ -93,5 +93,16 @@ class ScreenTrait extends Screen {
       canvas.fillText(info[i], x, y);
       y += dy;
     }
+  }
+}
+
+//TODO: map of rooms, can calculate path from room A to B
+class ScreenMap extends Screen {
+  constructor(game) {
+    super(game, "Map");
+  }
+
+  draw(canvas, width, height) {
+    super.draw(canvas, width, height);
   }
 }

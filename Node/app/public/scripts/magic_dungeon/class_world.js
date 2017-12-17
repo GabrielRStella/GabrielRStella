@@ -18,14 +18,16 @@ class World {
     this.tick = 0;
   }
 
-  get pauseInfo() {
+  pauseInfo(abridged) {
     var ret = [];
     ret.push("Difficulty: " + this.currentRoom.difficulty);
 
     var player = this.player;
     ret.push("Health: " + player.health + "/" + player.maxhealth);
-    for(var i = 0; i < ELEMENT_COUNT; i++) {
-      ret.push(ELEMENTS[i].name + ": " + player.elementTraits[i].name + " (" + player.elementDamage[i] + ")");
+    if(!abridged) {
+      for(var i = 0; i < ELEMENT_COUNT; i++) {
+        ret.push(ELEMENTS[i].name + ": " + player.elementTraits[i].name + " (" + player.elementDamage[i] + ")");
+      }
     }
 
     return ret;

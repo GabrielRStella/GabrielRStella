@@ -10,10 +10,15 @@ class Game {
   register(keys) {
     this.keys = keys;
     this.io = new IO(keys);
+    this.KEY_MAP = new Key(KEY_M, function(e) {
+      if(GAME_PAUSED) GAME_PAUSED = false;
+      else this.display(new ScreenMap(this));
+    }.bind(this));
+    keys.addKeyListenerDown(this.KEY_MAP);
   }
 
   unregister(keys) {
-    
+    keys.removeKeyListenerDown(this.KEY_MAP);
   }
 
   end(msg) {
@@ -113,7 +118,7 @@ class Game {
       var y = bounds.minY + 30;
       var dy = 30;
 
-      var pauseInfo = this.world.pauseInfo;
+      var pauseInfo = this.world.pauseInfo(true);
 
       for(var i = 0; i < pauseInfo.length; i++) {
         canvas.fillText(pauseInfo[i], x, y);
