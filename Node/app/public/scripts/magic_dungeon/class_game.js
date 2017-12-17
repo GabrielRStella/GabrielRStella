@@ -44,11 +44,11 @@ class Game {
   register(keys) {
     this.keys = keys;
     this.io = new IO(keys);
-    this.KEY_MAP = new Key(KEY_M, function(e) {
+    var key_map = new Key(KEY_M, function(e) {
       if(GAME_PAUSED) GAME_PAUSED = false;
       else this.display(new ScreenMap(this));
     }.bind(this));
-    keys.addKeyListenerDown(this.KEY_MAP);
+    this.KEY_MAP = keys.addKeyListenerDown(key_map);
   }
 
   unregister(keys) {

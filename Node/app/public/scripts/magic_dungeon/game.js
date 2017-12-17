@@ -72,7 +72,7 @@ function UPDATE_TICK(part, paused) {
 
 function RESTART_GAME() {
   THE_GAME.unregister(KEY_OBJ);
-  THE_GAME = new Game();
+  THE_GAME.restart();
   THE_GAME.register(KEY_OBJ);
   GAME_PAUSED = true;
 }
