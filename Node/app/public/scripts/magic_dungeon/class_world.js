@@ -21,8 +21,13 @@ class World {
   get pauseInfo() {
     var ret = [];
     ret.push("Difficulty: " + this.currentRoom.difficulty);
-    ret.push("Health: " + this.player.health + "/" + this.player.maxhealth);
-    //TODO: traits and such
+
+    var player = this.player;
+    ret.push("Health: " + player.health + "/" + player.maxhealth);
+    for(var i = 0; i < ELEMENT_COUNT; i++) {
+      ret.push(ELEMENTS[i].name + ": " + player.elementTraits[i].name + " (" + player.elementDamage[i] + ")");
+    }
+
     return ret;
   }
 

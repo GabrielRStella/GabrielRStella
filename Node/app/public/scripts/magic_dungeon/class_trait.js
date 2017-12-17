@@ -86,10 +86,22 @@ class Trait {
     }
     return null; //what happen???
   }
+
+  get name() {
+    var ret = "";
+    var space = false;
+    for(var i = 0; i < this.inner.length; i++) {
+      if(space) ret += " ";
+      space = true;
+      ret += this.inner[i].name;
+    }
+    return ret;
+  }
 }
 
 class TraitPart {
-  constructor(rarity) {
+  constructor(name, rarity) {
+    this.name = name;
     this.rarity = rarity || 1;
     this.id = TRAIT_COUNT;
     TRAIT_COUNT++;
@@ -120,8 +132,8 @@ class TraitPart {
 }
 
 class TraitPartBasic extends TraitPart {
-  constructor(rarity) {
-    super(rarity);
+  constructor(name, rarity) {
+    super(name, rarity);
   }
 
   fireSpell(room, srcEntity, element, damage, direction) {
@@ -131,8 +143,8 @@ class TraitPartBasic extends TraitPart {
 }
 
 class TraitPartRandom extends TraitPart {
-  constructor(rarity) {
-    super(rarity);
+  constructor(name, rarity) {
+    super(name, rarity);
   }
 
   fireSpell(room, srcEntity, element, damage, direction) {
@@ -144,8 +156,8 @@ class TraitPartRandom extends TraitPart {
 }
 
 class TraitPartHoming extends TraitPart {
-  constructor(rarity) {
-    super(rarity);
+  constructor(name, rarity) {
+    super(name, rarity);
   }
 
   fireSpell(room, srcEntity, element, damage, direction) {
@@ -170,8 +182,8 @@ class TraitPartHoming extends TraitPart {
 }
 
 class TraitPartCircle extends TraitPart {
-  constructor(rarity, angle) {
-    super(rarity);
+  constructor(name, rarity, angle) {
+    super(name, rarity);
     this.angle = angle || 0;
   }
 
@@ -192,8 +204,8 @@ class TraitPartCircle extends TraitPart {
 }
 
 class TraitPartSpread extends TraitPart {
-  constructor(rarity) {
-    super(rarity);
+  constructor(name, rarity) {
+    super(name, rarity);
   }
 
   fireSpell(room, srcEntity, element, damage, direction) {
@@ -210,12 +222,12 @@ class TraitPartSpread extends TraitPart {
 }
 
 //generic traits
-var TRAIT_BASIC = new TraitPartBasic(1);
-var TRAIT_RANDOM = new TraitPartRandom(1);
-var TRAIT_HOMING = new TraitPartHoming(4);
-var TRAIT_CIRCLE = new TraitPartCircle(4);
-var TRAIT_CROSS = new TraitPartCircle(4, Math.PI / 4);
-var TRAIT_SPREAD = new TraitPartSpread(2);
+var TRAIT_BASIC = new TraitPartBasic("Basic", 1);
+var TRAIT_RANDOM = new TraitPartRandom("Random", 1);
+var TRAIT_HOMING = new TraitPartHoming("Homing", 4);
+var TRAIT_CIRCLE = new TraitPartCircle("Circle", 4);
+var TRAIT_CROSS = new TraitPartCircle("Cross", 4, Math.PI / 4);
+var TRAIT_SPREAD = new TraitPartSpread("Spread", 2);
 
 //specific traits-
 
