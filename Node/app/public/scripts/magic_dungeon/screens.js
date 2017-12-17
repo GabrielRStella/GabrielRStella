@@ -232,7 +232,6 @@ class ScreenMap extends Screen {
 
       canvas.save();
 
-      canvas.lineWidth = 4;
       canvas.beginPath();
       canvas.moveTo(src.x, src.y);
       canvas.lineTo(dst.x, dst.y);
@@ -242,6 +241,7 @@ class ScreenMap extends Screen {
       canvas.restore();
     };
 
+    canvas.lineWidth = 4;
     canvas.strokeStyle = "#ffffff";
     for(var i = 0; i < rooms.length; i++) {
       var room2 = rooms[i];
@@ -269,6 +269,7 @@ class ScreenMap extends Screen {
           if(roomCurr.hasConnection(DIRS[j])) {
             var roomNext = roomCurr.getConnection(DIRS[j]);
             if(roomNext == roomDst) {
+              sources[roomNext.id] = roomCurr;
               while(roomNext) {
                 path.push(roomNext);
                 roomNext = sources[roomNext.id];
@@ -285,6 +286,7 @@ class ScreenMap extends Screen {
 
       }
 
+      canvas.lineWidth = 2;
       canvas.strokeStyle = "#ff0000";
       for(var i = 0; i < path.length - 1; i++) {
         var room2 = path[i];
