@@ -189,11 +189,12 @@ class ScreenMap extends Screen {
     var roomDst = null;
 
     for(var i = 0; i < rooms.length; i++) {
-      var point = getPoint(rooms[i]);
+      var room2 = rooms[i];
+      var point = getPoint(room2);
 
-      var isCurrent = (rooms[i] == room);
+      var isCurrent = (room2 == room);
       var isDist = (mouse.distance(point) <= r2 + 2); //2 = half of line width
-      if(isDist) roomDst = rooms[i]; //for later
+      if(isDist) roomDst = room2; //for later
       if(isCurrent || isDist) {
         canvas.fillStyle = isDist ? "#800000c0" : "#000000a0";
         canvas.strokeStyle = "#ffffff";
@@ -209,7 +210,7 @@ class ScreenMap extends Screen {
       canvas.save();
       canvas.textAlign = "center";
       canvas.textBaseline = "middle";
-      canvas.fillText(rooms[i].name, point.x, point.y);
+      canvas.fillText(room2.name, point.x, point.y);
       canvas.restore();
     }
 
@@ -252,10 +253,7 @@ class ScreenMap extends Screen {
       }
     }
 
-//something is wrong with this, it crashes the entire page
-/*
     //draw path
-
     if(roomDst && (roomDst != roomSrc)) {
       var checked = [roomSrc];
       var frontier = [roomSrc];
@@ -270,7 +268,6 @@ class ScreenMap extends Screen {
         for(var j = 0; j < DIRS.length; j++) {
           if(roomCurr.hasConnection(DIRS[j])) {
             var roomNext = roomCurr.getConnection(DIRS[j]);
-            sources[roomNext.id] = roomCurr;
             if(roomNext == roomDst) {
               while(roomNext) {
                 path.push(roomNext);
@@ -279,11 +276,13 @@ class ScreenMap extends Screen {
               frontier = []; //to make it end
               break;
             } else if(!checked.includes(roomNext)) {
+              sources[roomNext.id] = roomCurr;
               checked.push(roomCurr);
               frontier.push(roomNext);
             }
           }
         }
+
       }
 
       canvas.strokeStyle = "#ff0000";
@@ -293,6 +292,5 @@ class ScreenMap extends Screen {
         drawLine(room2, room3);
       }
     }
-*/
   }
 }
