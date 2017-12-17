@@ -44,6 +44,7 @@ class ScreenPause extends Screen {
     var keybindInfo = [
       "P to pause",
       "R to restart",
+      "M to view the map",
       "WASD to move",
       "Arrow keys to shoot",
       "1-4 to select element"
