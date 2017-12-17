@@ -5,7 +5,7 @@ class World {
     this.difficulty = 0;
     this.rooms = [];
 
-    var room = new Room(this, 24, 24); //TODO: non-default constructor (width, height, style)
+    var room = new Room(this, 0, 24, 24); //TODO: non-default constructor (width, height, style)
     room.setOpenAll();
     room.generateWalls();
     room.generateDoors();
@@ -215,7 +215,7 @@ class World {
   connectNew(r, dir) {
     this.difficulty++;
 
-    var room = new Room(this, 16 + Math.floor(Math.random() * 10) * 2, 16 + Math.floor(Math.random() * 10) * 2);
+    var room = new Room(this, this.difficulty, 16 + Math.floor(Math.random() * 10) * 2, 16 + Math.floor(Math.random() * 10) * 2);
     for(var i = 0; i < DIRS.length; i++) {
       room.open[DIRS[i]] = (Math.random() < 0.7); //70% chance of an open door
     }

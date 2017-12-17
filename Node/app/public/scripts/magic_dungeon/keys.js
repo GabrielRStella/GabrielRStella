@@ -10,6 +10,7 @@ var KEY_P = 80;
 var KEY_P_PRESS = 112;
 var KEY_R = 82;
 var KEY_C = 67;
+var KEY_M = 77;
 
 var KEY_0 = 48;
 var KEY_1 = 49;

@@ -104,5 +104,45 @@ class ScreenMap extends Screen {
 
   draw(canvas, width, height) {
     super.draw(canvas, width, height);
+
+    canvas.font = '24px sans-serif';
+    canvas.fillStyle = "#ffffff";
+    canvas.strokeStyle = "#000000";
+
+    var x = 40;
+    var y = 80;
+    var dy = 30;
+
+    var world = this.game.world;
+    var room = world.currentRoom;
+    var n1 = "?";
+    var n2 = "None";
+    var nameFunc = function(dir) {
+      if(room.hasConnection(dir)) {
+        return room.getConnection(dir).id;
+      }
+      return room.isOpen(dir) ? n1 : n2;
+    }
+    var r_left = nameFunc(DIR_LEFT);
+    var r_right = nameFunc(DIR_RIGHT);
+    var r_up = nameFunc(DIR_UP);
+    var r_down = nameFunc(DIR_DOWN);
+
+    var info = [
+      "Current Room: " + room.id,
+      "Left: " + r_left,
+      "Right: " + r_right,
+      "Up: " + r_up,
+      "Down: " + r_down
+      ];
+
+    info.push("");
+    var ln = world.rooms.length;
+    info.push("" + ln + " room" + (ln == 1 ? "" : "s"));
+
+    for(var i = 0; i < info.length; i++) {
+      canvas.fillText(info[i], x, y);
+      y += dy;
+    }
   }
 }
