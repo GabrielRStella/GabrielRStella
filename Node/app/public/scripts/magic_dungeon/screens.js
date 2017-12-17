@@ -166,18 +166,20 @@ class ScreenMap extends Screen {
     canvas.stroke();
     canvas.closePath();
 
-    var r2 = radius * 0.1;
+    var r2 = Math.max(radius * 0.1 - Math.sqrt(rooms.length), 25);
     radius *= 0.85;
 
     var angleIncr = (Math.PI * 2) / rooms.length;
-    var points = [];
-    for(var i = 0; i < rooms.length; i++) {
-      var angle = -(Math.PI / 2) + (angleIncr * i);
+    var getPoint = function(room) {
+      var angle = -(Math.PI / 2) + (angleIncr * room.difficulty);
       var point = new Point(radius, 0);
       point.rotate(angle);
       point.add(center);
+      return point;
+    }
 
-      points.push(point);
+    for(var i = 0; i < rooms.length; i++) {
+      var point = getPoint(rooms[i]);
 
       canvas.fillStyle = "#000000a0";
       canvas.strokeStyle = "#ffffff";
@@ -189,12 +191,46 @@ class ScreenMap extends Screen {
       canvas.closePath();
 
       canvas.fillStyle = "#ffffff";
+      canvas.save();
       canvas.textAlign = "center";
       canvas.textBaseline = "middle";
       canvas.fillText(rooms[i].id, point.x, point.y);
+      canvas.restore();
     }
 
-    
+    for(var i = 0; i < rooms.length; i++) {
+      var room2 = rooms[i];
+      for(var j = 0; j < DIRS.length; j++) {
+        if(room2.hasConnection(DIRS[j])) {
+          var room3 = room2.getConnection(DIRS[j]);
+          var src = getPoint(room2);
+          var dst = getPoint(room3);
 
+          //adjust points to be outside of the circles
+          var delta = dst.copy();
+          delta.sub(src);
+          delta.magnitude = r2;
+
+          var delta2 = src.copy();
+          delta2.sub(dst);
+          delta2.magnitude = r2;
+
+          src.add(delta);
+          dst.add(delta2);
+
+          canvas.save();
+
+          canvas.strokeStyle = "#ffffff";
+          canvas.lineWidth = 4;
+          canvas.beginPath();
+          canvas.moveTo(src.x, src.y);
+          canvas.lineTo(dst.x, dst.y);
+          canvas.stroke();
+          canvas.closePath();
+
+          canvas.restore();
+        }
+      }
+    }
   }
 }

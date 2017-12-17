@@ -19,6 +19,7 @@ class Room {
 
     this.world = world;
     this.id = id;
+    this.name = id + 1;
     this.width = width;
     this.height = height;
     this.style = style;

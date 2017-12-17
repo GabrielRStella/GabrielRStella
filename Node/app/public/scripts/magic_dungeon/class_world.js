@@ -4,7 +4,7 @@ class World {
     this.player = new Player(game, this, new Rectangle(new Point(11.5, 11.5), 1, 1), 10); //TODO: implement player
     this.difficulty = 0;
     this.rooms = [];
-    this.nextRoomId = 1;
+    this.nextRoomId = 0;
 
     var room = new Room(this, this.nextId, 24, 24); //TODO: non-default constructor (width, height, style)
     room.setOpenAll();
