@@ -128,16 +128,16 @@ class Room {
 
   generateObstacles() {
     //TODO
-    var minX = -1;
-    var minY = -1;
-    var maxX = this.width - 1;
-    var maxY = this.height - 1;
 
     if(Math.random() < 0.13) {
       this.generateMaze();
       this.canHaveBoss = false;
     } else if(Math.random() < 0.2) {
       //random stuff...
+      var minX = 1;
+      var minY = 1;
+      var maxX = this.width - 1;
+      var maxY = this.height - 1;
       for(var i = minX; i < maxX; i++) {
         var arr = this.states[i];
         for(var j = minY; j < maxY; j++) {
