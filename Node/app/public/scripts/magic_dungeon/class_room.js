@@ -148,8 +148,9 @@ class Room {
 
     var health = 5 + Math.floor(Math.random() * difficulty);
     var bounds = new Rectangle(
-      this.getRandomPoint(1),
+      new Point(),
       1, 1);
+    bounds.center = this.getRandomPoint(4);
     var element = chooseElement();
     var damage = 0.5;
     var trait = new Trait([TRAIT_BASIC]);
@@ -161,8 +162,9 @@ class Room {
   generateBoss(difficulty) {
     var health = 10 + Math.floor(Math.random() * difficulty);
     var bounds = new Rectangle(
-      this.getRandomPoint(2),
+      new Point(),
       2, 2);
+    bounds.center = this.getRandomPoint(5);
     var element = chooseElement();
     var damage = 1 + Math.floor(Math.random() * 2);
     var trait = new Trait([TRAIT_BASIC]);
