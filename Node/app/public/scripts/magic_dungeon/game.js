@@ -2,8 +2,11 @@
 TODO:
 
 splash screen?
-trait names
+gui screens
+display level in HUD
 more traits
+room obstacles
+better AI
 actual good textures
 runes
 use octree for room bounding boxes

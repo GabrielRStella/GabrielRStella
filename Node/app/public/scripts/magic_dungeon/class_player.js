@@ -91,6 +91,7 @@ class Player {
       this.elementDamage[elem.id]++; //woo
     }
     //do some message... todo
+    this.game.display(new ScreenTrait(this.game, new Trait([t]), elem));
   }
 
   awardTrait(elem) {
