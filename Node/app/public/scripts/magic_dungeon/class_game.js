@@ -134,10 +134,24 @@ class Game {
     var hearts = new Rectangle(new Point(), player.maxhealth, 1);
     Gui.align(bounds, hearts, [Gui.fit, Gui.center], 0);
     var heartSize = hearts.height;
+    var heartEmpty = getImage("heartEmpty");
+    var heartFull = getImage("heart");
+    var imgW = heartFull.width;
+    var imgH = heartFull.height;
     
     for(var i = 0; i < player.maxhealth; i++) {
-      var heartBounds = new Rectangle(new Point(bounds.minX + i * heartSize, bounds.minY), heartSize, heartSize);
-      drawImage(i >= player.health ? "heartEmpty" : "heart", canvas, heartBounds);
+      var delta = player.health - i;
+      var r = new Rectangle(new Point(bounds.minX + i * heartSize, bounds.minY), heartSize, heartSize);
+      if(true) { //what condition?
+        canvas.drawImage(heartEmpty, r.minX, r.minY, r.width, r.height);
+      }
+      if(delta > 0) {
+        if(delta >= 1) {
+          canvas.drawImage(heartFull, r.minX, r.minY, r.width, r.height);
+        } else {
+          canvas.drawImage(heartFull, 0, 0, imgW * delta, imgH, r.minX, r.minY, r.width * delta, r.height);
+        }
+      }
       x += elemWidth + padding;
     }
 
