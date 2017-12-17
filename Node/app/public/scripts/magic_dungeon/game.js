@@ -4,6 +4,8 @@ TODO:
 splash screen?
 more traits
 ensure maze rooms are always fully open
+map screen - somehow take input and calculate path to a given room
+---also list open connections?
 room obstacles
 better AI
 actual good textures

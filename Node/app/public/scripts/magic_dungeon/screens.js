@@ -129,16 +129,12 @@ class ScreenMap extends Screen {
     var r_down = nameFunc(DIR_DOWN);
 
     var info = [
-      "Current Room: " + room.id,
+      "Current Room: " + room.id + "/" + world.rooms.length,
       "Left: " + r_left,
       "Right: " + r_right,
       "Up: " + r_up,
       "Down: " + r_down
       ];
-
-    info.push("");
-    var ln = world.rooms.length;
-    info.push("" + ln + " room" + (ln == 1 ? "" : "s"));
 
     for(var i = 0; i < info.length; i++) {
       canvas.fillText(info[i], x, y);
