@@ -5,10 +5,8 @@ splash screen?
 more traits
 ensure maze rooms are always fully open
 map screen - somehow take input and calculate path to a given room
----also list open connections?
-room obstacles
+room generators
 better AI
-actual good textures
 runes
 use octree for room bounding boxes
 
