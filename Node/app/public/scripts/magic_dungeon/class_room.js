@@ -141,7 +141,7 @@ class Room {
   generateMonster(difficulty) {
     //higher chance with higher difficulty
     var bossChance = 1 - (1 / difficulty);
-    bossChance = bossChance * bossChance * 0.1;
+    bossChance = bossChance * 0.1;
     if(Math.random() < bossChance) {
       return this.generateBoss(difficulty);
     }
