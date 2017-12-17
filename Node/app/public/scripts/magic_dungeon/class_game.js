@@ -48,13 +48,13 @@ class Game {
     var bounds = new Rectangle(new Point(0, 0), width, height);
     var worldBounds = this.world.getDrawBounds(bounds);
     this.world.draw(canvas, worldBounds);
-    this.drawHUD(canvas, width, height, worldBounds);
+    this.drawHUD(canvas, width, height, worldBounds, paused);
     if(paused) {
       this.drawPaused(canvas, width, height);
     }
   }
 
-  drawHUD(canvas, width, height, world) {
+  drawHUD(canvas, width, height, world, paused) {
 
     var player = this.world.player;
 
@@ -103,6 +103,23 @@ class Game {
     delta = heartSize;
     bounds.point.y += delta;
     bounds.height -= delta;
+
+    if(!paused) {
+      canvas.font = '24px sans-serif';
+      canvas.fillStyle = "#ffffff";
+      canvas.strokeStyle = "#000000";
+
+      var x = bounds.minX + 20;
+      var y = bounds.minY + 30;
+      var dy = 30;
+
+      var pauseInfo = this.world.pauseInfo;
+
+      for(var i = 0; i < pauseInfo.length; i++) {
+        canvas.fillText(pauseInfo[i], x, y);
+        y += dy;
+      }
+    }
   }
 
   drawPaused(canvas, width, height) {

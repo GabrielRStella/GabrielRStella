@@ -2,8 +2,6 @@
 TODO:
 
 splash screen?
-gui screens
-display level in HUD
 more traits
 room obstacles
 better AI
