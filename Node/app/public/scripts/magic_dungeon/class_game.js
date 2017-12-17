@@ -49,10 +49,46 @@ class Game {
       else this.display(new ScreenMap(this));
     }.bind(this));
     this.KEY_MAP = keys.addKeyListenerDown(key_map);
+
+    //patch input to gui screens
+
+    this.KEY_GUI_UP1 = keys.addKeyListenerDown(new Key(KEY_W, function(e) {
+        if(this.screen) this.screen.onKeyUp();
+      }.bind(this)));
+    this.KEY_GUI_DOWN1 = keys.addKeyListenerDown(new Key(KEY_S, function(e) {
+        if(this.screen) this.screen.onKeyDown();
+      }.bind(this)));
+    this.KEY_GUI_LEFT1 = keys.addKeyListenerDown(new Key(KEY_A, function(e) {
+        if(this.screen) this.screen.onKeyLeft();
+      }.bind(this)));
+    this.KEY_GUI_RIGHT1 = keys.addKeyListenerDown(new Key(KEY_D, function(e) {
+        if(this.screen) this.screen.onKeyRight();
+      }.bind(this)));
+
+    this.KEY_GUI_UP2 = keys.addKeyListenerDown(new Key(KEY_UP, function(e) {
+        if(this.screen) this.screen.onKeyUp();
+      }.bind(this)));
+    this.KEY_GUI_DOWN2 = keys.addKeyListenerDown(new Key(KEY_DOWN, function(e) {
+        if(this.screen) this.screen.onKeyDown();
+      }.bind(this)));
+    this.KEY_GUI_LEFT2 = keys.addKeyListenerDown(new Key(KEY_LEFT, function(e) {
+        if(this.screen) this.screen.onKeyLeft();
+      }.bind(this)));
+    this.KEY_GUI_RIGHT2 = keys.addKeyListenerDown(new Key(KEY_RIGHT, function(e) {
+        if(this.screen) this.screen.onKeyRight();
+      }.bind(this)));
   }
 
   unregister(keys) {
     keys.removeKeyListenerDown(this.KEY_MAP);
+    keys.removeKeyListenerDown(this.KEY_GUI_UP1);
+    keys.removeKeyListenerDown(this.KEY_GUI_DOWN1);
+    keys.removeKeyListenerDown(this.KEY_GUI_LEFT1);
+    keys.removeKeyListenerDown(this.KEY_GUI_RIGHT1);
+    keys.removeKeyListenerDown(this.KEY_GUI_UP2);
+    keys.removeKeyListenerDown(this.KEY_GUI_DOWN2);
+    keys.removeKeyListenerDown(this.KEY_GUI_LEFT2);
+    keys.removeKeyListenerDown(this.KEY_GUI_RIGHT2);
   }
 
   end(msg) {

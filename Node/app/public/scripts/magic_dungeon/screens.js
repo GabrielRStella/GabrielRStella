@@ -22,6 +22,11 @@ class Screen {
     canvas.lineWidth = 1;
     canvas.fillText(this.title, 20, 50);
   }
+
+  onKeyUp() {}
+  onKeyDown() {}
+  onKeyLeft() {}
+  onKeyRight() {}
 }
 
 class ScreenPause extends Screen {
@@ -116,6 +121,24 @@ class ScreenDeath extends Screen {
 class ScreenMap extends Screen {
   constructor(game) {
     super(game, "Map");
+    this.roomDst = null;
+  }
+
+  swapRoom(d) {
+    if(this.roomDst) {
+      var world = this.game.world;
+      this.roomDst = world.rooms[loop(this.roomDst.id + d, world.rooms.length)];
+    } else {
+      this.roomDst = this.game.world.currentRoom;
+    }
+  }
+
+  onKeyLeft() {
+    this.swapRoom(-1);
+  }
+
+  onKeyRight() {
+    this.swapRoom(1);
   }
 
   draw(canvas, width, height) {
@@ -137,7 +160,7 @@ class ScreenMap extends Screen {
     var n2 = "None";
     var nameFunc = function(dir) {
       if(room.hasConnection(dir)) {
-        return room.getConnection(dir).id;
+        return room.getConnection(dir).name;
       }
       return room.isOpen(dir) ? n1 : n2;
     }
@@ -186,16 +209,9 @@ class ScreenMap extends Screen {
     }
 
     var roomSrc = room;
-    var roomDst = null;
+    var roomDst = this.roomDst;
 
-    for(var i = 0; i < rooms.length; i++) {
-      var room2 = rooms[i];
-      var point = getPoint(room2);
-
-      var isCurrent = (room2 == room);
-      var isDist = (mouse.distance(point) <= r2 + 2); //2 = half of line width
-      if(isDist) roomDst = room2; //for later
-      if(isCurrent || isDist) {
+    var littleCircle = function(point, isDist) {
         canvas.fillStyle = isDist ? "#800000c0" : "#000000a0";
         canvas.strokeStyle = "#ffffff";
         canvas.lineWidth = 4;
@@ -204,6 +220,17 @@ class ScreenMap extends Screen {
         canvas.fill();
         canvas.stroke();
         canvas.closePath();
+    };
+
+    for(var i = 0; i < rooms.length; i++) {
+      var room2 = rooms[i];
+      var point = getPoint(room2);
+
+      var isCurrent = (room2 == room);
+      var isDist = (room2 == this.roomDst) || (mouse.distance(point) <= r2 + 2); //2 = half of line width
+      if(isDist) roomDst = this.roomDst = room2; //for later
+      if(isCurrent || isDist) {
+        littleCircle(point, isDist);
       }
 
       canvas.fillStyle = "#ffffff";
@@ -253,7 +280,8 @@ class ScreenMap extends Screen {
       }
     }
 
-    //draw path
+    //generate + draw path
+    //TODO: it sometimes doesn't give the best (off by 1 or maybe more)
     if(roomDst && (roomDst != roomSrc)) {
       var checked = [roomSrc];
       var frontier = [roomSrc];
@@ -264,6 +292,7 @@ class ScreenMap extends Screen {
       while(frontier.length > 0) {
         var roomCurr = frontier[0];
         frontier.splice(0, 1);
+        checked.push(roomCurr);
 
         for(var j = 0; j < DIRS.length; j++) {
           if(roomCurr.hasConnection(DIRS[j])) {
@@ -278,7 +307,7 @@ class ScreenMap extends Screen {
               break;
             } else if(!checked.includes(roomNext)) {
               sources[roomNext.id] = roomCurr;
-              checked.push(roomCurr);
+              checked.push(roomNext);
               frontier.push(roomNext);
             }
           }
@@ -286,13 +315,21 @@ class ScreenMap extends Screen {
 
       }
 
-      canvas.lineWidth = 2;
+      canvas.lineWidth = 3;
       canvas.strokeStyle = "#ff0000";
       for(var i = 0; i < path.length - 1; i++) {
         var room2 = path[i];
         var room3 = path[i + 1];
         drawLine(room2, room3);
       }
+      var ln = path.length - 1;
+      littleCircle(center, false);
+      canvas.save();
+      canvas.fillStyle = "#ffffff";
+      canvas.textAlign = "center";
+      canvas.textBaseline = "middle";
+      canvas.fillText(ln, center.x, center.y);
+      canvas.restore();
     }
   }
 }

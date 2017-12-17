@@ -15,6 +15,11 @@ var KEY_M = 77;
 var KEY_0 = 48;
 var KEY_1 = 49;
 
+var KEY_W = 87;
+var KEY_A = 65;
+var KEY_S = 83;
+var KEY_D = 68;
+
 function getKeyCode(keyChar) {
   return keyChar.toUpperCase().charCodeAt(0);
 }
