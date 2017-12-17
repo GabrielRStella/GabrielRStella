@@ -252,6 +252,8 @@ class ScreenMap extends Screen {
       }
     }
 
+//something is wrong with this, it crashes the entire page
+/*
     //draw path
 
     if(roomDst && (roomDst != roomSrc)) {
@@ -291,5 +293,6 @@ class ScreenMap extends Screen {
         drawLine(room2, room3);
       }
     }
+*/
   }
 }
