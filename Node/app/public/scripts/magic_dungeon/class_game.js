@@ -98,7 +98,7 @@ class Game {
 
   drawPaused(canvas, width, height) {
     //overlay
-    canvas.fillStyle = "#00000070";
+    canvas.fillStyle = "#000000a0";
     canvas.strokeStyle = "#ffffff";
     canvas.lineWidth = 4;
     canvas.beginPath();
