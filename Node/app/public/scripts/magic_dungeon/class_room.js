@@ -22,6 +22,7 @@ class Room {
     this.height = height;
     this.style = style;
     this.difficulty = -1;
+    this.canHaveBoss = true;
 
     this.states = [];
     for(var i = 0; i < width; i++) {
@@ -127,99 +128,16 @@ class Room {
 
   generateObstacles() {
     //TODO
-    var minX = 1;
-    var minY = 1;
+    var minX = -1;
+    var minY = -1;
     var maxX = this.width - 1;
     var maxY = this.height - 1;
 
-return; //TEMP
-
-    if(Math.random() < 1) {
-
-      var convert = function(p) {
-        return p.x + p.y * this.width;
-      }.bind(this);
-      var convert2 = function(x) {
-        return new Point(x % this.width, Math.floor(x / this.width));
-      }.bind(this);
-
-      //make it a maze
-      //using a "randomized kruskal's algorithm" from wikipedia
-      //woo...
-      var walls = [];
-      var points = []
-      for(var x = minX; x <= maxX; x++) {
-        for(var y = minY; y <= maxY; y++) {
-          if(x % 2 == 0 && y % 2 == 0) {
-            points.push(new Set([convert(new Point(x, y))]));
-          } else if(x % 2 == 0 || y % 2 == 0) {
-            walls.push(convert(new Point(x, y)));
-          }
-        }
-      }
-      shuffle(walls);
-      walls = new Set(walls);
-      walls.forEach(function(wall) {
-        wall = convert2(wall);
-        var p1;
-        var p2;
-        if(wall.x % 2 == 0) {
-          //join vertically
-          p1 = new Point(wall.x, wall.y - 1);
-          p2 = new Point(wall.x, wall.y + 1);
-        } else {
-          //join horizontally
-          p1 = new Point(wall.x - 1, wall.y);
-          p2 = new Point(wall.x + 1, wall.y);
-        }
-        p1 = convert(p1);
-        p2 = convert(p2);
-        var s1;
-        var s2;
-        var i2;
-        for(var i = 0; i < points.length; i++) {
-          var s = points[i];
-          //console.log(s);
-          if(s.has(p1)) {
-            s1 = s;
-          }
-          if(s.has(p2)) {
-            s2 = s;
-            i2 = i;
-          }
-        }
-        if(s1 && s2 && (s1 != s2)) {
-          s1.add(convert(wall));
-          var iter = s2.values();
-          do {
-            var n = iter.next();
-            if(n.done) break;
-            s1.add(n.value);
-          } while(true);
-
-          points.splice(i2, 1);
-        }
-      });
-
-      if(points.length != 1) {
-        console.log("what happened?");
-      }
-      points = points[0];
-
-      for(var x = minX; x <= maxX; x++) {
-        for(var y = minY; y <= maxY; y++) {
-          if(!points.has(convert(new Point(x, y)))) {
-            this.states[x][y] = STATE_WALL;
-          }
-        }
-      }
-
-
-
-
+    if(Math.random() < 0.13) {
+      this.generateMaze();
+      this.canHaveBoss = false;
     } else if(Math.random() < 0.2) {
       //random stuff...
-
       for(var i = minX; i < maxX; i++) {
         var arr = this.states[i];
         for(var j = minY; j < maxY; j++) {
@@ -240,6 +158,109 @@ return; //TEMP
     }
   }
 
+  generateMaze() {
+    var minX = -1;
+    var minY = -1;
+    var maxX = this.width - 1;
+    var maxY = this.height - 1;
+    var convert = function(p) {
+      return p.x + p.y * this.width;
+    }.bind(this);
+    var convert2 = function(x) {
+      return new Point(x % this.width, Math.floor(x / this.width));
+    }.bind(this);
+
+    //make it a maze
+    //using a "randomized kruskal's algorithm" from wikipedia
+    //https://en.wikipedia.org/wiki/Maze_generation_algorithm
+    //woo...
+    var walls = [];
+    var points = []
+    for(var x = minX; x <= maxX; x++) {
+      for(var y = minY; y <= maxY; y++) {
+        if(x % 2 == 0 && y % 2 == 0) {
+          points.push(new Set([convert(new Point(x, y))]));
+        } else if(x % 2 == 0 || y % 2 == 0) {
+          walls.push(convert(new Point(x, y)));
+        }
+      }
+    }
+    shuffle(walls);
+    walls = new Set(walls);
+    walls.forEach(function(wall) {
+      wall = convert2(wall);
+      var p1;
+      var p2;
+      if(wall.x % 2 == 0) {
+        //join vertically
+        p1 = new Point(wall.x, wall.y - 1);
+        p2 = new Point(wall.x, wall.y + 1);
+      } else {
+        //join horizontally
+        p1 = new Point(wall.x - 1, wall.y);
+        p2 = new Point(wall.x + 1, wall.y);
+      }
+      p1 = convert(p1);
+      p2 = convert(p2);
+      var s1;
+      var s2;
+      var i2;
+      for(var i = 0; i < points.length; i++) {
+        var s = points[i];
+        //console.log(s);
+        if(s.has(p1)) {
+          s1 = s;
+        }
+        if(s.has(p2)) {
+          s2 = s;
+          i2 = i;
+        }
+      }
+      if(s1 && s2 && (s1 != s2)) {
+        s1.add(convert(wall));
+        var iter = s2.values();
+        do {
+          var n = iter.next();
+          if(n.done) break;
+          s1.add(n.value);
+        } while(true);
+
+        points.splice(i2, 1);
+      }
+    });
+
+    if(points.length != 1) {
+      console.log("what happened? something went wrong while generating a maze.");
+    }
+    points = points[0];
+
+    var broken = 1 - (Math.random() * Math.random());
+    minX = 1;
+    minY = 1;
+    for(var x = minX; x < maxX; x++) {
+      for(var y = minY; y < maxY; y++) {
+        if((Math.random() < broken) && !points.has(convert(new Point(x, y)))) {
+          this.states[x][y] = STATE_WALL;
+        }
+      }
+    }
+
+    //dig tunnels from the gates
+    for(var i = 0; i < DIRS.length; i++) {
+      if(this.open[DIRS[i]]) {
+        var dir = DIRS[i].opposite; //if it's the bottom gate, we're going up, etc
+        
+        var src = ROOM_GATE_FUNC(DIRS[i].delta, this.width, this.height);
+        var dx = (dir.delta.x == 0) ? 1 : 0;
+        var dy = (dir.delta.y == 0) ? 1 : 0;
+        src.x += dir.delta.x;
+        src.y += dir.delta.y;
+        this.states[src.x][src.y] = STATE_EMPTY;
+        this.states[src.x + dx][src.y + dy] = STATE_EMPTY;
+      }
+    }
+  }
+
   generateMonsters(difficulty) {
     this.difficulty = difficulty;
     while(difficulty > 0) {
@@ -253,7 +274,7 @@ return; //TEMP
     //higher chance with higher difficulty
     var bossChance = 1 - (1 / difficulty);
     bossChance = bossChance * 0.1;
-    if(Math.random() < bossChance) {
+    if(this.canHaveBoss && (Math.random() < bossChance)) {
       return this.generateBoss(difficulty);
     }
 
