@@ -92,6 +92,7 @@ class Player {
     }
     //do some message... todo
     this.game.display(new ScreenTrait(this.game, new Trait([t]), elem));
+    this.game.addScore(1);
   }
 
   awardTrait(elem) {

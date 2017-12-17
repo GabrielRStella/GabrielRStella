@@ -5,6 +5,40 @@ class Game {
     this.world = new World(this);
 
     this.prevPaused = false;
+
+    this.score = 0;
+    this.loadHighScore();
+  }
+
+  get scoreInfo() {
+    return [
+        "Score: " + this.score,
+        "High Score: " + this.highScore,
+      ];
+  }
+
+  addScore(s) {
+    this.score += s;
+    this.saveScore();
+  }
+
+  saveScore() {
+    if(this.score > this.highScore) {
+      var date = new Date();
+      date.setFullYear(date.getFullYear() + 1); //won't expire for a while :)
+      document.cookie = "maxScore=" + this.score + ";expires=" + date;
+      this.highScore = this.score;
+    }
+  }
+
+  loadHighScore() {
+    var cookie = document.cookie;
+    var index = cookie.search("maxScore=");
+    if(index >= 0) {
+      index += 9; //beginning of the number
+      this.highScore = parseInt(cookie.substring(index));
+    } else this.highScore = 0;
+    return this.highScore;
   }
 
   register(keys) {
@@ -122,6 +156,14 @@ class Game {
 
       for(var i = 0; i < pauseInfo.length; i++) {
         canvas.fillText(pauseInfo[i], x, y);
+        y += dy;
+      }
+
+      y += dy;
+      var scoreInfo = this.scoreInfo;
+
+      for(var i = 0; i < scoreInfo.length; i++) {
+        canvas.fillText(scoreInfo[i], x, y);
         y += dy;
       }
     }

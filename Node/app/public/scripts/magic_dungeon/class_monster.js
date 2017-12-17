@@ -105,6 +105,7 @@ class Monster {
 
   onDeath(player) {
     player.heal(1);
+    player.game.addScore(1);
   }
 }
 
@@ -117,5 +118,6 @@ class MonsterBoss extends Monster {
   onDeath(player) {
     //super.onDeath(player);
     player.awardTrait(this.element);
+    player.game.addScore(1);
   }
 }

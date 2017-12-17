@@ -219,6 +219,7 @@ class World {
 
   connectNew(r, dir) {
     this.difficulty++;
+    this.game.addScore(1);
 
     var room = new Room(this, this.nextId, 16 + Math.floor(Math.random() * 10) * 2, 16 + Math.floor(Math.random() * 10) * 2);
     for(var i = 0; i < DIRS.length; i++) {

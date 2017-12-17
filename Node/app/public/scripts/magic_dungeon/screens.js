@@ -57,6 +57,15 @@ class ScreenPause extends Screen {
 
     y += dy;
 
+    var scoreInfo = this.game.scoreInfo;
+
+    for(var i = 0; i < scoreInfo.length; i++) {
+      canvas.fillText(scoreInfo[i], x, y);
+      y += dy;
+    }
+
+    y += dy;
+
     var pauseInfo = this.game.world.pauseInfo();
 
     for(var i = 0; i < pauseInfo.length; i++) {
