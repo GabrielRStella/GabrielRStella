@@ -159,10 +159,10 @@ class Room {
   }
 
   generateMaze() {
-    var minX = -1;
-    var minY = -1;
-    var maxX = this.width - 1;
-    var maxY = this.height - 1;
+    var minX = 0;
+    var minY = 0;
+    var maxX = this.width;
+    var maxY = this.height;
     var convert = function(p) {
       return p.x + p.y * this.width;
     }.bind(this);
@@ -176,11 +176,11 @@ class Room {
     //woo...
     var walls = [];
     var points = []
-    for(var x = minX; x <= maxX; x++) {
-      for(var y = minY; y <= maxY; y++) {
+    for(var x = minX; x < maxX; x++) {
+      for(var y = minY; y < maxY; y++) {
         if(x % 2 == 0 && y % 2 == 0) {
           points.push(new Set([convert(new Point(x, y))]));
-        } else if(x % 2 == 0 || y % 2 == 0) {
+        } else if((x % 2 == 0 || y % 2 == 0)) {
           walls.push(convert(new Point(x, y)));
         }
       }
@@ -237,6 +237,8 @@ class Room {
     var broken = 1 - (Math.random() * Math.random());
     minX = 1;
     minY = 1;
+    maxX = this.width - 1;
+    maxY = this.height - 1;
     for(var x = minX; x < maxX; x++) {
       for(var y = minY; y < maxY; y++) {
         if((Math.random() < broken) && !points.has(convert(new Point(x, y)))) {
@@ -259,6 +261,8 @@ class Room {
         this.states[src.x + dx][src.y + dy] = STATE_EMPTY;
       }
     }
+
+    //TODO: correctly ensure all gates are reachable using a search
   }
 
   generateMonsters(difficulty) {

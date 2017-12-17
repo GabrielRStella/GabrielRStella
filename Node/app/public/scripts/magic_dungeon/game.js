@@ -3,6 +3,7 @@ TODO:
 
 splash screen?
 more traits
+ensure maze rooms are always fully open
 room obstacles
 better AI
 actual good textures
