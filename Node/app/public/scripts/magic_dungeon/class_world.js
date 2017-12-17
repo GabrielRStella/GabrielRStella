@@ -171,7 +171,8 @@ class World {
 
     //prevent game rendering from exiting the world drawing bounds
     canvas.beginPath();
-    canvas.rect(bounds2.minX, bounds2.minY, bounds2.width, bounds2.height);
+    //canvas.rect(bounds2.minX, bounds2.minY, bounds2.width, bounds2.height);
+    canvas.rect(bounds.minX, bounds.minY, bounds.width, bounds.height);
     canvas.clip();
 
     //robots in disguise
