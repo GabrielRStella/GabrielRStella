@@ -125,6 +125,7 @@ class ScreenMap extends Screen {
 
     var world = this.game.world;
     var room = world.currentRoom;
+    var rooms = world.rooms;
     var n1 = "?";
     var n2 = "None";
     var nameFunc = function(dir) {
@@ -139,7 +140,7 @@ class ScreenMap extends Screen {
     var r_down = nameFunc(DIR_DOWN);
 
     var info = [
-      "Current Room: " + room.id + "/" + world.rooms.length,
+      "Current Room: " + room.id + "/" + rooms.length,
       "Left: " + r_left,
       "Right: " + r_right,
       "Up: " + r_up,
@@ -150,5 +151,50 @@ class ScreenMap extends Screen {
       canvas.fillText(info[i], x, y);
       y += dy;
     }
+
+    var mapBounds = new Rectangle(new Point(), 1, 1);
+    Gui.align(new Rectangle(new Point(), width, height), mapBounds, [Gui.fit, Gui.center], 0);
+
+    canvas.beginPath();
+    canvas.fillStyle = "#000000a0";
+    canvas.strokeStyle = "#ffffff";
+    canvas.lineWidth = 4;
+    var center = mapBounds.center;
+    var radius = mapBounds.width / 2;
+    canvas.arc(center.x, center.y, radius, 0, Math.PI*2);
+    canvas.fill();
+    canvas.stroke();
+    canvas.closePath();
+
+    var r2 = radius * 0.1;
+    radius *= 0.85;
+
+    var angleIncr = (Math.PI * 2) / rooms.length;
+    var points = [];
+    for(var i = 0; i < rooms.length; i++) {
+      var angle = -(Math.PI / 2) + (angleIncr * i);
+      var point = new Point(radius, 0);
+      point.rotate(angle);
+      point.add(center);
+
+      points.push(point);
+
+      canvas.fillStyle = "#000000a0";
+      canvas.strokeStyle = "#ffffff";
+      canvas.lineWidth = 4;
+      canvas.beginPath();
+      canvas.arc(point.x, point.y, r2, 0, Math.PI*2);
+      canvas.fill();
+      canvas.stroke();
+      canvas.closePath();
+
+      canvas.fillStyle = "#ffffff";
+      canvas.textAlign = "center";
+      canvas.textBaseline = "middle";
+      canvas.fillText(rooms[i].id, point.x, point.y);
+    }
+
+    
+
   }
 }
