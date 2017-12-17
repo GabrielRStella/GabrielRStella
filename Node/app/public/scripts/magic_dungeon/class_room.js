@@ -127,6 +127,117 @@ class Room {
 
   generateObstacles() {
     //TODO
+    var minX = 1;
+    var minY = 1;
+    var maxX = this.width - 1;
+    var maxY = this.height - 1;
+
+return; //TEMP
+
+    if(Math.random() < 1) {
+
+      var convert = function(p) {
+        return p.x + p.y * this.width;
+      }.bind(this);
+      var convert2 = function(x) {
+        return new Point(x % this.width, Math.floor(x / this.width));
+      }.bind(this);
+
+      //make it a maze
+      //using a "randomized kruskal's algorithm" from wikipedia
+      //woo...
+      var walls = [];
+      var points = []
+      for(var x = minX; x <= maxX; x++) {
+        for(var y = minY; y <= maxY; y++) {
+          if(x % 2 == 0 && y % 2 == 0) {
+            points.push(new Set([convert(new Point(x, y))]));
+          } else if(x % 2 == 0 || y % 2 == 0) {
+            walls.push(convert(new Point(x, y)));
+          }
+        }
+      }
+      shuffle(walls);
+      walls = new Set(walls);
+      walls.forEach(function(wall) {
+        wall = convert2(wall);
+        var p1;
+        var p2;
+        if(wall.x % 2 == 0) {
+          //join vertically
+          p1 = new Point(wall.x, wall.y - 1);
+          p2 = new Point(wall.x, wall.y + 1);
+        } else {
+          //join horizontally
+          p1 = new Point(wall.x - 1, wall.y);
+          p2 = new Point(wall.x + 1, wall.y);
+        }
+        p1 = convert(p1);
+        p2 = convert(p2);
+        var s1;
+        var s2;
+        var i2;
+        for(var i = 0; i < points.length; i++) {
+          var s = points[i];
+          //console.log(s);
+          if(s.has(p1)) {
+            s1 = s;
+          }
+          if(s.has(p2)) {
+            s2 = s;
+            i2 = i;
+          }
+        }
+        if(s1 && s2 && (s1 != s2)) {
+          s1.add(convert(wall));
+          var iter = s2.values();
+          do {
+            var n = iter.next();
+            if(n.done) break;
+            s1.add(n.value);
+          } while(true);
+
+          points.splice(i2, 1);
+        }
+      });
+
+      if(points.length != 1) {
+        console.log("what happened?");
+      }
+      points = points[0];
+
+      for(var x = minX; x <= maxX; x++) {
+        for(var y = minY; y <= maxY; y++) {
+          if(!points.has(convert(new Point(x, y)))) {
+            this.states[x][y] = STATE_WALL;
+          }
+        }
+      }
+
+
+
+
+    } else if(Math.random() < 0.2) {
+      //random stuff...
+
+      for(var i = minX; i < maxX; i++) {
+        var arr = this.states[i];
+        for(var j = minY; j < maxY; j++) {
+          if(Math.random() < 0.01) {
+            arr[j] = STATE_WALL_BROKEN;
+          }
+        }
+      }
+    } else if(Math.random() < 0.1) {
+      //structures
+
+      while(Math.random() < 0.7) {
+        var x = Math.floor(randomRange(minX, maxX));
+        var y = Math.floor(randomRange(minY, maxY));
+      }
+    } else {
+      //empty
+    }
   }
 
   generateMonsters(difficulty) {
