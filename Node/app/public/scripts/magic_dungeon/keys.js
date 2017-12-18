@@ -41,12 +41,28 @@ class KeyDual {
   }
 }
 
+class FakeArray {
+  constructor() {
+    this.length = 0;
+  }
+
+  push(t) {
+    this[this.length] = t;
+    this.length++;
+    return this.length;
+  }
+
+  remove(i) {
+    this[i] = undefined;
+  }
+}
+
 class Keys {
   constructor() {
-    this.KEYS_DOWN = [];
-    this.KEYS_UP = [];
-    this.KEYS_PRESS = [];
-    this.KEYS_DUAL = [];
+    this.KEYS_DOWN = new FakeArray();
+    this.KEYS_UP = new FakeArray();
+    this.KEYS_PRESS = new FakeArray();
+    this.KEYS_DUAL = new FakeArray();
 
     this.eventKeydownB = this.eventKeydown.bind(this);
     this.eventKeyupB = this.eventKeyup.bind(this);
@@ -80,19 +96,19 @@ class Keys {
   }
 
   removeKeyListenerDown(key) {
-    this.KEYS_DOWN.splice(key, 1);
+    this.KEYS_DOWN.remove(key);
   }
 
   removeKeyListenerUp(key) {
-    this.KEYS_UP.splice(key, 1);
+    this.KEYS_UP.remove(key);
   }
 
   removeKeyListenerPress(key) {
-    this.KEYS_PRESS.splice(key, 1);
+    this.KEYS_PRESS.remove(key);
   }
 
   removeKeyListenerDual(key) {
-    this.KEYS_DUAL.splice(key, 1);
+    this.KEYS_DUAL.remove(key);
   }
 
   register() {
@@ -111,10 +127,12 @@ class Keys {
     var keyCode = e.keyCode;
     for(var i = 0; i < this.KEYS_DOWN.length; i++) {
       var key = this.KEYS_DOWN[i];
+      if(!key) continue;
       if(key.keyCode == keyCode) key.callBack(e);
     }
     for(var i = 0; i < this.KEYS_DUAL.length; i++) {
       var key = this.KEYS_DUAL[i];
+      if(!key) continue;
       if(key.keyCode == keyCode) key.callBackDown(e);
     }
     this.keyStates[keyCode] = true;
@@ -124,10 +142,12 @@ class Keys {
     var keyCode = e.keyCode;
     for(var i = 0; i < this.KEYS_UP.length; i++) {
       var key = this.KEYS_UP[i];
+      if(!key) continue;
       if(key.keyCode == keyCode) key.callBack(e);
     }
     for(var i = 0; i < this.KEYS_DUAL.length; i++) {
       var key = this.KEYS_DUAL[i];
+      if(!key) continue;
       if(key.keyCode == keyCode) key.callBackUp(e);
     }
     this.keyStates[keyCode] = false;
@@ -137,6 +157,7 @@ class Keys {
     var keyCode = e.keyCode;
     for(var i = 0; i < this.KEYS_PRESS.length; i++) {
       var key = this.KEYS_PRESS[i];
+      if(!key) continue;
       if(key.keyCode == keyCode) key.callBack(e);
     }
   }
