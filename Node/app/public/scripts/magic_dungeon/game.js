@@ -10,6 +10,7 @@ runes
 use octree for room bounding boxes
 clean up code for screens
 fancy fx
+more monster varieties
 
 */
 

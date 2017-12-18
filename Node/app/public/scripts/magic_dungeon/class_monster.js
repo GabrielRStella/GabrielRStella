@@ -53,9 +53,12 @@ class Monster {
     }
   }
 
+  get img() {
+    return "monsters/" + this.element.name.toLowerCase();
+  }
+
   draw(canvas) {
-    //drawImageFlipped("monster", canvas, this.bounds);
-    drawImageFlipped("monsters/" + this.element.name.toLowerCase(), canvas, this.bounds);
+    drawImageFlipped(this.img, canvas, this.bounds);
 
     //health bar!
 
@@ -93,13 +96,18 @@ class Monster {
     this.room.fireSpell(this, this.element, this.damage, this.trait.copy(), dir);
   }
 
+  getDamageModifier(element) {
+    if(element.beats(this.element)) {
+      return 2;
+    } else if(element.loses(this.element)) {
+      return 0.5;
+    }
+    return 1;
+  }
+
   onHit(spellPart) {
     var dmg = spellPart.damage;
-    if(spellPart.element.beats(this.element)) {
-      dmg *= 2;
-    } else if(spellPart.element.loses(this.element)) {
-      dmg /= 2;
-    }
+    dmg *= this.getDamageModifier(spellPart.element);
     this.health -= dmg;
   }
 
@@ -119,5 +127,24 @@ class MonsterBoss extends Monster {
     //super.onDeath(player);
     player.awardTrait(this.element);
     player.game.addScore(1);
+  }
+}
+
+class MonsterRainbow extends Monster {
+
+  constructor(world, room, difficulty, health, bounds, element, damage, trait, cooldown) {
+    super(world, room, difficulty, health, bounds, element, damage, trait, cooldown);
+  }
+
+  get img() {
+    return "monster";
+  }
+
+  getDamageModifier(element) {
+    return 1;
+  }
+
+  fireSpell(dir) {
+    this.room.fireSpell(this, chooseElement(), this.damage, this.trait.copy(), dir);
   }
 }
