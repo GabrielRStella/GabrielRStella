@@ -17,7 +17,7 @@ class Monster {
     this.maxCooldown = cooldown || MONSTER_SPELL_COOLDOWN;
     this.spellCooldown = this.maxCooldown * Math.random();
 
-    this.ai = new AIAggressive(this);
+    this.ai = new AICombined(this);
   }
 
   get isPlayer() {

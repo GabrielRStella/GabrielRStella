@@ -83,6 +83,7 @@ class AIAggressive extends AIGoal {
       var player = this.room.world.player.bounds.center;
       this.path = this.room.findPath(this.bounds.center, player, Math.max(this.bounds.width, this.bounds.height));
     }
+    if(!this.path.length) return this.bounds.center;
     var g = this.path[0];
     this.path.splice(0, 1);
     return g;
@@ -133,9 +134,26 @@ class AICombined extends AI {
   constructor(entity) {
     super(entity);
     //change internal AI based on difficulty
-    //types: Aggressive, Random, Dodger
+    this.types = [];
+    var dif = entity.difficulty;
+    var coeff
+    this.addType(AIRandom, 2 / dif);
+    this.addType(AIAggressive, 4 + 2 * dif);
+    this.addType(AIDodger, 3 + dif);
+  }
+
+  addType(type, weight) {
+    var inst = new type(this.entity);
+    this.types.push({ai: inst, weight: weight});
   }
 
   move(tickPart) {
+    var delta = new Point();
+    for(var i = 0; i < this.types.length; i++) {
+      var mov = this.types[i].ai.move(tickPart);
+      mov.multiply(this.types[i].weight);
+      delta.add(mov);
+    }
+    return delta;
   }
 }
