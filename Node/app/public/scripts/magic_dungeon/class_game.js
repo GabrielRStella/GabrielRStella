@@ -111,6 +111,7 @@ class Game {
 
   update(tickPart, paused) {
     if(!paused && this.prevPaused) this.screen = null;
+    else if(this.screen) this.screen.update(paused, THE_MOUSE, this.keys);
     this.prevPaused = paused;
     if(paused) {
       //...?

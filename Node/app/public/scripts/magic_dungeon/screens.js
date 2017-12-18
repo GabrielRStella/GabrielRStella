@@ -27,6 +27,8 @@ class Screen {
   onKeyDown() {}
   onKeyLeft() {}
   onKeyRight() {}
+
+  update(paused, mouse, keys) {}
 }
 
 class ScreenPause extends Screen {
