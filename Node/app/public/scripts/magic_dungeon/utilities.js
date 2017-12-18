@@ -18,7 +18,11 @@ function shuffle(arr) {
 }
 
 function randomRange(min, max) {
-  return min + Math.random() * (max - min)
+  return min + Math.random() * (max - min);
+}
+
+function randomRangeFloor(min, max) {
+  return Math.floor(randomRange(min, max));
 }
 
 function choosePoint() {

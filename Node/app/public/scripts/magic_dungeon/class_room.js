@@ -144,8 +144,6 @@ class Room {
   }
 
   generateObstacles() {
-    //TODO
-
     if(Math.random() < 0.13) {
       this.generateMaze();
       this.canHaveBoss = false;
@@ -163,12 +161,22 @@ class Room {
           }
         }
       }
-    } else if(Math.random() < 0.1) {
+    } else if(Math.random() < 1) {
       //structures
-
-      while(Math.random() < 0.7) {
-        var x = Math.floor(randomRange(minX, maxX));
-        var y = Math.floor(randomRange(minY, maxY));
+      while(Math.random() < 0.8) {
+        var minX = 2;
+        var minY = 2;
+        var maxX = this.width - 2;
+        var maxY = this.height - 2;
+        var x = randomRangeFloor(minX, maxX);
+        var y = randomRangeFloor(minY, maxY);
+        var width = Math.min(maxX - x, Math.ceil(Math.random() * 4));
+        var height = Math.min(maxY - y, Math.ceil(Math.random() * 4));
+        for(var dx = 0; dx < width; dx++) {
+          for(var dy = 0; dy < height; dy++) {
+            this.states[x + dx][y + dy] = STATE_WALL;
+          }
+        }
       }
     } else {
       //empty
