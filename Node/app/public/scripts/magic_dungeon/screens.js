@@ -222,25 +222,6 @@ class ScreenMap extends Screen {
         canvas.closePath();
     };
 
-    for(var i = 0; i < rooms.length; i++) {
-      var room2 = rooms[i];
-      var point = getPoint(room2);
-
-      var isCurrent = (room2 == room);
-      var isDist = (room2 == this.roomDst) || (mouse.distance(point) <= r2 + 2); //2 = half of line width
-      if(isDist) roomDst = this.roomDst = room2; //for later
-      if(isCurrent || isDist) {
-        littleCircle(point, isDist);
-      }
-
-      canvas.fillStyle = "#ffffff";
-      canvas.save();
-      canvas.textAlign = "center";
-      canvas.textBaseline = "middle";
-      canvas.fillText(room2.name, point.x, point.y);
-      canvas.restore();
-    }
-
     var drawLine = function(room2, room3) {
       var src = getPoint(room2);
       var dst = getPoint(room3);
@@ -268,6 +249,9 @@ class ScreenMap extends Screen {
       canvas.restore();
     };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//draw white lines
+
     canvas.lineWidth = 4;
     canvas.strokeStyle = "#ffffff";
     for(var i = 0; i < rooms.length; i++) {
@@ -280,8 +264,10 @@ class ScreenMap extends Screen {
       }
     }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//draw red path
+
     //generate + draw path
-    //TODO: it sometimes doesn't give the best (off by 1 or maybe more)
     if(roomDst && (roomDst != roomSrc)) {
       var checked = [roomSrc];
       var frontier = [roomSrc];
@@ -331,5 +317,28 @@ class ScreenMap extends Screen {
       canvas.fillText(ln, center.x, center.y);
       canvas.restore();
     }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//draw circles
+
+    for(var i = 0; i < rooms.length; i++) {
+      var room2 = rooms[i];
+      var point = getPoint(room2);
+
+      var isCurrent = (room2 == room);
+      var isDist = (room2 == this.roomDst) || (mouse.distance(point) <= r2 + 2); //2 = half of line width
+      if(isDist) roomDst = this.roomDst = room2; //for later
+      if(isCurrent || isDist) {
+        littleCircle(point, isDist);
+      }
+
+      canvas.fillStyle = "#ffffff";
+      canvas.save();
+      canvas.textAlign = "center";
+      canvas.textBaseline = "middle";
+      canvas.fillText(room2.name, point.x, point.y);
+      canvas.restore();
+    }
+
   }
 }
