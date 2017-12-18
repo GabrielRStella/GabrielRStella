@@ -174,7 +174,6 @@ class Game {
     canvas.beginPath();
     canvas.fillStyle = "#ffffffa0";
     canvas.arc(center.x, center.y, radius + 4, 0, Math.PI * 2);
-    canvas.lineTo(center.x, center.y);
     canvas.fill();
     canvas.closePath();
     for(var i = 0; i < ELEMENT_COUNT; i++) {
@@ -187,6 +186,18 @@ class Game {
       canvas.lineTo(center.x, center.y);
       canvas.fill();
       canvas.closePath();
+
+      var pt = new Point(radius * 0.6, 0);
+      pt.rotate(angle + Math.PI / 4);
+      pt.add(center);
+      canvas.font = Math.floor(radius * 0.6) + 'px sans-serif';
+      canvas.fillStyle = "#000000";
+      canvas.save();
+      canvas.textAlign = 'center';
+      canvas.textBaseline = 'middle';
+      var txt = element.beats(elem) ? "2" : (element.loses(elem) ? "0" : "1");
+      canvas.fillText(txt, pt.x, pt.y);
+      canvas.restore();
     }
 
     var delta = elemHeight + padding * 2;
