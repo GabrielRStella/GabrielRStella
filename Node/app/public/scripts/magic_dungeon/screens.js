@@ -55,7 +55,8 @@ class ScreenPause extends Screen {
       "WASD to move",
       "Arrow keys to shoot",
       "1-4 to select element",
-      "Q/E to swap elements"
+      "Q/E to swap elements",
+      "Hold space for fun"
       ];
 
     for(var i = 0; i < keybindInfo.length; i++) {
