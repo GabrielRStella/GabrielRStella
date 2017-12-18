@@ -8,6 +8,8 @@ class Game {
 
     this.score = 0;
     this.loadHighScore();
+
+    this.prevDial = 0;
   }
 
   get scoreInfo() {
@@ -133,6 +135,14 @@ class Game {
     }
   }
 
+  drawPaused(canvas, width, height) {
+    if(!this.screen) {
+      this.screen = new ScreenPause(this);
+    }
+
+    this.screen.draw(canvas, width, height);
+  }
+
   drawHUD(canvas, width, height, world, paused) {
 
     var player = this.world.player;
@@ -177,9 +187,17 @@ class Game {
     canvas.arc(center.x, center.y, radius + 4, 0, Math.PI * 2);
     canvas.fill();
     canvas.closePath();
+    var dial = (5 * Math.PI / 4) - (angleIncr * element.id);
+    var prevDial = this.prevDial;
+    var altPrev = prevDial + Math.PI * 2;
+    if(Math.abs(dial - altPrev) < Math.abs(dial - prevDial)) prevDial = altPrev;
+    dial += prevDial * 3;
+    dial /= 4;
+    this.prevDial = dial;
+    var startAngle = dial;
     for(var i = 0; i < ELEMENT_COUNT; i++) {
-      var elem = ELEMENTS[(element.id + i) % ELEMENT_COUNT];
-      var angle = -(3 * Math.PI / 4) + (angleIncr * i);
+      var elem = ELEMENTS[(i) % ELEMENT_COUNT];
+      var angle = startAngle + (angleIncr * i);
 
       canvas.beginPath();
       canvas.fillStyle = elem.color;
@@ -196,7 +214,7 @@ class Game {
       canvas.save();
       canvas.textAlign = 'center';
       canvas.textBaseline = 'middle';
-      var txt = element.beats(elem) ? "2" : (element.loses(elem) ? "0" : "1");
+      var txt = element.beats(elem) ? "+" : (element.loses(elem) ? "-" : "");
       canvas.fillText(txt, pt.x, pt.y);
       canvas.restore();
     }
@@ -258,13 +276,5 @@ class Game {
       }
     }
 
-  }
-
-  drawPaused(canvas, width, height) {
-    if(!this.screen) {
-      this.screen = new ScreenPause(this);
-    }
-
-    this.screen.draw(canvas, width, height);
   }
 }
