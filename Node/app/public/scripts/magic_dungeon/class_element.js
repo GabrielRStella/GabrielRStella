@@ -6,13 +6,14 @@ function chooseElement() {
 }
 
 class Element {
-  constructor(name, deathMessage) {
+  constructor(name, color, deathMessage) {
     this.id = ELEMENT_COUNT;
     ELEMENT_COUNT++;
     if(ELEMENTS.push(this) != ELEMENT_COUNT) {
       throw "ERROR: Invalid Element count";
     }
     this.name = name;
+    this.color = color;
     this.deathMessage = deathMessage;
   }
 
@@ -34,7 +35,7 @@ class Element {
   }
 }
 
-var ELEMENT_LIGHTNING = new Element("Lightning", "You died. Shocking!");
-var ELEMENT_WATER = new Element("Water", "You drowned!");
-var ELEMENT_FIRE = new Element("Fire", "You got roasted!");
-var ELEMENT_EARTH = new Element("Earth", "You got crushed!");
+var ELEMENT_LIGHTNING = new Element("Lightning", "#ffff00", "You died. Shocking!");
+var ELEMENT_WATER = new Element("Water", "#0000ff", "You drowned!");
+var ELEMENT_FIRE = new Element("Fire", "#ff0000", "You got roasted!");
+var ELEMENT_EARTH = new Element("Earth", "#00ff00", "You got crushed!");

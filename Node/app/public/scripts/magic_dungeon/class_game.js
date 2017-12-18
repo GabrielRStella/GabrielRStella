@@ -147,7 +147,7 @@ class Game {
     bounds.height -= space * 2;
 
     var padding = 10;
-    var elemWidth = (bounds.width - (padding * (ELEMENT_COUNT + 1))) / ELEMENT_COUNT;
+    var elemWidth = (bounds.width - (padding * (ELEMENT_COUNT + 2))) / (ELEMENT_COUNT + 1);
     var elemHeight = elemWidth;
     var x = bounds.minX;
     var y = bounds.minY;
@@ -156,12 +156,37 @@ class Game {
       if(element == ELEMENTS[i]) {
         canvas.fillStyle = "#606060";
         canvas.beginPath();
-        canvas.rect(x, y, elemWidth + padding * 2, elemHeight + padding * 2);
+        var inset = 4;
+        canvas.rect(x + inset, y + inset, elemWidth + (padding - inset) * 2, elemHeight + (padding - inset) * 2);
         canvas.fill();
         canvas.closePath();
       }
       ELEMENTS[i].drawSymbol(canvas, new Rectangle(new Point(x + padding, y + padding), elemWidth, elemHeight));
       x += elemWidth + padding;
+    }
+
+    //draw a dial...
+    var size = elemHeight;
+    var radius = size / 2;
+    var center = new Point(x + padding + radius + 4, y + padding + radius);
+    var startAngle = 0;
+    var angleIncr = (Math.PI * 2) / ELEMENT_COUNT;
+    canvas.beginPath();
+    canvas.fillStyle = "#ffffffa0";
+    canvas.arc(center.x, center.y, radius + 4, 0, Math.PI * 2);
+    canvas.lineTo(center.x, center.y);
+    canvas.fill();
+    canvas.closePath();
+    for(var i = 0; i < ELEMENT_COUNT; i++) {
+      var elem = ELEMENTS[(element.id + i) % ELEMENT_COUNT];
+      var angle = -(3 * Math.PI / 4) + (angleIncr * i);
+
+      canvas.beginPath();
+      canvas.fillStyle = elem.color;
+      canvas.arc(center.x, center.y, radius, angle, angle + angleIncr);
+      canvas.lineTo(center.x, center.y);
+      canvas.fill();
+      canvas.closePath();
     }
 
     var delta = elemHeight + padding * 2;
@@ -220,6 +245,7 @@ class Game {
         y += dy;
       }
     }
+
   }
 
   drawPaused(canvas, width, height) {
