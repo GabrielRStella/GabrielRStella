@@ -398,5 +398,10 @@ class Room {
     this.spells = this.spells.filter(g);
     this.spellParts = this.spellParts.filter(g);
   }
+
+  //path finder
+  findPath(start, end, sz) {
+    
+  }
   
 }

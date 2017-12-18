@@ -1,7 +1,7 @@
 class MovementEngine {
-  constructor() {
+  constructor(drag) {
     this.velocity = new Point();
-    this.drag = 0.995;
+    this.drag = drag || 0.995;
     this.tick = 0;
   }
 
@@ -84,9 +84,40 @@ class AIAggressive extends AI {
 class AIDodger extends AI {
   constructor(entity) {
     super(entity);
+    this.room = entity.room;
+    this.bounds = entity.bounds;
+    this.mover = new MovementEngine(0.9);
+    this.tick = 0;
   }
 
   move(tickPart) {
+    var spells = this.room.spellParts;
+    var pos = this.bounds.center;
+
+    var mov = new Point();
+    var count = 0;
+    for(var i = 0; i < spells.length; i++) {
+      var spell = spells[i];
+      if(spell.srcEntity.isPlayer) {
+        var sPos = spell.bounds.center;
+        var sVel = spell.velocity.copy();
+        var sPosNext = sPos.copy();
+        sPosNext.add(sVel);
+        if(sPosNext.distance(pos) < sPos.distance(pos)) {
+          var del = pos;
+          del.sub(sPos);
+          del.rotate(Math.PI * (Math.random() - Math.random()));
+          mov.add(del);
+          count++;
+        }
+      }
+    }
+
+    if(count) {
+      mov.multiply(1/count);
+    }
+
+    return this.mover.updateAccel(tickPart, mov);
   }
 }
 
