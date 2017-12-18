@@ -62,6 +62,14 @@ class Room {
     }
   }
 
+  countOpen() {
+    var open = 0;
+    for(var i = 0; i < DIRS.length; i++) {
+      if(this.open[DIRS[i]] && this.connections[DIRS[i]] == null) open++;
+    }
+    return open;
+  }
+
   hasConnection(dir) {
     return this.connections[dir];
   }
@@ -74,6 +82,13 @@ class Room {
 
   setConnection(dir, room) {
     this.connections[dir] = room;
+  }
+
+  findConnection(room) {
+    for(var i = 0; i < DIRS.length; i++) {
+      if(this.connections[DIRS[i]] == room) return DIRS[i];
+    }
+    return null;
   }
 
   getState(x, y) {

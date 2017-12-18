@@ -204,7 +204,7 @@ class World {
     var dir2 = dir.opposite;
     for(var i = 0; i < this.rooms.length; i++) {
       var r = this.rooms[i];
-      if((r != room) && (r.isOpen(dir2)) && (!r.hasConnection(dir2))) {
+      if((r != room) && (r.isOpen(dir2)) && (!r.hasConnection(dir2)) && (!r.findConnection(room))) {
         var chance = 1.0 / (Math.abs(room.difficulty - r.difficulty) + 2);
         if(Math.random() < (chance * chance)) {
           //rooms with similar difficulty are more likely to be connected
