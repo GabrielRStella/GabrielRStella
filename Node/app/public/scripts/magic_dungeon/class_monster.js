@@ -17,7 +17,7 @@ class Monster {
     this.maxCooldown = cooldown || MONSTER_SPELL_COOLDOWN;
     this.spellCooldown = this.maxCooldown * Math.random();
 
-    this.tick = 0;
+    this.ai = new AIRandom(this);
   }
 
   get isPlayer() {
@@ -34,23 +34,10 @@ class Monster {
 
   update(tickPart) {
     this.spellCooldown -= tickPart;
-    this.tick += tickPart;
 
-    //TODO: actual movement ai
-    var mov = new Point();
-    if(this.goal) {
-      var delta = this.goal.copy();
-      delta.sub(this.bounds.center);
-      delta.magnitude = 1;
-      mov.add(delta);
-    }
+    var mov = this.ai.move(tickPart);
     mov.magnitude = this.moveSpeed;
     this.bounds.point.add(mov);
-
-    if(!this.goal || this.bounds.center.distance(this.goal) < (this.tick / 100)) {
-      this.goal = this.room.getRandomPoint();
-      this.tick = 0;
-    }
 
     if((this.spellCooldown <= 0) && (Math.random() < 0.1)) {
       this.fireSpellNaturally();
