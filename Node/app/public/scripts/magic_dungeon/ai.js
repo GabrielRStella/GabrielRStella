@@ -72,12 +72,27 @@ class AIRandom extends AIGoal {
   }
 }
 
-class AIAggressive extends AI {
+class AIAggressive extends AIGoal {
   constructor(entity) {
     super(entity);
+    this.path = [];
   }
 
-  move(tickPart) {
+  newPath() {
+    var player = this.room.world.player.bounds.center;
+    this.path = this.room.findPath(this.bounds.center, player, Math.max(this.bounds.width, this.bounds.height));
+console.log(this.path);
+  }
+
+  newGoal() {
+    var path = this.path;
+    if(!path.length) {
+      this.newPath();
+      path = this.path;
+    }
+    var g = path[0];
+    path.splice(0, 1);
+    return g;
   }
 }
 

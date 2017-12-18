@@ -180,12 +180,6 @@ class Room {
     var minY = 0;
     var maxX = this.width;
     var maxY = this.height;
-    var convert = function(p) {
-      return p.x + p.y * this.width;
-    }.bind(this);
-    var convert2 = function(x) {
-      return new Point(x % this.width, Math.floor(x / this.width));
-    }.bind(this);
 
     //make it a maze
     //using a "randomized kruskal's algorithm" from wikipedia
@@ -196,16 +190,16 @@ class Room {
     for(var x = minX; x < maxX; x++) {
       for(var y = minY; y < maxY; y++) {
         if(x % 2 == 0 && y % 2 == 0) {
-          points.push(new Set([convert(new Point(x, y))]));
+          points.push(new Set([this.convertPoint(new Point(x, y))]));
         } else if((x % 2 == 0 || y % 2 == 0)) {
-          walls.push(convert(new Point(x, y)));
+          walls.push(this.convertPoint(new Point(x, y)));
         }
       }
     }
     shuffle(walls);
     walls = new Set(walls);
     walls.forEach(function(wall) {
-      wall = convert2(wall);
+      wall = this.convertInt(wall);
       var p1;
       var p2;
       if(wall.x % 2 == 0) {
@@ -217,8 +211,8 @@ class Room {
         p1 = new Point(wall.x - 1, wall.y);
         p2 = new Point(wall.x + 1, wall.y);
       }
-      p1 = convert(p1);
-      p2 = convert(p2);
+      p1 = this.convertPoint(p1);
+      p2 = this.convertPoint(p2);
       var s1;
       var s2;
       var i2;
@@ -234,7 +228,7 @@ class Room {
         }
       }
       if(s1 && s2 && (s1 != s2)) {
-        s1.add(convert(wall));
+        s1.add(this.convertPoint(wall));
         var iter = s2.values();
         do {
           var n = iter.next();
@@ -244,7 +238,7 @@ class Room {
 
         points.splice(i2, 1);
       }
-    });
+    }, this);
 
     if(points.length != 1) {
       console.log("what happened? something went wrong while generating a maze.");
@@ -258,7 +252,7 @@ class Room {
     maxY = this.height - 1;
     for(var x = minX; x < maxX; x++) {
       for(var y = minY; y < maxY; y++) {
-        if((Math.random() < broken) && !points.has(convert(new Point(x, y)))) {
+        if((Math.random() < broken) && !points.has(this.convertPoint(new Point(x, y)))) {
           this.states[x][y] = STATE_WALL;
         }
       }
@@ -369,6 +363,13 @@ class Room {
 
   //---helpers
 
+  convertPoint(p) {
+    return p.x + p.y * this.width;
+  }
+  convertInt(x) {
+    return new Point(x % this.width, Math.floor(x / this.width));
+  }
+
   fireSpell(srcEntity, element, damage, trait, direction) {
     this.spells.push(new Spell(this, srcEntity, element, damage, trait, direction));
   }
@@ -401,7 +402,64 @@ class Room {
 
   //path finder
   findPath(start, end, sz) {
-    
+    var sz2 = sz / 2;
+    start = start.copy();
+    end = end.copy();
+    //align to block
+    start.x = Math.floor(start.x - sz2);
+    start.y = Math.floor(start.y - sz2);
+    end.x = Math.floor(end.x - sz2);
+    end.y = Math.floor(end.y - sz2);
+
+    start = this.convertPoint(start);
+    end = this.convertPoint(end);
+
+    var checked = [start];
+    var frontier = [start];
+    var sources = {};
+    var path = [];
+
+    var last = null;
+
+    while(frontier.length > 0) {
+      var curr = frontier[0];
+      frontier.splice(0, 1);
+      checked.push(curr);
+      curr = this.convertInt(curr);
+
+      for(var j = 0; j < DIRS.length; j++) {
+        var dir = DIRS[j];
+        var next = curr.copy();
+        next.add(dir.delta);
+
+        //check if it's a usable point (enough space around)
+        
+
+        next = this.convertPoint(next);
+        if(next == end) {
+          sources[next] = this.convertPoint(curr);
+          last = next;
+          frontier = []; //to make it end
+          break;
+        } else if(!checked.includes(next)) {
+          sources[next] = this.convertPoint(curr);
+          checked.push(next);
+          frontier.push(next);
+        }
+      }
+
+    }
+
+    while(last) {
+      var p = this.convertInt(last);
+      p.add(new Point(sz2, sz2));
+      path.push(p);
+      last = sources[last];
+    }
+
+    path.reverse();
+    return path;
+
   }
   
 }
