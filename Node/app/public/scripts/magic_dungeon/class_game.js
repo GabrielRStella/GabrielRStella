@@ -79,18 +79,32 @@ class Game {
     this.KEY_GUI_RIGHT2 = keys.addKeyListenerDown(new Key(KEY_RIGHT, function(e) {
         if(this.screen) this.screen.onKeyRight();
       }.bind(this)));
+
+    this.KEY_Q = keys.addKeyListenerDown(new Key(KEY_Q, function(e) {
+        var player = this.world.player;
+        player.element = player.element.prev;
+      }.bind(this)));
+    this.KEY_E = keys.addKeyListenerDown(new Key(KEY_E, function(e) {
+        var player = this.world.player;
+        player.element = player.element.next;
+      }.bind(this)));
   }
 
   unregister(keys) {
     keys.removeKeyListenerDown(this.KEY_MAP);
+
     keys.removeKeyListenerDown(this.KEY_GUI_UP1);
     keys.removeKeyListenerDown(this.KEY_GUI_DOWN1);
     keys.removeKeyListenerDown(this.KEY_GUI_LEFT1);
     keys.removeKeyListenerDown(this.KEY_GUI_RIGHT1);
+
     keys.removeKeyListenerDown(this.KEY_GUI_UP2);
     keys.removeKeyListenerDown(this.KEY_GUI_DOWN2);
     keys.removeKeyListenerDown(this.KEY_GUI_LEFT2);
     keys.removeKeyListenerDown(this.KEY_GUI_RIGHT2);
+
+    keys.removeKeyListenerDown(this.KEY_Q);
+    keys.removeKeyListenerDown(this.KEY_E);
   }
 
   end(msg) {
@@ -189,7 +203,9 @@ class Game {
     canvas.closePath();
     var dial = (5 * Math.PI / 4) - (angleIncr * element.id);
     var prevDial = this.prevDial;
-    var altPrev = prevDial + Math.PI * 2;
+    var altPrev = this.prevDial + Math.PI * 2;
+    if(Math.abs(dial - altPrev) < Math.abs(dial - prevDial)) prevDial = altPrev;
+    var altPrev = this.prevDial - Math.PI * 2;
     if(Math.abs(dial - altPrev) < Math.abs(dial - prevDial)) prevDial = altPrev;
     dial += prevDial * 3;
     dial /= 4;

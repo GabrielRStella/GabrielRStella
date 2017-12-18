@@ -54,7 +54,8 @@ class ScreenPause extends Screen {
       "M to view the map",
       "WASD to move",
       "Arrow keys to shoot",
-      "1-4 to select element"
+      "1-4 to select element",
+      "Q/E to swap elements"
       ];
 
     for(var i = 0; i < keybindInfo.length; i++) {

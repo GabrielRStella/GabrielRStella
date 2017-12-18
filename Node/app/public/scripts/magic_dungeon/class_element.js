@@ -25,6 +25,14 @@ class Element {
     return loop(this.id - e.id, ELEMENT_COUNT) == (1);
   }
 
+  get prev() {
+    return ELEMENTS[loop(this.id - 1, ELEMENT_COUNT)];
+  }
+
+  get next() {
+    return ELEMENTS[loop(this.id + 1, ELEMENT_COUNT)];
+  }
+
   //draw this element's symbol on the given canvas inside the given rectangle
   drawSymbol(canvas, r, flipped) {
     drawImage("elements/" + this.name.toLowerCase(), canvas, r, flipped);
