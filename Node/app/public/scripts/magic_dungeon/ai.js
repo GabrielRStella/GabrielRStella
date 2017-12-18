@@ -75,23 +75,16 @@ class AIRandom extends AIGoal {
 class AIAggressive extends AIGoal {
   constructor(entity) {
     super(entity);
-    this.path = [];
-  }
-
-  newPath() {
-    var player = this.room.world.player.bounds.center;
-    this.path = this.room.findPath(this.bounds.center, player, Math.max(this.bounds.width, this.bounds.height));
-console.log(this.path);
+    this.mover = new MovementEngine(0.9);
   }
 
   newGoal() {
-    var path = this.path;
-    if(!path.length) {
-      this.newPath();
-      path = this.path;
+    if(!this.path || !this.path.length || Math.random() < 0.2) {
+      var player = this.room.world.player.bounds.center;
+      this.path = this.room.findPath(this.bounds.center, player, Math.max(this.bounds.width, this.bounds.height));
     }
-    var g = path[0];
-    path.splice(0, 1);
+    var g = this.path[0];
+    this.path.splice(0, 1);
     return g;
   }
 }
@@ -140,6 +133,7 @@ class AICombined extends AI {
   constructor(entity) {
     super(entity);
     //change internal AI based on difficulty
+    //types: Aggressive, Random, Dodger
   }
 
   move(tickPart) {

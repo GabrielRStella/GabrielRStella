@@ -366,8 +366,13 @@ class Room {
   convertPoint(p) {
     return p.x + p.y * this.width;
   }
+
   convertInt(x) {
     return new Point(x % this.width, Math.floor(x / this.width));
+  }
+
+  inBounds(p) {
+    return p.x >= 0 && p.x < this.width && p.y >= 0 && p.y < this.height;
   }
 
   fireSpell(srcEntity, element, damage, trait, direction) {
@@ -406,24 +411,31 @@ class Room {
     start = start.copy();
     end = end.copy();
     //align to block
-    start.x = Math.floor(start.x - sz2);
-    start.y = Math.floor(start.y - sz2);
-    end.x = Math.floor(end.x - sz2);
-    end.y = Math.floor(end.y - sz2);
+    start.x = Math.round(start.x - sz2);
+    start.y = Math.round(start.y - sz2);
+    end.x = Math.round(end.x - sz2);
+    end.y = Math.round(end.y - sz2);
 
+    var startp = start;
+    var endp = end;
     start = this.convertPoint(start);
     end = this.convertPoint(end);
 
     var checked = [start];
-    var frontier = [start];
+    var frontier = new PriorityQueue();
+    frontier.push(start, 0); //element, priority
     var sources = {};
     var path = [];
 
+    //simple path length heuristic - may make it A*
+    var heuristic = function(p) {
+      return p.distance(startp) + p.distance(endp);
+    }
+
     var last = null;
 
-    while(frontier.length > 0) {
-      var curr = frontier[0];
-      frontier.splice(0, 1);
+    while(frontier.size) {
+      var curr = frontier.pop();
       checked.push(curr);
       curr = this.convertInt(curr);
 
@@ -433,7 +445,18 @@ class Room {
         next.add(dir.delta);
 
         //check if it's a usable point (enough space around)
-        
+        var cont = true;
+        for(var dx = 0; cont && dx < sz; dx++) {
+          for(var dy = 0; cont && dy < sz; dy++) {
+            var nextd = next.copy();
+            nextd.x += dx;
+            nextd.y += dy;
+            if(!this.inBounds(nextd) || !this.states[next.x + dx][next.y + dy].walkable) {
+              cont = false;
+            }
+          }
+        }
+        if(!cont) continue;
 
         next = this.convertPoint(next);
         if(next == end) {
@@ -444,7 +467,7 @@ class Room {
         } else if(!checked.includes(next)) {
           sources[next] = this.convertPoint(curr);
           checked.push(next);
-          frontier.push(next);
+          frontier.push(next, heuristic(this.convertInt(next)));
         }
       }
 

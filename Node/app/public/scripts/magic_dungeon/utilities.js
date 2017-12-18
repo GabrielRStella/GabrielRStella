@@ -273,3 +273,35 @@ var DIR_RIGHT = new Direction(1, new Point(1, 0));
 var DIR_DOWN = new Direction(2, new Point(0, -1));
 var DIR_LEFT = new Direction(3, new Point(-1, 0));
 var DIRS = [DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT];
+
+//a very bad priority queue. i'm rushed...
+//for note: it's a minimum priority queue
+class PriorityQueue {
+  constructor() {
+    this.data = [];
+  }
+
+  get size() {
+    return this.data.length
+  }
+
+  getPriorityPair(e, priority) {
+    return {
+      element: e,
+      priority: priority
+    };
+  }
+
+  push(e, priority) {
+    var pair = this.getPriorityPair(e, priority);
+    for(var i = 0; i < this.data.length; i++) {
+      var pair2 = this.data[i];
+      if(pair.priority < pair2.priority) break;
+    }
+    this.data.splice(i, 0, pair);
+  }
+
+  pop() {
+    return this.data.length ? this.data.splice(0, 1)[0].element : null;
+  }
+}
