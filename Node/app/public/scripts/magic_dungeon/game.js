@@ -4,13 +4,14 @@ TODO:
 splash screen?
 ensure maze rooms are always fully open
 make sure rendering order for Map gui is correct (circles on top of ALL lines)
+monster that rewards additional max health
 room generators
 better AI
 runes
 use octree for room bounding boxes
 clean up code for screens
 fancy fx
-more monster varieties
+JUICINESS
 
 */
 
