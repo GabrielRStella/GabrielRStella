@@ -33,7 +33,7 @@ class Player {
   }
 
   draw(canvas) {
-    drawImageFlipped("player", canvas, this.bounds);
+    drawImageFlipped("players/" + this.element.name, canvas, this.bounds);
 
     //health bar (from monster)
 
