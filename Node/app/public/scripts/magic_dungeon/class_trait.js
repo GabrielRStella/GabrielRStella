@@ -73,13 +73,14 @@ class Trait {
 
   //uses a weighted random distribution
   getRandomTrait() {
+    //inverse rarity = commonness
     var total = 0;
     for(var i = 0; i < this.inner.length; i++) {
-      total += this.inner[i].rarity;
+      total += 1 / this.inner[i].rarity;
     }
     total *= Math.random();
     for(var i = 0; i < this.inner.length; i++) {
-      total -= this.inner[i].rarity;
+      total -= 1 / this.inner[i].rarity;
       if(total <= 0) {
         return this.inner[i];
       }

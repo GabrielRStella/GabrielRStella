@@ -307,8 +307,7 @@ class Room {
     var element = chooseElement();
     var damage = 0.5;
     var trait = new Trait([TRAIT_BASIC]);
-    var t = Monster;
-    if(Math.random() < 0.1) t = MonsterRainbow;
+    var t = chooseMonsterType();
     var monster = new t(this.world, this, difficulty, health, bounds, element, damage, trait);
     return monster;
   }

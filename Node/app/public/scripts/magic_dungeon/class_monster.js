@@ -28,19 +28,23 @@ class Monster {
     return this.health > 0;
   }
 
+  get moveSpeed() {
+    return 0.03;
+  }
+
   update(tickPart) {
     this.spellCooldown -= tickPart;
     this.tick += tickPart;
 
-    //TODO: move
-    var mov = new Point(Math.random() - Math.random(), Math.random() - Math.random());
+    //TODO: actual movement ai
+    var mov = new Point();
     if(this.goal) {
       var delta = this.goal.copy();
       delta.sub(this.bounds.center);
       delta.magnitude = 1;
       mov.add(delta);
     }
-    mov.magnitude = 0.03;
+    mov.magnitude = this.moveSpeed;
     this.bounds.point.add(mov);
 
     if(!this.goal || this.bounds.center.distance(this.goal) < (this.tick / 100)) {
@@ -147,4 +151,47 @@ class MonsterRainbow extends Monster {
   fireSpell(dir) {
     this.room.fireSpell(this, chooseElement(), this.damage, this.trait.copy(), dir);
   }
+}
+
+class MonsterFast extends Monster {
+
+  constructor(world, room, difficulty, health, bounds, element, damage, trait, cooldown) {
+    super(world, room, difficulty, health, bounds, element, damage, trait, cooldown);
+  }
+
+  get moveSpeed() {
+    return 0.06;
+  }
+
+  getDamageModifier(element) {
+    return 2 * super.getDamageModifier(element);
+  }
+}
+
+class MonsterType {
+  constructor(type, weight) {
+    this.type = type;
+    this.weight = weight;
+  }
+}
+
+var MONSTER_TYPES = [
+    new MonsterType(Monster, 100),
+    new MonsterType(MonsterRainbow, 5),
+    new MonsterType(MonsterFast, 20)
+  ];
+
+function chooseMonsterType() {
+  var total = 0;
+  for(var i = 0; i < MONSTER_TYPES.length; i++) {
+    total += MONSTER_TYPES[i].weight;
+  }
+  total *= Math.random();
+  for(var i = 0; i < MONSTER_TYPES.length; i++) {
+    total -= MONSTER_TYPES[i].weight;
+    if(total <= 0) {
+      return MONSTER_TYPES[i].type;
+    }
+  }
+  return null; //what happen???
 }
