@@ -26,6 +26,10 @@ class IO {
   }
 
   get playerSpell() {
+    if(this.keys.checkKeyCode(KEY_SPACE)) {
+      return choosePoint();
+    }
+
     var p = new Point(0, 0);
     if(this.keys.checkKeyCode(KEY_UP)) {
       p.y++;

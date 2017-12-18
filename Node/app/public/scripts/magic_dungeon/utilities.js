@@ -21,6 +21,12 @@ function randomRange(min, max) {
   return min + Math.random() * (max - min)
 }
 
+function choosePoint() {
+  var p = new Point(1, 0);
+  p.rotate(Math.random() * Math.PI * 2);
+  return p;
+}
+
 class Point {
   constructor(x, y) {
     this.x = x || 0;
