@@ -188,12 +188,12 @@ class MonsterBurster extends Monster {
   constructor(world, room, difficulty, health, bounds, element, damage, trait, cooldown) {
     super(world, room, difficulty, health, bounds, element, damage, trait, cooldown);
     this.resetFiring();
-    this.randomBulletChance = 0.25;
+    this.randomBulletChance = 0.20;
   }
 
   resetFiring() {
     var r = (Math.random() + Math.random()) / 2;
-    this.firing = Math.floor(r * 10 + this.difficulty) + 1;
+    this.firing = Math.floor(r * (10 + Math.sqrt(this.difficulty))) + 1;
   }
 
   get cooldown() {
@@ -202,7 +202,7 @@ class MonsterBurster extends Monster {
       this.resetFiring();
       return (this.maxCooldown + (this.difficulty * Math.random())) * 2;
     }
-    return 10 / this.difficulty;
+    return 20 / Math.sqrt(this.difficulty);
   }
 }
 
