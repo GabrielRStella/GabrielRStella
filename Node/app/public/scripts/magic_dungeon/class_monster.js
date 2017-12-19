@@ -125,6 +125,17 @@ class MonsterBoss extends Monster {
   }
 }
 
+class MonsterBigBoss extends Monster {
+
+  constructor(world, room, difficulty, health, bounds, element, damage, trait, cooldown) {
+    super(world, room, difficulty, health, bounds, element, damage, trait, cooldown);
+  }
+
+  onDeath(player) {
+    player.health = ++player.maxhealth;
+  }
+}
+
 class MonsterRainbow extends Monster {
 
   constructor(world, room, difficulty, health, bounds, element, damage, trait, cooldown) {

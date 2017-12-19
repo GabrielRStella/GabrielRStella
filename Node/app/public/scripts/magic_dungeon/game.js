@@ -4,7 +4,6 @@ TODO:
 splash screen?
 ensure maze rooms are always fully open
 monster that rewards additional max health
-room generators
 better AI
 runes
 use octree for room bounding boxes?

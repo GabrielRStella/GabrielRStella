@@ -317,10 +317,16 @@ class Room {
   //TODO: different enemy class types (including better ai and such
   generateBoss(difficulty) {
     var health = 10 + Math.floor(Math.random() * difficulty);
+    var sz = 2;
+    var type = MonsterBoss;
+    if(Math.random() < 0.1) {
+      type = MonsterBigBoss;
+      sz = 3;
+    }
     var bounds = new Rectangle(
       new Point(),
-      2, 2);
-    bounds.center = this.getRandomPoint(5);
+      sz, sz);
+    bounds.center = this.getRandomPoint(3 + sz);
     var element = chooseElement();
     var damage = 1 + Math.floor(Math.random() * 2);
     var trait = new Trait([TRAIT_BASIC]);
@@ -334,7 +340,7 @@ class Room {
       counter = counter * Math.random() - 1;
     }
     var cooldown = MONSTER_SPELL_COOLDOWN * ((1 - (Math.random() * Math.random())) + 1) / 2;
-    var monster = new MonsterBoss(this.world, this, difficulty, health, bounds, element, damage, trait, cooldown);
+    var monster = new type(this.world, this, difficulty, health, bounds, element, damage, trait, cooldown);
     return monster;
   }
 
