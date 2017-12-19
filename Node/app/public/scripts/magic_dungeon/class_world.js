@@ -25,7 +25,7 @@ class World {
 
   pauseInfo(abridged) {
     var ret = [];
-    ret.push("Difficulty: " + this.currentRoom.difficulty);
+    ret.push("Room: " + this.currentRoom.name);
 
     var player = this.player;
     ret.push("Health: " + player.health + "/" + player.maxhealth);
