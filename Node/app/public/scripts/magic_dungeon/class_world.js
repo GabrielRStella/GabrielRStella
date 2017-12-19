@@ -26,6 +26,7 @@ class World {
   pauseInfo(abridged) {
     var ret = [];
     ret.push("Room: " + this.currentRoom.name);
+    ret.push("Difficulty: " + this.currentRoom.difficulty);
 
     var player = this.player;
     ret.push("Health: " + player.health + "/" + player.maxhealth);
@@ -219,12 +220,11 @@ class World {
 
   get nextDifficulty() {
     var dif = this.difficulty;
-    return 1 + this.nextRoomId * Math.log1p(dif);
+    return Math.floor(1 + this.nextRoomId * Math.log1p(dif));
   }
 
   connectNew(r, dir) {
     this.difficulty = this.nextDifficulty;
-console.log(this.difficulty);
     this.game.addScore(1);
 
     var room = new Room(this, this.nextId, 16 + Math.floor(Math.random() * 10) * 2, 16 + Math.floor(Math.random() * 10) * 2);
