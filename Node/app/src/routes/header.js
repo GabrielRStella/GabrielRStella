@@ -4,7 +4,7 @@ function alternateHeader() {
   return null;
 }
 
-module.exports = function(cb){
+function header(cb){
   fs.readdir("../public/img/headers", function(err, files) {
     if(err) {
       //?
@@ -13,7 +13,7 @@ module.exports = function(cb){
     } else {
       if(files.length > 0) {
         var index = Math.floor(Math.random() * files.length);
-        cb("url(/static/img/headers/" + files[index] + ")");
+        cb("/static/img/headers/" + files[index]);
       } else {
         //?
         cb(alternateHeader());
@@ -21,3 +21,9 @@ module.exports = function(cb){
     }
   });
 };
+
+module.exports = function(req, res) {
+    header(function(bg) {
+      res.redirect(bg);
+    });
+}

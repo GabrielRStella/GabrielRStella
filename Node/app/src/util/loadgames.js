@@ -36,14 +36,14 @@ exports.loadGames = function(cbOk) {
     fs.readdir('./games', function(err, files) {
       var games = [];
       var counter = files.length;
+      var count = function() {
+        counter--;
+        if(counter == 0) {
+          cbOk(games);
+        }
+      };
       for(var index in files) {
         var file = files[index];
-        var count = function() {
-          counter--;
-          if(counter == 0) {
-            cbOk(games);
-          }
-        };
         if(fs.lstatSync('./games/' + file).isDirectory()) {
           exports.loadGame(file, function(data) {
             games.push(data);

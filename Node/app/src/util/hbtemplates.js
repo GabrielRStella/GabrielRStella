@@ -1,10 +1,7 @@
 //TODO: may move handlebars to routes
 var handlebars = require('handlebars');
-var hbhelpers = require('./hbhelpers');
 
-//
-
-hbhelpers(handlebars);
+//TODO: add handlebars block helpers, maybe
 
 //for reading files
 var fs = require('fs');
