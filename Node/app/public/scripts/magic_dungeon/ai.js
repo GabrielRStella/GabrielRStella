@@ -153,11 +153,12 @@ class AIDodgeWall extends AI {
       for(var dy = 0; dy < sz; dy++) {
         var xx = minPos.x + dx;
         var yy = minPos.y + dy;
-        if(!states[xx][yy].walkable) {
-          var del = new Point(xx + 0.5, yy + 0.5);
-          del.sub(pos);
-          del.magnitude = -1 / del.magnitude; //farther away = less important
-          mov.add(del);
+        var p = new Point(xx, yy);
+        if(this.room.inBounds(p) && !states[xx][yy].walkable) {
+          p.add(0.5, 0.5);
+          p.sub(pos);
+          p.magnitude = -1 / p.magnitude; //farther away = less important; negative = away from block
+          mov.add(p);
         }
       }
     }
@@ -176,7 +177,7 @@ class AICombined extends AI {
     this.addType(AIRandom, 2 / dif);
     this.addType(AIAggressive, 4 + 2 * dif);
     this.addType(AIDodger, 3 + dif);
-    this.addType(AIDodgeWall, 2 + dif);
+    this.addType(AIDodgeWall, 2 + dif / 2);
   }
 
   addType(type, weight) {
