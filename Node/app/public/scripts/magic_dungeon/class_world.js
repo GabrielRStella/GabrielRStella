@@ -217,8 +217,14 @@ class World {
     return this.connectNew(room, dir);
   }
 
+  get nextDifficulty() {
+    var dif = this.difficulty;
+    return 1 + this.nextRoomId * Math.log1p(dif);
+  }
+
   connectNew(r, dir) {
-    this.difficulty++;
+    this.difficulty = this.nextDifficulty;
+console.log(this.difficulty);
     this.game.addScore(1);
 
     var room = new Room(this, this.nextId, 16 + Math.floor(Math.random() * 10) * 2, 16 + Math.floor(Math.random() * 10) * 2);
