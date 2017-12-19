@@ -118,6 +118,26 @@ class ScreenTrait extends Screen {
 class ScreenDeath extends Screen {
   constructor(game, msg) {
     super(game, msg);
+    this.info = [
+      "Score: " + game.score,
+      "High Score: " + game.highScore
+      ];
+  }
+
+  draw(canvas, width, height) {
+    super.draw(canvas, width, height);
+    canvas.font = '24px sans-serif';
+    canvas.fillStyle = "#ffffff";
+    canvas.strokeStyle = "#000000";
+
+    var x = 40;
+    var y = 80;
+    var dy = 30;
+
+    for(var i = 0; i < this.info.length; i++) {
+      canvas.fillText(this.info[i], x, y);
+      y += dy;
+    }
   }
 }
 
