@@ -18,6 +18,8 @@ class Monster {
     this.spellCooldown = this.maxCooldown * Math.random();
 
     this.ai = new AICombined(this);
+
+    this.randomBulletChance = 0.1;
   }
 
   get isPlayer() {
@@ -39,7 +41,7 @@ class Monster {
     mov.magnitude = this.moveSpeed;
     this.bounds.point.add(mov);
 
-    if((this.spellCooldown <= 0) && (Math.random() < 0.1)) {
+    if((this.spellCooldown <= 0) && (Math.random() < this.randomBulletChance)) {
       this.fireSpellNaturally();
     }
   }
@@ -186,6 +188,7 @@ class MonsterBurster extends Monster {
   constructor(world, room, difficulty, health, bounds, element, damage, trait, cooldown) {
     super(world, room, difficulty, health, bounds, element, damage, trait, cooldown);
     this.resetFiring();
+    this.randomBulletChance = 0.25;
   }
 
   resetFiring() {
