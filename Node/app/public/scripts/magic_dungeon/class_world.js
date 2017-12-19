@@ -228,6 +228,7 @@ class World {
     this.game.addScore(1);
 
     var sz = function() {
+      return 16 + Math.floor(Math.random() * 10 + Math.random() * Math.log1p(dif)) * 2;
     }
     var w = sz();
     var h = sz();
