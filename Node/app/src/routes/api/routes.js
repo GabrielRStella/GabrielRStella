@@ -5,7 +5,11 @@ var route_game = require('./game');
 
 module.exports = function(app, express) {
 
-  app.get('/api/games', route_games);
-  app.get('/api/game/:game', route_game);
+  var router = express.Router();
+
+  router.get('/games', route_games);
+  router.get('/game/:game', route_game);
+
+  app.use('/api', router);
 
 };
