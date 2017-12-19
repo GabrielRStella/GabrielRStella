@@ -296,7 +296,7 @@ class Room {
   generateMonster(difficulty) {
     //higher chance with higher difficulty
     var bossChance = 1 - (1 / difficulty);
-    bossChance = bossChance * 0.1;
+    bossChance = bossChance * bossChance * 0.5; //tops out at 50% boss monsters
     if(this.canHaveBoss && (Math.random() < bossChance)) {
       return this.generateBoss(difficulty);
     }
