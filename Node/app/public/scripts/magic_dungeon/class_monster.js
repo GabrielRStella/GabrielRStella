@@ -73,6 +73,10 @@ class Monster {
     canvas.closePath();
   }
 
+  get cooldown() {
+    return this.maxCooldown + (this.difficulty * Math.random())
+  }
+
   fireSpellNaturally() {
     var player = this.world.player;
     var dir = player.bounds.center;
@@ -80,7 +84,7 @@ class Monster {
     dir.magnitude = 0.1;
     dir.rotate((Math.random() - Math.random()) * (0.5 / this.difficulty));
     this.fireSpell(dir);
-    this.spellCooldown = this.maxCooldown + (this.difficulty * Math.random());
+    this.spellCooldown = this.cooldown;
   }
 
   fireSpell(dir) {
@@ -155,6 +159,27 @@ class MonsterFast extends Monster {
   }
 }
 
+class MonsterBurster extends Monster {
+  constructor(world, room, difficulty, health, bounds, element, damage, trait, cooldown) {
+    super(world, room, difficulty, health, bounds, element, damage, trait, cooldown);
+    this.resetFiring();
+  }
+
+  resetFiring() {
+    var r = (Math.random() + Math.random()) / 2;
+    this.firing = Math.floor(r * 10 + this.difficulty) + 1;
+  }
+
+  get cooldown() {
+    this.firing--;
+    if(this.firing < 0) {
+      this.resetFiring();
+      return (this.maxCooldown + (this.difficulty * Math.random())) * 2;
+    }
+    return 10 / this.difficulty;
+  }
+}
+
 class MonsterType {
   constructor(type, weight) {
     this.type = type;
@@ -165,7 +190,8 @@ class MonsterType {
 var MONSTER_TYPES = [
     new MonsterType(Monster, 100),
     new MonsterType(MonsterRainbow, 5),
-    new MonsterType(MonsterFast, 20)
+    new MonsterType(MonsterFast, 20),
+    new MonsterType(MonsterBurster, 10)
   ];
 
 function chooseMonsterType() {
