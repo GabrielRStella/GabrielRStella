@@ -301,7 +301,7 @@ class Room {
       return this.generateBoss(difficulty);
     }
 
-    var health = 5 + Math.floor(Math.random() * difficulty);
+    var health = 5 + Math.floor(Math.sqrt(Math.random() * difficulty));
     var bounds = new Rectangle(
       new Point(),
       1, 1);
@@ -316,7 +316,7 @@ class Room {
 
   //TODO: different enemy class types (including better ai and such
   generateBoss(difficulty) {
-    var health = 10 + Math.floor(Math.random() * difficulty);
+    var health = 10 + Math.floor(Math.sqrt(Math.random() * difficulty));
     var sz = 2;
     var type = MonsterBoss;
     if(Math.random() < 0.1) {

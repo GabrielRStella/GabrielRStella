@@ -134,6 +134,18 @@ class MonsterBigBoss extends Monster {
   onDeath(player) {
     player.health = ++player.maxhealth;
   }
+
+  get moveSpeed() {
+    return 0.05;
+  }
+
+  get cooldown() {
+    return (this.maxCooldown + this.difficulty) * Math.random();
+  }
+
+  getDamageModifier(element) {
+    return 0.75 * super.getDamageModifier(element);
+  }
 }
 
 class MonsterRainbow extends Monster {

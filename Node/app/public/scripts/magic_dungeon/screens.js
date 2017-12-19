@@ -205,7 +205,7 @@ class ScreenMap extends Screen {
 
     var angleIncr = (Math.PI * 2) / rooms.length;
     var getPoint = function(room) {
-      var angle = -(Math.PI / 2) + (angleIncr * room.difficulty);
+      var angle = -(Math.PI / 2) + (angleIncr * room.id);
       var point = new Point(radius, 0);
       point.rotate(angle);
       point.add(center);
