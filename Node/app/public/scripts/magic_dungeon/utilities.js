@@ -130,6 +130,16 @@ class Point {
     return new Point(this.x, this.y);
   }
 
+  floor() {
+    this.x = Math.floor(this.x);
+    this.y = Math.floor(this.y);
+  }
+
+  round() {
+    this.x = Math.round(this.x);
+    this.y = Math.round(this.y);
+  }
+
 }
 
 class Rectangle {

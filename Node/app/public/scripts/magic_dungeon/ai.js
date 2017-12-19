@@ -130,6 +130,42 @@ class AIDodger extends AI {
   }
 }
 
+class AIDodgeWall extends AI {
+  constructor(entity) {
+    super(entity);
+    this.room = entity.room;
+    this.bounds = entity.bounds;
+    this.mover = new MovementEngine(0.95);
+    this.tick = 0;
+  }
+
+  move(tickPart) {
+    var states = this.room.states;
+    var pos = this.bounds.center;
+    var sz = Math.max(this.bounds.width, this.bounds.height) * 2;
+    var minPos = pos.copy();
+    minPos.sub(new Point(sz, sz));
+    minPos.round();
+    sz *= 2;
+
+    var mov = new Point();
+    for(var dx = 0; dx < sz; dx++) {
+      for(var dy = 0; dy < sz; dy++) {
+        var xx = minPos.x + dx;
+        var yy = minPos.y + dy;
+        if(!states[xx][yy].walkable) {
+          var del = new Point(xx + 0.5, yy + 0.5);
+          del.sub(pos);
+          del.magnitude = -1 / del.magnitude; //farther away = less important
+          mov.add(del);
+        }
+      }
+    }
+
+    return this.mover.updateAccel(tickPart, mov);
+  }
+}
+
 class AICombined extends AI {
   constructor(entity) {
     super(entity);
@@ -140,6 +176,7 @@ class AICombined extends AI {
     this.addType(AIRandom, 2 / dif);
     this.addType(AIAggressive, 4 + 2 * dif);
     this.addType(AIDodger, 3 + dif);
+    this.addType(AIDodgeWall, 2 + dif);
   }
 
   addType(type, weight) {
@@ -151,7 +188,7 @@ class AICombined extends AI {
     var delta = new Point();
     for(var i = 0; i < this.types.length; i++) {
       var mov = this.types[i].ai.move(tickPart);
-      mov.multiply(this.types[i].weight);
+      mov.magnitude = this.types[i].weight;
       delta.add(mov);
     }
     return delta;
