@@ -18,7 +18,12 @@ class ProjectEntry extends React.Component {
         React.createElement('div', {className: 'square-content'},
           React.createElement('div', {className: 'square-inner', onClick: this.onClick},
             React.createElement('img', {style: {position: 'relative', minWidth: '100%', minHeight: '100%'}, src: this.props.thumbnail}),
-            React.createElement('p', {className: 'img-overlay', style: {color: this.props.color}}, this.props.title),
+            React.createElement('div', {className: 'square-hidden'}),
+            React.createElement('div', {className: 'img-overlay', style: {color: this.props.color}},
+              React.createElement('p', {style: {display: 'inline'}}, this.props.title),
+              React.createElement('div', {className: 'divider'}),
+              React.createElement('p', {className: 'img-overlay-hidden'}, this.props.description)
+            )
           )
         )
       )

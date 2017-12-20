@@ -28,6 +28,18 @@
   outline: 2px solid black;
   cursor: pointer;
 }
+.square-hidden{
+  position: absolute;
+  top: 0%;
+  height: 100%;
+  left: 0%;
+  width: 100%;
+  transition: background-color 0.5s ease;
+  background-color: #ffffff00;
+}
+.square-inner:hover .square-hidden{
+  background-color: #ffffff60;
+}
 .img-overlay {
   position: absolute;
   top: 0px;
@@ -36,4 +48,11 @@
   text-align: left;
   margin: 0 0;
   padding: 10px;
+}
+.img-overlay-hidden{
+  transition: background-color 0.5s ease;
+  color: #00000000;
+}
+.square-inner:hover .img-overlay-hidden{
+  color: #000000;
 }
