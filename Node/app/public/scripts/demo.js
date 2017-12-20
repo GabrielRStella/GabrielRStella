@@ -34,15 +34,39 @@ function update() {
   requestAnimationFrame(update);
 }
 
-update();
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
+
+var positions = [];
+var maxAge = 20;
 
 function updateTick(part) {
   //logic...
-console.log(part);
+  positions = positions.filter(function(e) {
+    e.age -= part;
+    e.size += part;
+    return e.age > 0;
+  });
+  positions.push({
+    x: mouse.x,
+    y: mouse.y,
+    age: maxAge,
+    size: 0
+  });
 }
 
 function draw() {
-  //...
+  //this is the 21st century, I shouldn't have to write my own for loops
+  positions.forEach(drawElement);
 }
+
+function drawElement(e) {
+  ctx.fillStyle = "#00000010";
+  ctx.beginPath();
+  ctx.arc(e.x, e.y, e.size, 0, Math.PI*2);
+  ctx.fill();
+  ctx.closePath();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+update();
