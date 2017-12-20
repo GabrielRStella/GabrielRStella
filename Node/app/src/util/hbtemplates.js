@@ -1,7 +1,21 @@
 //TODO: may move handlebars to routes
 var handlebars = require('handlebars');
 
-//TODO: add handlebars block helpers, maybe
+//add handlebars block helpers
+
+handlebars.registerHelper('react', function(script, id) {
+  //test if it's actually the 'options' object
+  id = id.name ? "react-app" : ("react-app-" + id);
+
+var p1 = `
+<div style="display: block; background: #ffffff">
+  <div id="`;
+var p2 = `"></div>
+  <script src="static/scripts/react/`;
+var p3 = `.js"></script>
+</div>`;
+  return new handlebars.SafeString(p1 + id + p2 + script + p3);
+});
 
 //for reading files
 var fs = require('fs');

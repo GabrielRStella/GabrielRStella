@@ -16,7 +16,12 @@ var t_react = function(script, id) {
 
 var t_header = hbt.header(require('./nav.js'));
 
-var t_page = function(script, id) {
+var t_page = function(page) {
+  //todo: prepend header, append footer
+  return t_body(t_list([t_header, hbt.content[page], t_footer]));
+};
+
+var t_react_page = function(script, id) {
   //todo: prepend header, append footer
   return t_body(t_list([t_header, t_react(script, id), t_footer]));
 };
@@ -30,6 +35,7 @@ module.exports = {
   body: t_body,
   list: t_list,
   page: t_page,
+  page_react: t_react_page,
   page2: t_page2,
   footer: t_footer,
   react: t_react
