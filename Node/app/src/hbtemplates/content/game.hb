@@ -13,16 +13,12 @@
       pre_canvas.height = window.innerHeight - 10;
       pre_canvas.width = document.body.clientWidth - 10;
     </script>
-    {{#if game.template_before}}
-      {{{game.template}}}
-    {{/if}}
+    {{{game.template_before}}}
     <script src="/static/games/{{game.script}}"></script>
     <br/>
     <div style="align-content: center; text-align: center; margin: 0 auto">
       <div style="display: inline-block; align-content: center; text-align: center;">
-        {{#if game.template_after}}
-          {{{game.template}}}
-        {{/if}}
+        {{{game.template_after}}}
         <p style="width: 70%; margin: 0 auto">
           {{{game.caption}}}
         </p>

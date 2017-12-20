@@ -15,11 +15,7 @@ module.exports = function(app, express) {
 
   app.get('/games', route_request('games', 'games', 'games'));
 
-  //no longer necessary thanks to the below
-  //app.get('/github', route_react('github'));
-
-  //i feel like this could be dangerous...but i like it ;)
-  app.get('/:script', route_react());
+  app.get('/github', route_react('github'));
 
   api(app, express);
 

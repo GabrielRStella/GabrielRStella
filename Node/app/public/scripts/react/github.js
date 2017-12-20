@@ -201,12 +201,15 @@ class Page extends React.Component {
     }
 
     return React.createElement('div', {className: "container"},
-      React.createElement('h4', {}, "GitHub Commit Tracker"),
+      React.createElement('div', {style: {height: '10px'}}),
+      React.createElement('h4', {style: {display: 'inline'}}, "GitHub Commit Tracker"),
+      React.createElement('div', {style: {height: '10px'}}),
       React.createElement(Options, {onSearch: this.load}),
       React.createElement('div', {style: {alignContent: "center", textAlign: "center"}},
         body,
         React.createElement('p', {style: {fontSize: "10px"}}, "This page uses jQuery to make connections directly to the GitHub api.")
-      )
+      ),
+      React.createElement('div', {style: {height: '1px'}})
     );
   }
 }

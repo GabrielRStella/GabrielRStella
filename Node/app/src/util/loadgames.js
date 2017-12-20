@@ -12,7 +12,6 @@ exports.loadGame = function(game, cbOk, cbErr) {
       } else {
         var gameData = require('.' + path + '/game.json');
         gameData.path = game;
-        gameData.template_after = !gameData.template_before;
         if(!gameData.background) {
           gameData.background = "#ffffff";
         }
@@ -20,11 +19,13 @@ exports.loadGame = function(game, cbOk, cbErr) {
           gameData.foreground = "#000000";
         }
 
-        if(fs.existsSync(path + '/game.hb')) {
-          var template = handlebars.compile(fs.readFileSync(path + '/game.hb', 'utf8'));
-          gameData.template = template({
-            //nothing yet
-          });
+        if(gameData.template_before) {
+          var template = handlebars.compile(fs.readFileSync(path + '/' + gameData.template_before + '.hb', 'utf8'));
+          gameData.template_before = template({});
+        }
+        if(gameData.template_after) {
+          var template = handlebars.compile(fs.readFileSync(path + '/' + gameData.template_after + '.hb', 'utf8'));
+          gameData.template_after = template({});
         }
 
         cbOk(gameData);
