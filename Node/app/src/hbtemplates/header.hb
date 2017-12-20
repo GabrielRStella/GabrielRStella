@@ -19,6 +19,7 @@
         border-top: 1px solid white;
         border-bottom: 1px solid white;
         width: 150px;
+        cursor: pointer;
       }
       .navbar-link:hover {
         background-color: #505050;
@@ -41,12 +42,12 @@
       }
     </style>
     {{#each links}}
-        <div class="navbar-link">
+        <div class="navbar-link" onclick="window.location.assign('{{this.to}}')">
           <a href="{{this.to}}">{{this.title}}</a>
           {{#if this.sub}}
             <div class="navbar-dropdown">
               {{#each this.sub}}
-                <div class="navbar-link"><a href="{{this.to}}">{{this.title}}</a></div>
+                <div class="navbar-link" onclick="window.location.assign('{{this.to}}')"><a href="{{this.to}}">{{this.title}}</a></div>
               {{/each}}
             </div>
           {{/if}}

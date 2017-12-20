@@ -6,11 +6,13 @@ var route_request = require('./routes/router_request');
 var route_data = require('./routes/router_data');
 
 var route_game = require('./routes/game');
+//var route_project = require('./routes/project');
 
 var route_header = require('./routes/header');
 var api = require('./routes/api/routes');
 
 var loadGames = require('./util/loadgames');
+var loadProjects = require('./util/loadprojects');
 
 module.exports = function(app, express) {
 
@@ -20,6 +22,9 @@ module.exports = function(app, express) {
 
   app.get('/games', route_data(loadGames.loadGames, 'games', 'games'));
   app.get('/games/:game', route_game);
+
+  app.get('/projects', route_react('projects'));
+  //app.get('/projects/:project', route_project);
 
   app.get('/github', route_react('github'));
 

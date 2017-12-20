@@ -1,5 +1,6 @@
-<div style="background: {{palette.background}}">
-  <div class="center section">
-    Hi! This page is currently under construction. Come back soon!
+<div style="background: white">
+  <div class="container">
+    <h1 style="display: inline; padding: 10px">Projects</h1>
+    {{#react "projects"}}{{/react}}
   </div>
 </div>
