@@ -7,7 +7,7 @@
   </p>
 <div class="divider"></div>
   <br/>
-  <div style="margin: 0 auto; width: 200px; height: 200px; background: #ffffff;
+  <div style="margin: 0 auto; width: 200px; height: 200px; background: white;
     border: 1px solid gray"></div>
   <br/>
 <div class="divider"></div>

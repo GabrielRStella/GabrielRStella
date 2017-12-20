@@ -1,4 +1,4 @@
-<div style="background: {{palette.background}}">
+<div style="background: white">
   <div class="section">
   <div class="row">
     {{#each games}}

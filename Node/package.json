@@ -13,6 +13,7 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
     "handlebars": "^4.0.10",
-    "nodemon": "^1.11.0"
+    "nodemon": "^1.11.0",
+    "request": "2.79.0"
   }
 }
