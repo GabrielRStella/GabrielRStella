@@ -1,4 +1,4 @@
-<div style="background: {{palette.background}}">
+<div style="background: white">
   <div class="center section">
     Invalid game url.
   </div>

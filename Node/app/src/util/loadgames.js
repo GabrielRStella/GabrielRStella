@@ -19,13 +19,14 @@ exports.loadGame = function(game, cbOk, cbErr) {
           gameData.foreground = "#000000";
         }
 
+        gameData.template = {};
         if(gameData.template_before) {
           var template = handlebars.compile(fs.readFileSync(path + '/' + gameData.template_before + '.hb', 'utf8'));
-          gameData.template_before = template({});
+          gameData.template.before = template({});
         }
         if(gameData.template_after) {
           var template = handlebars.compile(fs.readFileSync(path + '/' + gameData.template_after + '.hb', 'utf8'));
-          gameData.template_after = template({});
+          gameData.template.after = template({});
         }
 
         cbOk(gameData);

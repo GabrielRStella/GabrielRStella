@@ -11,3 +11,13 @@ module.exports = function(dataFunc, template, key) {
     });
   };
 };
+
+var loadGames = require('../util/loadgames');
+
+module.exports = function(req, res) {
+  loadGames.loadGame(req.params.game, function(data) {
+    res.send(templates.page('game', {game: data}));
+  }, function(err) {
+    res.send(templates.page('game_invalid', {}));
+  });
+}
