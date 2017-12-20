@@ -7,8 +7,10 @@
   </p>
 <div class="divider"></div>
   <br/>
-  <div style="margin: 0 auto; width: 200px; height: 200px; background: white;
-    border: 1px solid gray"></div>
+  <div style="margin: 0 auto; width: 200px; height: 200px; background: white; border: 1px solid gray; cursor: pointer">
+    <canvas id="the-canvas" style="width: 200px; height: 200px"></canvas>
+    <script src="/static/scripts/demo.js"></script>
+  </div>
   <br/>
 <div class="divider"></div>
   <p>
