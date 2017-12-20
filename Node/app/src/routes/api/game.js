@@ -3,6 +3,6 @@ var loader = require('../../util/loadgames');
 
 module.exports = function(req, res) {
     loader.loadGame(req.params.game, res.send.bind(res), function() {
-      res.status(404).send("Game not found.");
+      res.status(404).send({});
     });
 }
