@@ -4,7 +4,7 @@ class IndexPage extends React.Component {
   }
 
   render() {
-    return React.createElement('p', {style: {fontSize: "36px"}}, "Hello! (index)");
+    return React.createElement('p', {style: {display: "inline", fontSize: "36px"}}, "Hello! (index)");
   }
 }
 
