@@ -14,9 +14,11 @@ var t_react = function(script, id) {
   return hbt.react({script: script, id: id});
 }
 
+var t_header = hbt.header(require('./nav.js'));
+
 var t_page = function(script, id) {
   //todo: prepend header, append footer
-  return t_body(t_list([t_react('header', 'header'), t_react(script, id), t_footer]));
+  return t_body(t_list([t_header, t_react(script, id), t_footer]));
 };
 
 var t_page2 = function(contents) {

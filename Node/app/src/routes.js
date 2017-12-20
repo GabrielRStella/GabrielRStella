@@ -6,9 +6,11 @@ var router_api = require('./routes/api/routes');
 
 module.exports = function(app, express) {
 
+  app.get('/header', route_header);
+
   app.get('/', route_react('index'));
 
-  app.get('/header', route_header);
+  app.get('/github', route_react('github'));
 
   router_api(app, express);
 
