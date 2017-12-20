@@ -54,9 +54,15 @@ function weighted(a, b, weight) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-var pos = mouse;
 var positions = [];
 var maxAge = 50;
+
+var pos = mouse;
+var vel = {x: 0, y: 0};
+var speed = 1.8;
+var edge = 4;
+
+var prevMouse = null;
 
 function updateTick(part) {
   //logic...
@@ -65,11 +71,42 @@ function updateTick(part) {
     e.size += part;
     return e.age > 0;
   });
-  var dx = pos.x - mouse.x;
-  var dy = pos.y - mouse.y;
-  var dist = Math.sqrt(dx * dx + dy * dy) * 0.6;
-  pos.x = weighted(pos.x, mouse.x, dist);
-  pos.y = weighted(pos.y, mouse.y, dist);
+
+  if(mouse == prevMouse) {
+    //mouse isn't moving, do physics
+    if(pos.x < edge) {
+      vel = {
+        x: Math.abs(vel.x),
+        y: vel.y
+      };
+    } else if(pos.x > width - edge) {
+      vel = {
+        x: -Math.abs(vel.x),
+        y: vel.y
+      };
+    } else if(pos.y < edge) {
+      vel = {
+        x: vel.x,
+        y: Math.abs(vel.y)
+      };
+    } else if(pos.y > height - edge) {
+      vel = {
+        x: vel.x,
+        y: -Math.abs(vel.y)
+      };
+    }
+  } else {
+    var dx = mouse.x - pos.x;
+    var dy = mouse.y - pos.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    var mult = 0;
+    if(dist) mult = speed / dist; //set magnitude
+    vel = {x: dx * mult, y: dy * mult};
+  }
+  prevMouse = mouse;
+
+  pos.x += vel.x;
+  pos.y += vel.y;
 
   positions.push({
     x: pos.x,
