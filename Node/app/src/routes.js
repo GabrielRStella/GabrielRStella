@@ -7,8 +7,6 @@ var route_request = require('./routes/router_request');
 var route_header = require('./routes/header');
 var api = require('./routes/api/routes');
 
-var route_games = require('./routes/games');
-
 module.exports = function(app, express) {
 
   app.get('/header', route_header);
@@ -16,7 +14,6 @@ module.exports = function(app, express) {
   app.get('/', route_page('index'));
 
   app.get('/games', route_request('games', 'games', 'games'));
-
 
   //no longer necessary thanks to the below
   //app.get('/github', route_react('github'));
