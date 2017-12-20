@@ -5,6 +5,6 @@ module.exports = function(req, res) {
   loadProjects.loadProject(req.params.project, function(data) {
     res.send(templates.page('project', {project: data}));
   }, function(err) {
-    res.send(templates.page('project_invalid', {}));
+    res.redirect('/projects');
   });
 }
