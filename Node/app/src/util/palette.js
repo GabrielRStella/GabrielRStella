@@ -1,8 +1,6 @@
 module.exports = {
-  negative: "#5f5f5f",
-  background: "#ffffff",
-  primary: "#000000",
-  text: "#ffffff",
-  secondary: "#ff0000",
-  tertiary: "#ffab00"
+  primary: "#ffffff", //used for backgrounds and large chunks of color
+  secondary: "#000000", //used for text and highlights
+  tertiary: "#ffab00", //used for extra highlights
+  negative: "#5f5f5f" //used for very-far backgrounds
 };
