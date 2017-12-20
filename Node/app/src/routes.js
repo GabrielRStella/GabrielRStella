@@ -6,7 +6,7 @@ var route_request = require('./routes/router_request');
 var route_data = require('./routes/router_data');
 
 var route_game = require('./routes/game');
-//var route_project = require('./routes/project');
+var route_project = require('./routes/project');
 
 var route_header = require('./routes/header');
 var api = require('./routes/api/routes');
@@ -24,7 +24,7 @@ module.exports = function(app, express) {
   app.get('/games/:game', route_game);
 
   app.get('/projects', route_page('projects'));
-  //app.get('/projects/:project', route_project);
+  app.get('/projects/:project', route_project);
 
   app.get('/github', route_react('github'));
 
