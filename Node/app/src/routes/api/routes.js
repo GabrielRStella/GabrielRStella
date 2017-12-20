@@ -8,7 +8,7 @@ module.exports = function(app, express) {
   var router = express.Router();
 
   router.get('/games', route_games);
-  router.get('/game/:game', route_game);
+  router.get('/games/:game', route_game);
 
   app.use('/api', router);
 
