@@ -1,7 +1,7 @@
 <!-- https://www.w3schools.com/css/tryit.asp?filename=trycss_dropdown_navbar -->
 
 <div style="background: url(/header)">
-  <div style="height: 150px" class="valign-wrapper">
+  <div style="height: 108px" class="valign-wrapper">
     <div style="margin-left: 20px" class="center-align">
       <h1 style="color: #000000; font-size: 72px">Gabriel R Stella</h1>
     </div>
