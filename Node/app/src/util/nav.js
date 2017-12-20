@@ -16,7 +16,7 @@ module.exports = {links: [
     title: "Links",
     sub: [
       {
-        to: "/github",
+        to: "https://github.com/GabrielRStella/",
         title: "GitHub"
       }
     ]

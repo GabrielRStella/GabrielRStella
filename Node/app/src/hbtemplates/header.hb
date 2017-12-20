@@ -17,6 +17,7 @@
         transition: background-color 0.25s ease;
         display: inline-block;
         border-top: 1px solid white;
+        border-bottom: 1px solid white;
         width: 150px;
       }
       .navbar-link:hover {
@@ -33,6 +34,10 @@
       .navbar-link:hover .navbar-dropdown {
         display: block;
         width: inherit;
+      }
+      .navbar-dropdown .navbar-link {
+        border-top: none;
+        border-bottom: none;
       }
     </style>
     {{#each links}}
