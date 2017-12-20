@@ -6,9 +6,10 @@
     Hi! I'm a second-year junior at Texas A&M University. I'm getting a bachelor's degree in computer science with a minor in mathematics. I like to experiment with AI and other random programming things. Please check out my games and other projects!
   </p>
 <div class="divider"></div>
-  <p>
-    hi.
-  </p>
+  <br/>
+  <div style="margin: 0 auto; width: 200px; height: 200px; background: #ffffff;
+    border: 1px solid gray"></div>
+  <br/>
 <div class="divider"></div>
   <p>
   I'm building this site completely from scratch, so please bear with me while everything is under construction :)
