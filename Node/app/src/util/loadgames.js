@@ -12,6 +12,9 @@ exports.loadGame = function(game, cbOk, cbErr) {
       } else {
         var gameData = require('.' + path + '/game.json');
         gameData.path = game;
+        gameData.url = '/games/' + game;
+        gameData.scriptUrl = '/static/games/' + gameData.script;
+        gameData.thumbnail = '/static/games/thumbnails/' + game + '.png';
         if(!gameData.background) {
           gameData.background = "#ffffff";
         }

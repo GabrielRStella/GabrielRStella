@@ -12,6 +12,10 @@ exports.loadProject = function(project, cbOk, cbErr) {
       } else {
         var projectData = require('.' + path + '/project.json');
         projectData.path = project;
+        projectData.url = '/projects/' + project;
+        projectData.thumbnail = '/static/projects/thumbnails/' + project + '.png';
+
+        projectData.color = projectData.color || "#000";
         projectData.template = handlebars.compile(fs.readFileSync(path + '/page.hb', 'utf8'))({});
 
         cbOk(projectData);

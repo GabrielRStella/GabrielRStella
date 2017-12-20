@@ -1,0 +1,39 @@
+.square-box{
+    position: relative;
+    overflow: hidden;  
+    display: inline-block;
+    float: left;
+}
+.square-box:before{
+    content: "";
+    display: block;
+    padding-top: 100%;
+}
+.square-content{
+    position:  absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    color: white;
+    text-align: center;
+}
+.square-inner{
+  overflow: hidden;
+  position: absolute;
+  top: 2%;
+  height: 96%;
+  left: 2%;
+  width: 96%;
+  outline: 2px solid black;
+  cursor: pointer;
+}
+.img-overlay {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  text-align: left;
+  margin: 0 0;
+  padding: 10px;
+}
