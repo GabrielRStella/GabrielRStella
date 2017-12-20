@@ -1,5 +1,4 @@
 var templates = require('../util/templates.js');
-var connect = require('../util/connect.js');
 
 module.exports = function(dataFunc, template, key) {
   return function(req, res) {
@@ -8,8 +7,6 @@ module.exports = function(dataFunc, template, key) {
       if(key) params[key] = data;
       else params = data;
       res.send(templates.page(template, params));
-    }, function(error) {
-      res.status(500).send("Error!");
     });
   };
 };
