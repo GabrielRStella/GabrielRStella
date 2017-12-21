@@ -11,7 +11,7 @@ var p1 = `
 <div style="display: block; background: #ffffff">
   <div id="`;
 var p2 = `"></div>
-  <script src="static/scripts/react/`;
+  <script src="/static/scripts/react/`;
 var p3 = `.js"></script>
 </div>`;
   return new handlebars.SafeString(p1 + id + p2 + script + p3);

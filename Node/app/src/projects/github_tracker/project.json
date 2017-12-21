@@ -2,5 +2,6 @@
   "title": "GitHub Tracker",
   "description": "A client-side tracker for GitHub repository updates.",
   "extension": ".svg",
-  "url": "/github"
+  "url": "/github",
+  "redirect": "true"
 }
