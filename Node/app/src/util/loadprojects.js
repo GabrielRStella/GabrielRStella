@@ -12,7 +12,7 @@ exports.loadProject = function(project, cbOk, cbErr) {
       } else {
         var projectData = require('.' + path + '/project.json');
         projectData.path = project;
-        projectData.url = '/projects/' + project;
+        projectData.url = projectData.url || ('/projects/' + project);
         projectData.extension = projectData.extension || '.png';
         projectData.thumbnail = '/static/projects/thumbnails/' + project + projectData.extension;
 
