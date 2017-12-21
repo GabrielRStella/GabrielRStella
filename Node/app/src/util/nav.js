@@ -18,6 +18,10 @@ module.exports = {links: [
       {
         to: "https://github.com/GabrielRStella/",
         title: "GitHub"
+      },
+      {
+        to: "static/Resume.pdf",
+        title: "Resume"
       }
     ]
   }
