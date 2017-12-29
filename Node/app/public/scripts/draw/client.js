@@ -180,8 +180,8 @@ function UPDATE() {
 
   //resize
   if(WIDTH != window.innerWidth || HEIGHT != window.innerHeight) {
-    WIDTH = CANVAS_ELEMENT.width = window.innerWidth;
-    HEIGHT = CANVAS_ELEMENT.height = window.innerHeight;
+    WIDTH = CANVAS_ELEMENT.width = window.innerWidth - 10;
+    HEIGHT = CANVAS_ELEMENT.height = window.innerHeight - 10;
   }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
