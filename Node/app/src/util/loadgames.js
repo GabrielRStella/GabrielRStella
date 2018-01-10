@@ -3,18 +3,22 @@ var fs = require('fs');
 
 var exports = {};
 
+var DIR = '../data/games/';
+
 exports.loadGame = function(game, cbOk, cbErr) {
-  var path = './games/' + game;
+  var path = DIR + game;
+console.log(path);
 
   fs.stat(path, function(err, stats) {
       if(err) {
         cbErr();
       } else {
-        var gameData = require('.' + path + '/game.json');
+        var gameData = require('../' + path + '/game.json');
         gameData.path = game;
         gameData.url = '/games/' + game;
-        gameData.scriptUrl = '/static/games/' + gameData.script;
-        gameData.thumbnail = '/static/games/thumbnails/' + game + '.png';
+        gameData.staticUrl = '/data/games/' + game + '/';
+        gameData.scriptUrl = gameData.staticUrl + gameData.script;
+        gameData.thumbnailUrl = gameData.staticUrl + gameData.thumbnail;
         if(!gameData.background) {
           gameData.background = "#ffffff";
         }
@@ -38,7 +42,7 @@ exports.loadGame = function(game, cbOk, cbErr) {
 };
 
 exports.loadGames = function(cbOk) {
-    fs.readdir('./games', function(err, files) {
+    fs.readdir(DIR, function(err, files) {
       var games = [];
       var counter = files.length;
       var count = function() {
@@ -49,7 +53,7 @@ exports.loadGames = function(cbOk) {
       };
       for(var index in files) {
         var file = files[index];
-        if(fs.lstatSync('./games/' + file).isDirectory()) {
+        if(fs.lstatSync(DIR + file).isDirectory()) {
           exports.loadGame(file, function(data) {
             games.push(data);
             count();

@@ -4,5 +4,6 @@
   "description": "Spin a triangle around to follow a circle.",
   "caption": "Use the left and right arrow keys to spin CCW and CW, respectively. Try to choose the rotation that would be the shorter path from the triangle to the circle. You can also use the buttons if you are on a mobile browser.",
   "img": "TODO",
-  "foreground": "#000000"
+  "foreground": "#000000",
+  "thumbnail": "thumb.png"
 }
