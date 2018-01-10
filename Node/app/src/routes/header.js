@@ -5,7 +5,7 @@ function alternateHeader() {
 }
 
 function header(cb){
-  fs.readdir("../public/img/headers", function(err, files) {
+  fs.readdir("../root/static/img/headers", function(err, files) {
     if(err) {
       //?
       //throw err;
