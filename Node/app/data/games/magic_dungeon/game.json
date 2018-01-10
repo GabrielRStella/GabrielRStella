@@ -1,0 +1,30 @@
+{
+  "scripts": [
+    "utilities.js",
+    "images.js",
+    "keys.js",
+    "io.js",
+    "gui.js",
+    "screens.js",
+    "class_element.js",
+    "spells.js",
+    "class_trait.js",
+    "ai.js",
+    "class_monster.js",
+    "class_player.js",
+    "class_state.js",
+    "class_style.js",
+    "class_room.js",
+    "class_world.js",
+    "class_game.js",
+    "game.js"
+    ],
+  "scriptDir": "scripts/",
+  "title": "Magic Dungeon",
+  "description": "",
+  "caption": "",
+  "background": "#202020",
+  "foreground": "#ffffff",
+  "fullscreen": true,
+  "thumbnail": "thumb.png"
+}

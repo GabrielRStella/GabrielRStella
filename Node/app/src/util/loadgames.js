@@ -16,8 +16,15 @@ exports.loadGame = function(game, cbOk, cbErr) {
         gameData.path = game;
         gameData.url = '/games/' + game;
         gameData.staticUrl = '/data/games/' + game + '/';
-        gameData.scriptUrl = gameData.staticUrl + gameData.script;
         gameData.thumbnailUrl = gameData.staticUrl + gameData.thumbnail;
+
+        if(gameData.script) {
+          gameData.scripts = [gameData.script];
+        }
+        gameData.scriptDir = gameData.scriptDir || "";
+        var gameScriptUrl = gameData.staticUrl + gameData.scriptDir;
+        gameData.scriptUrls = gameData.scripts.map(x => (gameScriptUrl + x));
+
         if(!gameData.background) {
           gameData.background = "#ffffff";
         }

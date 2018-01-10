@@ -14,7 +14,9 @@
       pre_canvas.width = document.body.clientWidth - 10;
     </script>
     {{{game.template.before}}}
-    <script src="{{game.scriptUrl}}"></script>
+    {{#each game.scriptUrls}}
+      <script src="{{this}}"></script>
+    {{/each}}
     <br/>
     <div style="align-content: center; text-align: center; margin: 0 auto">
       <div style="display: inline-block; align-content: center; text-align: center;">
