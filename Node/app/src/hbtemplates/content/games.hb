@@ -1,8 +1,14 @@
 <div style="background: white">
+  <div class="container">
   <div class="section">
-  <div class="row">
-    {{#each games}}
-      <div class="col s4" style="vertical-align: top">
+    <div style="height: 10px"></div>
+    <h1 style="display: inline; padding: 10px">Games</h1>
+    <div style="height: 10px"></div>
+    <div class="divider"></div>
+    <br/>
+  {{#each games}}
+    <div class="row">
+      <div class="col s12" style="vertical-align: top">
         <div style="padding: 10px; border: 2px solid #000000; border-radius: 10px; background: {{this.background}}; cursor: pointer"
           onclick="window.location.assign('{{this.url}}')">
         <div style="display: inline-block; width: 128px; height: 128px;">
@@ -15,7 +21,8 @@
         </div>
         </div>
       </div>
-    {{/each}}
+    </div>
+  {{/each}}
   </div>
   </div>
 </div>
