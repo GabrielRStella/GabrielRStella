@@ -1,4 +1,4 @@
-<p><a href="/static/scripts/magic_dungeon/page.html" class="waves-effect waves-light black btn">Play!</a></p>
+<p><a href="/games/magic_dungeon" class="waves-effect waves-light black btn">Play!</a></p>
 <div class="divider"></div>
 <div style="text-align: left">
 <p>
@@ -17,7 +17,7 @@
     <li>A world map</li>
   </ol>
   Overall, I am very happy with how the Javascript version came out.
-  Click <a href="/static/scripts/magic_dungeon/page.html">here</a> to play it!
+  Click <a href="/games/magic_dungeon">here</a> to play it!
 </p>
 
 </div>
