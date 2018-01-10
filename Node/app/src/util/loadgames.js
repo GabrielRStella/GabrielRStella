@@ -7,7 +7,6 @@ var DIR = '../data/games/';
 
 exports.loadGame = function(game, cbOk, cbErr) {
   var path = DIR + game;
-console.log(path);
 
   fs.stat(path, function(err, stats) {
       if(err) {
