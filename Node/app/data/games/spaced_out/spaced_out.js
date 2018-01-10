@@ -240,7 +240,7 @@ function setMaxScore(score) {
   if(score > max) {
     var date = new Date();
     date.setFullYear(date.getFullYear() + 1); //won't expire for a while :)
-    document.cookie = "maxScore=" + score + ";expires=" + date;
+    document.cookie = "maxScore_spaced_out=" + score + ";expires=" + date;
     max = score;
   }
   maxScore = max;
@@ -249,7 +249,7 @@ function setMaxScore(score) {
 
 function getMaxScore() {
   var cookie = document.cookie;
-  var index = cookie.search("maxScore=");
+  var index = cookie.search("maxScore_spaced_out=");
   if(index >= 0) {
     index += 9; //beginning of the number
     maxScore = parseInt(cookie.substring(index));
@@ -261,7 +261,7 @@ function getMaxScore() {
 function clearMaxScore() {
     var date = new Date();
     date.setFullYear(date.getFullYear() - 1); //already expired! woo
-    document.cookie = "maxScore=;expires=" + date.toUTCString();
+    document.cookie = "maxScore_spaced_out=;expires=" + date.toUTCString();
     maxScore = -1;
 }
 

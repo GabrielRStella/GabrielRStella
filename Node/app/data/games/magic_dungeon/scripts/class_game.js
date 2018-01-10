@@ -28,14 +28,14 @@ class Game {
     if(this.score > this.highScore) {
       var date = new Date();
       date.setFullYear(date.getFullYear() + 1); //won't expire for a while :)
-      document.cookie = "maxScore=" + this.score + ";expires=" + date;
+      document.cookie = "maxScore_magic_dungeon=" + this.score + ";expires=" + date;
       this.highScore = this.score;
     }
   }
 
   loadHighScore() {
     var cookie = document.cookie;
-    var index = cookie.search("maxScore=");
+    var index = cookie.search("maxScore_magic_dungeon=");
     if(index >= 0) {
       index += 9; //beginning of the number
       this.highScore = parseInt(cookie.substring(index));
