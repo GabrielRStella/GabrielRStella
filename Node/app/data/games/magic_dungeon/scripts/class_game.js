@@ -37,7 +37,7 @@ class Game {
     var cookie = document.cookie;
     var index = cookie.search("maxScore_magic_dungeon=");
     if(index >= 0) {
-      index += 9; //beginning of the number
+      index += 23; //beginning of the number
       this.highScore = parseInt(cookie.substring(index));
     } else this.highScore = 0;
     return this.highScore;

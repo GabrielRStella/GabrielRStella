@@ -251,7 +251,7 @@ function getMaxScore() {
   var cookie = document.cookie;
   var index = cookie.search("maxScore_spaced_out=");
   if(index >= 0) {
-    index += 9; //beginning of the number
+    index += 20; //beginning of the number
     maxScore = parseInt(cookie.substring(index));
     return maxScore;
   } else maxScore = 0;
