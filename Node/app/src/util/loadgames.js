@@ -31,6 +31,12 @@ exports.loadGame = function(game, cbOk, cbErr) {
         if(!gameData.foreground) {
           gameData.foreground = "#000000";
         }
+        if(!gameData.page_background) {
+          gameData.page_background = "#ffffff";
+        }
+        if(!gameData.canvas_background) {
+          gameData.canvas_background = "#ffffff";
+        }
 
         gameData.template = {};
         if(gameData.template_before) {

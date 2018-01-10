@@ -21,10 +21,11 @@
     ],
   "scriptDir": "scripts/",
   "title": "Magic Dungeon",
-  "description": "",
-  "caption": "",
-  "background": "#202020",
-  "foreground": "#ffffff",
+  "description": "A procedurally-generated top-down dungeon crawler.",
+  "caption": "Hi! This is a fullscreen game, so you shouldn't be able to see this.",
+  "page_background": "#202020",
+  "canvas_background": "#000000",
   "fullscreen": true,
-  "thumbnail": "thumb.png"
+  "thumbnail": "thumb.gif",
+  "template_before": "template_before"
 }
