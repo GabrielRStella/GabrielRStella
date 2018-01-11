@@ -25,6 +25,10 @@ exports.loadGame = function(game, cbOk, cbErr) {
         var gameScriptUrl = gameData.staticUrl + gameData.scriptDir;
         gameData.scriptUrls = gameData.scripts.map(x => (gameScriptUrl + x));
 
+        gameData.libs = gameData.libs || [];
+        var gameLibUrl = "/static/scripts/games/";
+        gameData.libsUrls = gameData.libs.map(x => (gameLibUrl + x));
+
         if(!gameData.background) {
           gameData.background = "#ffffff";
         }
@@ -32,10 +36,10 @@ exports.loadGame = function(game, cbOk, cbErr) {
           gameData.foreground = "#000000";
         }
         if(!gameData.page_background) {
-          gameData.page_background = "#ffffff";
+          gameData.page_background = gameData.background;
         }
         if(!gameData.canvas_background) {
-          gameData.canvas_background = "#ffffff";
+          gameData.canvas_background = gameData.background;
         }
 
         gameData.template = {};
@@ -47,6 +51,8 @@ exports.loadGame = function(game, cbOk, cbErr) {
           var template = handlebars.compile(fs.readFileSync(path + '/' + gameData.template_after + '.hb', 'utf8'));
           gameData.template.after = template({});
         }
+
+        gameData.date = new Date(gameData.dateString);
 
         cbOk(gameData);
       }
@@ -60,6 +66,10 @@ exports.loadGames = function(cbOk) {
       var count = function() {
         counter--;
         if(counter == 0) {
+          games.sort(function(a, b) {
+            //negative to reverse order (recent games at top)
+            return -(a.date.getTime() - b.date.getTime());
+          });
           cbOk(games);
         }
       };

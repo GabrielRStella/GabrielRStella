@@ -27,5 +27,6 @@
   "canvas_background": "#000000",
   "fullscreen": true,
   "thumbnail": "thumb.gif",
-  "template_before": "template_before"
+  "template_before": "template_before",
+  "dateString": "Mon Jan 1 2018 00:00:04 GMT-0600 (Central Standard Time)"
 }

@@ -5,6 +5,9 @@
   <canvas id="gameCanvas"></canvas>
   {{{game.template.after}}}
 
+  {{#each game.libsUrls}}
+    <script src="{{this}}"></script>
+  {{/each}}
   {{#each game.scriptUrls}}
     <script src="{{this}}"></script>
   {{/each}}

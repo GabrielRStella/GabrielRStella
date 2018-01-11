@@ -1,0 +1,19 @@
+{
+  "scripts": [
+    "polywar.js"
+    ],
+  "scriptDir": "scripts/",
+  "libs": [
+    "game_lib.js"
+    ],
+  "title": "PolyWar",
+  "description": "Prototype for an upcoming game.",
+  "caption": "-",
+  "foreground": "#ffffff",
+  "background": "#000000",
+  "page_background": "#000000",
+  "canvas_background": "#000000",
+  "fullscreen": true,
+  "thumbnail": "thumb.png",
+  "dateString": "Mon Jan 1 2018 00:00:06 GMT-0600 (Central Standard Time)"
+}

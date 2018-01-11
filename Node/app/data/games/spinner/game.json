@@ -5,5 +5,6 @@
   "caption": "Use the left and right arrow keys to spin CCW and CW, respectively. Try to choose the rotation that would be the shorter path from the triangle to the circle. You can also use the buttons if you are on a mobile browser.",
   "img": "TODO",
   "foreground": "#000000",
-  "thumbnail": "thumb.png"
+  "thumbnail": "thumb.png",
+  "dateString": "Mon Jan 1 2018 00:00:02 GMT-0600 (Central Standard Time)"
 }

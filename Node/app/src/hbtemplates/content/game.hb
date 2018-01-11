@@ -14,6 +14,9 @@
       pre_canvas.width = document.body.clientWidth - 10;
     </script>
     {{{game.template.before}}}
+    {{#each game.libsUrls}}
+      <script src="{{this}}"></script>
+    {{/each}}
     {{#each game.scriptUrls}}
       <script src="{{this}}"></script>
     {{/each}}
