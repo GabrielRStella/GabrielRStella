@@ -1,6 +1,6 @@
 class PolyWarGame extends Game {
-  constructor(name) {
-    super(name);
+  constructor() {
+    super("polywar");
   }
 
   register(keys) {
@@ -10,9 +10,14 @@ class PolyWarGame extends Game {
   }
 
   update(tickPart) {
+    console.log(tickPart);
   }
 
   //ctx = canvas 2d drawing context
   render(ctx, width, height) {
   }
 }
+
+//use default options
+var gameManager = new GameManager(new PolyWarGame());
+//gameManager.start();

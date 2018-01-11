@@ -12,6 +12,7 @@ Array.prototype.shuffle = Array.prototype.shuffle || function() {
 
 class Game {
   constructor(name) {
+console.log(-1);
     this.name = name;
   }
 
@@ -360,24 +361,46 @@ class ImageStore {
     }
   }
 
-  function loadImage(name) {
+  loadImage(name) {
     var img = new Image();
     img.src = this.path + name + ".png";
     imgCache[name] = img;
 //todo - make sure it's loaded before returning (and have async version)
   }
 
-  function drawImage(img, canvas, r, flipped) {
-    if(flipped) drawImageFlipped(img, canvas, r);
-    else canvas.drawImage(getImage(img), r.minX, r.minY, r.width, r.height);
+  drawImage(img, canvas, r, flipped) {
+    if(flipped) this.drawImageFlipped(img, canvas, r);
+    else canvas.drawImage(this.getImage(img), r.minX, r.minY, r.width, r.height);
   }
 
-  function drawImageFlipped(img, canvas, r) {
+  drawImageFlipped(img, canvas, r) {
     canvas.save();
     canvas.translate(r.minX, r.maxY);
     canvas.scale(1, -1);
-    canvas.drawImage(getImage(img), 0, 0, r.width, r.height);
+    canvas.drawImage(this.getImage(img), 0, 0, r.width, r.height);
     canvas.restore();
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//MOUSE
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+class MouseListener {
+  constructor() {
+    this.mouse = new Point(0, 0);
+  }
+
+  getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return new Point(evt.clientX - rect.left - EDGE_PADDING, evt.clientY - rect.top - EDGE_PADDING);
+  }
+
+  register(canvas) {
+    canvas.addEventListener('mousemove', function(evt) {
+      var mousePos = getMousePos(canvas, evt);
+      this.mouse = mousePos;
+    }.bind(this), false);
   }
 }
 
