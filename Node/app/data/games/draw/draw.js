@@ -98,6 +98,30 @@ CANVAS_ELEMENT.addEventListener('mouseup', function(evt) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+function scaleToScreen(p) {
+  return {
+    x: p.x * WIDTH,
+    y: p.y * HEIGHT
+  };
+}
+
+function scaleFromScreen(p) {
+  return {
+    x: p.x / WIDTH,
+    y: p.y / HEIGHT
+  };
+}
+
+function scaleLineToScreen(l) {
+  l.start = scaleToScreen(l.start);
+  l.end = scaleToScreen(l.end);
+}
+
+function scaleLineFromScreen(l) {
+  l.start = scaleFromScreen(l.start);
+  l.end = scaleFromScreen(l.end);
+}
+
 function getLine(p1, p2) {
   return {
     id: THE_ID,
@@ -129,6 +153,7 @@ var prevMouse = null;
 function UPDATE_TICK(tickPart, cbLine) {
   if(MOUSE_DOWN && prevMouse) {
     var line = getLine(prevMouse, THE_MOUSE);
+    scaleLineFromScreen(line);
     cbLine(line);
   }
   prevMouse = THE_MOUSE;
@@ -154,8 +179,10 @@ function DRAW(ctx) {
 
     ctx.save();
     ctx.beginPath();
-    ctx.moveTo(line.start.x, line.start.y);
-    ctx.lineTo(line.end.x, line.end.y);
+    var start = scaleToScreen(line.start);
+    var end = scaleToScreen(line.end);
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
     ctx.strokeStyle=line.color;
     ctx.lineWidth = line.width;
     ctx.stroke();
