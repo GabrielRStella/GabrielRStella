@@ -10,6 +10,8 @@ Array.prototype.shuffle = Array.prototype.shuffle || function() {
   }
 };
 
+Math.TAU = Math.TAU || (Math.PI * 2);
+
 class Game {
   constructor(name) {
     this.name = name;
