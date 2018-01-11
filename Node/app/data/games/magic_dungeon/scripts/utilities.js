@@ -1,5 +1,35 @@
 //various generic utility stuff
 
+function loop(x, max) {
+  if(x < 0) {
+    x %= max;
+    x += max;
+  }
+  return x % max;
+}
+
+function shuffle(arr) {
+  for(var i = 0; i < arr.length; i++) {
+    var j = Math.floor(Math.random() * arr.length);
+    var temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+  }
+}
+
+function randomRange(min, max) {
+  return min + Math.random() * (max - min);
+}
+
+function randomRangeFloor(min, max) {
+  return Math.floor(randomRange(min, max));
+}
+
+function choosePoint() {
+  var p = new Point(1, 0);
+  p.rotate(Math.random() * Math.PI * 2);
+  return p;
+}
 
 class Point {
   constructor(x, y) {
