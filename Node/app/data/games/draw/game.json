@@ -1,0 +1,9 @@
+{
+  "script": "draw.js",
+  "title": "Draw",
+  "description": "A collaborative drawing game.",
+  "caption": "-",
+  "fullscreen": true,
+  "thumbnail": "thumb.png",
+  "template_before": "template_before"
+}
