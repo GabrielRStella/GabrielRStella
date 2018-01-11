@@ -25,8 +25,7 @@ class GameManager {
 
     this.keys = new Keys();
     this.images = new ImageStore(options.imagePath || game.name);
-    this.mouse = new MouseListener();
-    this.mouse.register(this.canvas);
+    this.mouse = new MouseListener(this.canvas, this.edgePadding);
 
     this.ticksPerSec = options.ticksPerSec || 20;
     this.msPerTick = 1000 / this.ticksPerSec;
@@ -41,18 +40,18 @@ class GameManager {
 
   start() {
     this.keys.register();
+    this.mouse.register();
     this.game.register(this.keys);
 
     this.running = true;
     this.prevTickMs = new Date().getTime();
 
-    //run the loop
-    while(this.running) {
-      requestAnimationFrame(this.update);
-    }
+    requestAnimationFrame(this.update);
   }
 
   update() {
+    if(!this.running) return;
+
     var ms = new Date().getTime();
     var part = (ms - this.prevTickMs) / this.msPerTick;
 
@@ -82,11 +81,16 @@ class GameManager {
     this.game.render(ctx, this.width, this.height);
 
     this.prevTickMs = ms;
+
+    requestAnimationFrame(this.update);
   }
 
   stop() {
     this.game.unregister(this.keys);
     this.keys.unregister();
+
+    //TODO
+    //this.mouse.unregister();
 
     this.running = false;
   }

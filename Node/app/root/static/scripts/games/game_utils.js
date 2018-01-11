@@ -12,7 +12,6 @@ Array.prototype.shuffle = Array.prototype.shuffle || function() {
 
 class Game {
   constructor(name) {
-console.log(-1);
     this.name = name;
   }
 
@@ -387,19 +386,20 @@ class ImageStore {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 class MouseListener {
-  constructor() {
+  constructor(canvas, edgePadding) {
+    this.canvas = canvas;
+    this.edgePadding = edgePadding;
     this.mouse = new Point(0, 0);
   }
 
-  getMousePos(canvas, evt) {
-    var rect = canvas.getBoundingClientRect();
-    return new Point(evt.clientX - rect.left - EDGE_PADDING, evt.clientY - rect.top - EDGE_PADDING);
+  getMousePos(evt) {
+    var rect = this.canvas.getBoundingClientRect();
+    return new Point(evt.clientX - rect.left - this.edgePadding, evt.clientY - rect.top - this.edgePadding);
   }
 
-  register(canvas) {
-    canvas.addEventListener('mousemove', function(evt) {
-      var mousePos = getMousePos(canvas, evt);
-      this.mouse = mousePos;
+  register() {
+    this.canvas.addEventListener('mousemove', function(evt) {
+      this.mouse = this.getMousePos(evt);
     }.bind(this), false);
   }
 }
