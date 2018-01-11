@@ -1,5 +1,8 @@
 //https://stackoverflow.com/questions/10406930/how-to-construct-a-websocket-uri-relative-to-the-page-uri
 
+var loc = window.location;
+var GAME_URL = "ws://" + loc.hostname + "/ws/draw";
+
 class Color {
   constructor(r, g, b, a) {
     this.r = r;
@@ -226,7 +229,7 @@ connect();
 function connect() {
   if(!CONNECTED && !CONNECTING) {
     CONNECTING = true;
-    sock = new WebSocket("ws://localhost:3001");
+    sock = new WebSocket(GAME_URL);
 
   sock.addEventListener('open', function (event) {
     CONNECTING = false;
