@@ -1,6 +1,7 @@
 class PolyWarGame extends Game {
   constructor() {
     super("polywar");
+
     this.tick = 0;
   }
 
