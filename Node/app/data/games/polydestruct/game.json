@@ -11,7 +11,7 @@
     "gui.js"
     ],
   "title": "PolyDestruct",
-  "description": "Testing polygon destructibility (uses PolyK.js)",
+  "description": "Testing polygon destructibility (uses PolyK.js by IvanK)",
   "caption": "-",
   "foreground": "#ffffff",
   "background": "#000000",
