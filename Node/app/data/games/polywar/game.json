@@ -5,7 +5,8 @@
   "scriptDir": "scripts/",
   "libs": [
     "game_utils.js",
-    "game_manager.js"
+    "game_manager.js",
+    "gui.js"
     ],
   "title": "PolyWar",
   "description": "Prototype for an upcoming game.",
