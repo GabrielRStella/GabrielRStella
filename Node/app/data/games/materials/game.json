@@ -2,6 +2,7 @@
   "scripts": [
     "materials.js",
     "geometry.js",
+    "shapes.js",
     "materialmain.js"
     ],
   "scriptDir": "scripts/",
