@@ -1,0 +1,22 @@
+{
+  "scripts": [
+    "materials.js",
+    "geometry.js",
+    "materialmain.js"
+    ],
+  "scriptDir": "scripts/",
+  "libs": [
+    "game_utils.js",
+    "game_manager.js",
+    "gui.js"
+    ],
+  "title": "Materials",
+  "description": "More polygon destruction",
+  "caption": "-",
+  "page_background": "#000000",
+  "canvas_background": "#000000",
+  "fullscreen": true,
+  "thumbnail": "thumb.png",
+  "template_before": "template_before",
+  "dateString": "Fri Jan 12 2018 01:51:29 GMT-0600 (Central Standard Time)"
+}
