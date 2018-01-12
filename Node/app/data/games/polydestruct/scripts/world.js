@@ -26,10 +26,19 @@ class Rocket {
     pos.add(this.velocity);
 
     //check for collision (use distance, prevPosition & position)
-    
+    var closestEdge = poly.kClosestEdge(pos);
+    var pt = new Point(closestEdge.point.x, closestEdge.point.y);
 
+    var a1 = pt.angleTo(prevPos);
+    var a2 = pt.angleTo(pos);
+    if(Math.abs(a1 - a2) > Math.PI / 2) {
+      //collision (good approximation, seems to work)
+      
+    }
+
+    //otherwise just return age
     this.age += tickPart;
-    return this.age < 100;
+    return this.age < 2000; //20 ticks per sec
   }
 }
 
