@@ -35,6 +35,10 @@ class Polygon {
     
   }
 
+  //lowest distance to the given point
+  distance(p) {
+  }
+
   //does this shape contain the given point? uses CCW edge looping to check
   contains(p) {
   }

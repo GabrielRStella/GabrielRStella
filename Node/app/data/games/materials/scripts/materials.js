@@ -10,6 +10,10 @@ class Material {
     this.brittleness = brittleness;
     this.grain = grain;
   }
+
+  get propogationRate(angleOffGrain) {
+    return this.density;
+  }
 }
 
 var MATERIALS = [
