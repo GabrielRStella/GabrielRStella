@@ -13,8 +13,6 @@
   "title": "PolyDestruct",
   "description": "Testing polygon destructibility (uses PolyK.js by IvanK)",
   "caption": "-",
-  "foreground": "#ffffff",
-  "background": "#000000",
   "page_background": "#000000",
   "canvas_background": "#000000",
   "fullscreen": true,
