@@ -19,7 +19,7 @@ var Polygons = {
 };
 
 class Polygon {
-  construct(points, apiPoints) {
+  constructor(points, apiPoints) {
     this.points = points || Polygons.fromApiPoints(apiPoints);
     this.apiPoints = apiPoints || Polygons.toApiPoints(points);
     this.area = PolyK.GetArea(this.apiPoints);
@@ -88,9 +88,20 @@ class Polygon {
     }
   }
 
-  render(ctx) {
-    ctx.save();
-    
-    ctx.restore();
+  forEachVertex(f) {
+    for(var i = 0; i < this.points.length; i++) {
+      f(this.points[i]);
+    }
+  }
+
+  forEachEdge(f) {
+    var prev = null;
+    for(var i = 0; i <= this.points.length; i++) {
+      var p = this.points[i % this.points.length];
+      if(prev) {
+        f(prev, p);
+      }
+      prev = p;
+    }
   }
 }

@@ -16,7 +16,17 @@ class Gui {
   unregister(keys, mouse) {}
 
   update(tickPart) {}
-  draw(ctx, width, height) {}
+  render(ctx, width, height) {}
+
+  renderTitle(ctx, text) {
+    ctx.font = '64px sans-serif';
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'start';
+    ctx.lineWidth = 2;
+
+    ctx.fillText(text, 10, 10);
+    ctx.strokeText(text, 10, 10);
+  }
 }
 
 class GuiManager {
@@ -35,7 +45,6 @@ class GuiManager {
         this.screen.unregister(this.keys, this.mouse);
       }
     }
-    gui.register(this.keys, this.mouse);
     this.screens.push(gui);
     this.screen = gui;
     this.screen.enter(this);
@@ -73,8 +82,10 @@ class GuiManager {
   }
 
   register(keys, mouse) {
-    if(this.input && this.screen) {
-      this.screen.unregister(this.keys, this.mouse);
+    if(this.screen) {
+      if(this.input) {
+        this.screen.unregister(this.keys, this.mouse);
+      } 
       this.screen.register(keys, mouse);
     }
     this.input = true;
@@ -93,7 +104,7 @@ class GuiManager {
     if(this.screen) this.screen.update(tickPart);
   }
 
-  draw(ctx, width, height) {
-    if(this.screen) this.screen.draw(ctz, width, height);
+  render(ctx, width, height) {
+    if(this.screen) this.screen.render(ctx, width, height);
   }
 }

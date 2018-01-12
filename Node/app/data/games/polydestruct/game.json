@@ -1,6 +1,6 @@
 {
   "scripts": [
-    "polygon.js"
+    "polygon.js",
     "polydestruct.js"
     ],
   "scriptDir": "scripts/",
