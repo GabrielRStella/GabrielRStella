@@ -26,11 +26,11 @@ class Polygon {
   }
 
   isSimple() {
-    return PolyK.isSimple(this.apiPoints);
+    return PolyK.IsSimple(this.apiPoints);
   }
 
   isConvex() {
-    return PolyK.isConvex(this.apiPoints);
+    return PolyK.IsConvex(this.apiPoints);
   }
 
   get bounds() {
@@ -45,7 +45,7 @@ class Polygon {
       var points = this.points;
       var triangles = [];
       for(var i = 0; i < indices.length; i += 3) {
-        triangles.push(new Polygon(points[i], points[i + 1], points[i + 2]));
+        triangles.push(new Polygon([points[indices[i]], points[indices[i + 1]], points[indices[i + 2]]]));
       }
       this.triangles = triangles;
       return triangles;
@@ -103,5 +103,13 @@ class Polygon {
       }
       prev = p;
     }
+  }
+
+  kRaycast(point, dir) {
+    return PolyK.Raycast(this.apiPoints, point.x, point.y, dir.x, dir.y);
+  }
+
+  kClosestEdge(point) {
+    return PolyK.ClosestEdge(this.apiPoints, point.x, point.y);
   }
 }

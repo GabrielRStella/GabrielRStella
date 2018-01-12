@@ -1,7 +1,8 @@
-class GuiScreenPolygon extends Gui {
+class GuiScreenPolygonDestroyer extends Gui {
   constructor(poly) {
     super();
     this.poly = poly;
+    this.world = new World(poly);
   }
 
   //when it first gets added on
@@ -17,7 +18,7 @@ class GuiScreenPolygon extends Gui {
     this.mouse = mouse;
 
     this.LISTENER_MOUSE_CLICK = mouse.addListener("click", function(evt) {
-      var p = mouse.getMousePos(evt);
+      this.world.spawnRocket(mouse.getMousePos(evt));
     }.bind(this));
   }
 
@@ -26,40 +27,100 @@ class GuiScreenPolygon extends Gui {
   }
 
   update(tickPart) {
-    
+    this.world.update(tickPart);
   }
 
   render(ctx, width, height) {
     ctx.save();
-    ctx.fillStyle = "#00ff00";
-    ctx.strokeStyle = "#00ff00";
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//the actual shape
+
+    ctx.fillStyle = "#ffffff";
+    ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = 2;
-    var radius = 3;
+    var radius = 2;
 
-    var points = this.poly.points;
-    var prev = null;
-    for(var i = 0; i <= points.length; i++) {
-      var p = points[i % points.length];
-
+    var drawPoint = function(p) {
       ctx.beginPath();
       ctx.arc(p.x, p.y, radius, 0, Math.TAU);
       ctx.closePath();
       ctx.fill();
+    };
+    var drawLine = function(a, b) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    };
 
-      if(prev) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(prev.x, prev.y);
-        ctx.lineTo(p.x, p.y);
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
-      }
-      prev = p;
-    }
+    this.poly.forEachVertex(drawPoint);
+    this.poly.forEachEdge(drawLine);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//debug stuff
 
     var mouse = this.mouse.mouse;
-    //what now? rockets and debug stuff
+    var center = this.poly.center;
+    var delta = center.copy();
+    delta.sub(mouse);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//debug: raytrace
+
+    ctx.fillStyle = ctx.strokeStyle = "#ff0000";
+    ctx.lineWidth = 2;
+    radius = 2;
+    var rayCast = this.poly.kRaycast(mouse, delta);
+
+    var delta2 = delta.copy();
+    delta2.magnitude = rayCast.dist;
+    var rayHit = mouse.copy();
+    rayHit.add(delta2);
+    var rayRefl = rayCast.refl;
+    rayRefl = new Point(rayRefl.x, rayRefl.y);
+    rayRefl.magnitude = 30;
+    var rayEnd = rayHit.copy();
+    rayEnd.add(rayRefl);
+
+    drawLine(mouse, center);
+    drawLine(mouse, rayHit);
+    drawLine(rayHit, rayEnd);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//debug: closest point
+
+    ctx.fillStyle = ctx.strokeStyle = "#0000ff";
+    ctx.lineWidth = 3;
+    radius = 3;
+
+    var closestEdge = this.poly.kClosestEdge(mouse);
+    drawPoint(closestEdge.point);
+    drawLine(mouse, closestEdge.point);
+    
+    var edge = closestEdge.edge;
+    var p1 = this.poly.points[edge];
+    var p2 = this.poly.points[(edge + 1) % this.poly.points.length];
+    drawLine(p1, p2);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//debug: two points
+
+    ctx.fillStyle = ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    radius = 2;
+
+    drawPoint(mouse);
+    drawPoint(center);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//rockets
+    this.world.render(ctx, width, height);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
     ctx.fillStyle = "#ffffff";
     ctx.strokeStyle = "#000000";
@@ -92,8 +153,8 @@ class GuiScreenInitial extends Gui {
       var p = mouse.getMousePos(evt);
       for(var i = 0; i < this.points.length; i++) {
         if(this.points[i].distance(p) < this.tolerance) {
-          var poly = new Polygon(this.points); //dont need to add the final point
-          this.guiManager.push(new GuiScreenPolygon(poly));
+          //dont need to add the final point, polygons are closed
+          this.guiManager.push(new GuiScreenPolygonDestroyer(new Polygon(this.points)));
           return;
         }
       }

@@ -1,5 +1,6 @@
 {
   "scripts": [
+    "world.js",
     "polygon.js",
     "polydestruct.js"
     ],
@@ -10,7 +11,7 @@
     "gui.js"
     ],
   "title": "PolyDestruct",
-  "description": "Testing polygon destructibility",
+  "description": "Testing polygon destructibility (uses PolyK.js)",
   "caption": "-",
   "foreground": "#ffffff",
   "background": "#000000",
