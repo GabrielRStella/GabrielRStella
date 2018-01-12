@@ -18,27 +18,25 @@ class Rocket {
     var accel = GameLib.randomUnitPoint();
     var del = poly.center.copy();
     del.sub(pos);
-    del.magnitude = 0.5;
+    del.magnitude = 1;
     accel.add(del);
     accel.magnitude = 0.4;
     this.velocity.add(accel);
-    this.velocity.multiply(0.99);
+    this.velocity.multiply(0.999);
     pos.add(this.velocity);
 
-    //check for collision (use distance, prevPosition & position)
-    var closestEdge = poly.kClosestEdge(pos);
-    var pt = new Point(closestEdge.point.x, closestEdge.point.y);
+    if(poly.contains(pos)) {
 
-    var a1 = pt.angleTo(prevPos);
-    var a2 = pt.angleTo(pos);
-    if(Math.abs(a1 - a2) > Math.PI / 2) {
-      //collision (good approximation, seems to work)
-      
+      //check for collision (use distance, prevPosition & position)
+      var closestEdge = poly.kClosestEdge(pos);
+      var pt = new Point(closestEdge.point.x, closestEdge.point.y);
+      this.world.collide(prevPos, this.size, pt, this.velocity.copy(), closestEdge.edge);
+      return false;
     }
 
     //otherwise just return age
     this.age += tickPart;
-    return this.age < 2000; //20 ticks per sec
+    return this.age < 200; //20 ticks per sec
   }
 }
 
@@ -70,6 +68,48 @@ class World {
     };
 
     this.rockets.forEach(r => drawPoint(r.position, r.size));
-    
+  }
+
+  collide(pos, size, hit, dir, edge) {
+    var area = this.poly.area;
+
+    var deflection = (Math.pow(area, 1/3) / dir.magnitude / size);
+
+
+    //deflect dir away from center
+    var points = this.poly.points;
+    var closest = points[0];
+    var dist = closest.distance(hit);
+    for(var i = 1; i < points.length; i++) {
+      var p = points[i];
+      var d = p.distance(hit);
+      if(d < dist) {
+        closest = p;
+        dist = d;
+      }
+    }
+
+    var dir2 = closest.copy();
+    dir2.sub(hit);
+    dir2.magnitude = deflection;
+    dir.magnitude = (1 / deflection);
+    dir.add(dir2);
+    dir.magnitude = 1000;
+
+    //the segment
+    var a = pos;
+    var b = pos.copy();
+    b.add(dir);
+
+    //decide which poly to keep
+    var polys = this.poly.slice(a, b);
+    polys.sort(function(a, b) {
+      return a.area > b.area;
+    });
+    var center = this.poly.center;
+    var polys2 = polys.filter(x => x.contains(center));
+    var poly = polys2[0] || polys[0];
+
+    this.poly.rebuild(poly.points, poly.apiPoints);
   }
 }

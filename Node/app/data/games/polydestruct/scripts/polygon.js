@@ -15,6 +15,7 @@ var Polygons = {
     for(var i = 0; i < apiPoints.length; i+=2) {
       points.push(new Point(apiPoints[i], apiPoints[i + 1]));
     }
+    return points;
   }
 };
 
@@ -25,12 +26,24 @@ class Polygon {
     this.area = PolyK.GetArea(this.apiPoints);
   }
 
+  rebuild(points, apiPoints) {
+    this.points = points || Polygons.fromApiPoints(apiPoints);
+    this.apiPoints = apiPoints || Polygons.toApiPoints(points);
+    this.area = PolyK.GetArea(this.apiPoints);
+    this.triangles = null;
+    this.centerPoint = null;
+  }
+
   isSimple() {
     return PolyK.IsSimple(this.apiPoints);
   }
 
   isConvex() {
     return PolyK.IsConvex(this.apiPoints);
+  }
+
+  contains(p) {
+    return PolyK.ContainsPoint(this.apiPoints, p.x, p.y);
   }
 
   get bounds() {
@@ -111,5 +124,10 @@ class Polygon {
 
   kClosestEdge(point) {
     return PolyK.ClosestEdge(this.apiPoints, point.x, point.y);
+  }
+
+  slice(a, b) {
+    var polys = PolyK.Slice(this.apiPoints, a.x, a.y, b.x, b.y);
+    return polys.map(x => new Polygon(null, x));
   }
 }
