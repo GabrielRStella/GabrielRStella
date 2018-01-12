@@ -1,14 +1,19 @@
-class PolyWarGame extends Game {
+class PolyDestructGame extends Game {
   constructor() {
-    super("polywar");
+    super("polydestruct");
 
     this.tick = 0;
+    this.guiManager = new GuiManager(this);
   }
 
   register(keys, mouse) {
+    this.keys = keys;
+    this.mouse = mouse;
+    this.guiManager.register(keys, mouse);
   }
 
   unregister(keys, mouse) {
+    this.guiManager.unregister(keys, mouse);
   }
 
   update(tickPart) {
@@ -31,7 +36,7 @@ class PolyWarGame extends Game {
 }
 
 //use default options
-var gameManager = new GameManager(new PolyWarGame(), {
+var gameManager = new GameManager(new PolyDestructGame(), {
   canvasInset: 5 //prevents chrome from making scrollbars
 });
 gameManager.start();

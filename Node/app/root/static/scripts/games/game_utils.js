@@ -17,10 +17,10 @@ class Game {
     this.name = name;
   }
 
-  register(keys) {
+  register(keys, mouse) {
   }
 
-  unregister(keys) {
+  unregister(keys, mouse) {
   }
 
   update(tickPart) {
@@ -59,6 +59,24 @@ GameLib.randomUnitPoint = function() {
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //POINT/RECT
 /////////////////////////////////////////////////////////////////////////////////////////////////
+
+class FakeArray {
+  constructor() {
+    this.length = 0;
+  }
+
+  push(t) {
+    this[this.length] = t;
+    this.length++;
+    return this.length;
+  }
+
+  remove(i) {
+    var tmp = this[i];
+    this[i] = undefined;
+    return tmp;
+  }
+}
 
 class Point {
   constructor(x, y) {
@@ -392,6 +410,12 @@ class MouseListener {
     this.canvas = canvas;
     this.edgePadding = edgePadding;
     this.mouse = new Point(0, 0);
+
+    this.listeners = new FakeArray();
+
+    this.eventListenerMove = function(evt) {
+      this.mouse = this.getMousePos(evt);
+    }.bind(this);
   }
 
   getMousePos(evt) {
@@ -400,10 +424,24 @@ class MouseListener {
   }
 
   register() {
-    this.canvas.addEventListener('mousemove', function(evt) {
-      this.mouse = this.getMousePos(evt);
-    }.bind(this), false);
+    this.canvas.addEventListener('mousemove', this.eventListenerMove, false);
   }
+
+  unregister() {
+    this.canvas.removeEventListener('mousemove', this.eventListenerMove);
+  }
+
+  addListener(event, listener) {
+    var entry = {event: event, listener: listener};
+    this.canvas.addEventListener(event, listener, false);
+    return this.listeners.push(entry) - 1;
+  }
+
+  removeListener(listenerId) {
+    var entry = this.listeners.remove(listenerId);
+    this.canvas.removeEventListener(entry.event, entry.listener);
+  }
+  
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -448,22 +486,6 @@ class KeyDual {
     this.keyCode = keyCode;
     this.callBackDown = callBackDown;
     this.callBackUp = callBackUp;
-  }
-}
-
-class FakeArray {
-  constructor() {
-    this.length = 0;
-  }
-
-  push(t) {
-    this[this.length] = t;
-    this.length++;
-    return this.length;
-  }
-
-  remove(i) {
-    this[i] = undefined;
   }
 }
 

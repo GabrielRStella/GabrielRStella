@@ -1,0 +1,23 @@
+{
+  "scripts": [
+    "polygon.js"
+    "polydestruct.js"
+    ],
+  "scriptDir": "scripts/",
+  "libs": [
+    "game_utils.js",
+    "game_manager.js",
+    "gui.js"
+    ],
+  "title": "PolyDestruct",
+  "description": "Testing polygon destructibility",
+  "caption": "-",
+  "foreground": "#ffffff",
+  "background": "#000000",
+  "page_background": "#000000",
+  "canvas_background": "#000000",
+  "fullscreen": true,
+  "thumbnail": "thumb.png",
+  "template_before": "template_before",
+  "dateString": "Thu Jan 11 2018 17:53:01 GMT-0600 (Central Standard Time)"
+}

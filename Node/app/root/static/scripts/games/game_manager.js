@@ -41,7 +41,7 @@ class GameManager {
   start() {
     this.keys.register();
     this.mouse.register();
-    this.game.register(this.keys);
+    this.game.register(this.keys, this.mouse);
 
     this.running = true;
     this.prevTickMs = new Date().getTime();
@@ -86,11 +86,9 @@ class GameManager {
   }
 
   stop() {
-    this.game.unregister(this.keys);
+    this.game.unregister(this.keys, this.mouse);
     this.keys.unregister();
-
-    //TODO
-    //this.mouse.unregister();
+    this.mouse.unregister();
 
     this.running = false;
   }
