@@ -2,6 +2,9 @@
   "scripts": [
     "cruising.js"
     ],
+  "libs": [
+    "three.min.js"
+    ],
   "scriptDir": "scripts/",
   "title": "Cruising",
   "description": "A test using ThreeJS",

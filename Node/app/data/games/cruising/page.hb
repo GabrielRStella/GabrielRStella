@@ -9,9 +9,11 @@
 		</style>
 	</head>
 	<body>
-		<script src="js/three.js"></script>
-		<script>
-			// Our Javascript will go here.
-		</script>
+		{{#each game.libsUrls}}
+			<script src="{{this}}"></script>
+		{{/each}}
+		{{#each game.scriptUrls}}
+			<script src="{{this}}"></script>
+		{{/each}}
 	</body>
 </html>
