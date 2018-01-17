@@ -51,8 +51,16 @@ exports.loadGame = function(game, cbOk, cbErr) {
           var template = handlebars.compile(fs.readFileSync(path + '/' + gameData.template_after + '.hb', 'utf8'));
           gameData.template.after = template({});
         }
+        if(gameData.template_page) {
+          var template = handlebars.compile(fs.readFileSync(path + '/' + gameData.template_page + '.hb', 'utf8'));
+          gameData.template.page = template({});
+        }
 
         gameData.date = new Date(gameData.dateString);
+
+        //ensure both are boolean values
+        gameData.enabled = !gameData.disabled;
+        gameData.disabled = !gameData.enabled;
 
         cbOk(gameData);
       }
@@ -77,7 +85,7 @@ exports.loadGames = function(cbOk) {
         var file = files[index];
         if(fs.lstatSync(DIR + file).isDirectory()) {
           exports.loadGame(file, function(data) {
-            games.push(data);
+            if(data.enabled) games.push(data);
             count();
           }, count);
         }

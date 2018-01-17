@@ -19,5 +19,6 @@
   "fullscreen": true,
   "thumbnail": "thumb.png",
   "template_before": "template_before",
-  "dateString": "Fri Jan 12 2018 01:51:29 GMT-0600 (Central Standard Time)"
+  "dateString": "Fri Jan 12 2018 01:51:29 GMT-0600 (Central Standard Time)",
+  "disabled": true
 }

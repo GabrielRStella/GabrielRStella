@@ -1,0 +1,12 @@
+{
+  "scripts": [
+    "cruising.js"
+    ],
+  "scriptDir": "scripts/",
+  "title": "Cruising",
+  "description": "A test using ThreeJS",
+  "caption": "-",
+  "thumbnail": "thumb.png",
+  "template_page": "page",
+  "dateString": "Wed Jan 17 2018 11:22:26 GMT-0600 (Central Standard Time)"
+}

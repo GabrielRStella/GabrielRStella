@@ -114,8 +114,6 @@ class Body {
       parts = [parts];
     }
     this.parts = parts;
-
-    //TODO: store fractures and stuff?
   }
 
   update(tickPart) {
