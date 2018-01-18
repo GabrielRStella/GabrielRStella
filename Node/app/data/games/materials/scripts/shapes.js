@@ -6,8 +6,6 @@ class Force {
   }
 }
 
-
-
 class BodyForce {
   constructor(body, f, radius) {
     this.body = body;
@@ -20,10 +18,20 @@ class BodyForce {
 
     //precalculate bc whatever
     this.dist = body.poly.distance(this.position);
+
+    this.active = this.magnitude > 0;
   }
 
   get inBody() {
     return this.dist <= this.radius;
+  }
+
+  distance(p) {
+    return this.position.distance(p);
+  }
+
+  waveDistance(p) {
+    return Math.abs(this.distance(p) - this.radius);
   }
 
   update(tickPart) {
@@ -47,6 +55,7 @@ class BodyForce {
   usePower(amt) {
     amt *= this.area;
     this.magnitude -= amt;
+    this.active = this.magnitude > 0;
   }
 }
 
@@ -63,11 +72,13 @@ class BodyPart {
     this.forces = [];
     this.updateForce = this.updateForce.bind(this);
 
-    //Fracture format = {path: Segment, force: BodyForce, power: Number}
+    //Fracture format = {path: Segment, force: BodyForce, power: Number, end: true}
+    //power = how bad the fracture is
+    //end = whether this fracture is an end, or there are others coming from it
     this.fractures = [];
-    //Fracture Point format = {source: Fracture}
-    this.fracturePoints = [];
-    this.updateFracturePoint = this.updateFracturePoint.bind(this);
+    //Fracture ends: fractures.filter(x => x.end)
+    this.fractureEnds = [];
+    this.updateFractureEnd = this.updateFractureEnd.bind(this);
   }
 
   addForce(f) {
@@ -90,6 +101,10 @@ class BodyPart {
       var p = f.position;
       var dir = f.direction;
       var power = f.power;
+      for(var i = 0; i < this.fractures.length; i++) {
+        var fracture = this.fractures[i];
+        
+      }
     }
   }
 
@@ -97,11 +112,10 @@ class BodyPart {
   //calculate propogation
   //direction = random spread, possible forks, possibly in direction of grain
   //away or towards center? idk....
-  updateFracturePoint(fp) {
-    var source = fp.source; //the source fracture
-    var path =  source.path; //the line it follows
-    var force = source.force; //the force that spawned it
-    var power = source.power; //the power of the fracture (how big it is)
+  updateFractureEnd(f) {
+    var path =  f.path; //the line it follows
+    var force = f.force; //the force that spawned it
+    var power = f.power; //the power of the fracture (how big it is)
   }
 }
 
