@@ -117,6 +117,10 @@ class BodyPart {
     var force = f.force; //the force that spawned it
     var power = f.power; //the power of the fracture (how big it is)
   }
+
+  render(ctx, width, height) {
+    
+  }
 }
 
 class Body {
@@ -132,5 +136,9 @@ class Body {
 
   update(tickPart) {
     this.parts.forEach(x => x.update(tickPart));
+  }
+
+  render(ctx, width, height) {
+    this.parts.forEach(x => x.render(ctx, width, height));
   }
 }
