@@ -3,17 +3,26 @@
   "version": "1.0.0",
   "description": "Node implementation of my website.",
   "main": "index.js",
+  "private": true,
   "scripts": {
-    "start": "cd app/src && nodemon server.js",
-    "test": "cd app/src && nodemon server.js port=3000"
+    "start": "cd app && nodemon app.js",
+    "test": "cd app && nodemon app.js port=3000",
+    "build-server": "babel \"app/server/react/src\" --out-dir \"app/server/react/target\""
   },
   "author": "Gabriel R Stella",
   "license": "ISC",
   "dependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
     "body-parser": "^1.17.2",
     "express": "^4.15.4",
     "handlebars": "^4.0.10",
     "nodemon": "^1.11.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
     "request": "2.79.0"
   }
 }
