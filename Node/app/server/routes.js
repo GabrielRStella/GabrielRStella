@@ -4,17 +4,21 @@ var ReactDOMServer = require('react-dom/server');
 var templates = require('./templates');
 
 //performs server-side rendering using a basic template and a named react file
-function templatePage(name) {
-  return function(req, res) {
+function templatePage(name, template) {
+  template = template || 'html';
 
-    //get the react component
-    var component = require('./react/target/' + name + '.js');
-    //render to string
-    var title = "Gabriel R Stella | " + name;
-    var content = ReactDOMServer.renderToString(component);
+  return function(req, res) {
     
-    //insert into template
-    templates.loadAsync('html', function(template) {
+    //find and insert into template
+    templates.loadAsync(template, function(template) {
+
+      //template found - do some stuff
+      //get the react component
+      var component = require('./react/target/' + name + '.js');
+      //render to string
+      var title = "Gabriel R Stella | " + name;
+      var content = ReactDOMServer.renderToString(component);
+
       //send to client
       res.send(template({
         title: title,
@@ -23,7 +27,7 @@ function templatePage(name) {
     }, function(err) {
       //send error to client?
       //this shouldn't ever happen
-      res.status(500).send("Error loading page template. Sorry!");
+      res.status(500).send("Error loading page template \"" + template + "\". Sorry!");
     });
   }
 }

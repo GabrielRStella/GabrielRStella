@@ -12,9 +12,5 @@ module.exports = React.createElement(
     null,
     'Test'
   ),
-  React.createElement(
-    'p',
-    null,
-    'Test p'
-  )
+  utils.test
 );
