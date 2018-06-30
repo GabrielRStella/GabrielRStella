@@ -4,6 +4,16 @@ var utils = require('./utils.js');
 
 var React = require('react');
 
+var options = [{
+  "title": "Resume",
+  "to": "/resume.pdf",
+  "icon": "fas fa-file-alt"
+}, {
+  "title": "GitHub",
+  "to": "https://github.com/GabrielRStella/",
+  "icon": "fab fa-github"
+}];
+
 module.exports = [React.createElement('header', null), React.createElement(
   'main',
   null,
@@ -33,21 +43,12 @@ module.exports = [React.createElement('header', null), React.createElement(
               null,
               'Gabriel Stella'
             )
+          ),
+          React.createElement(
+            'p',
+            null,
+            'Hi! I\'m a senior at Texas A&M University. I\'m getting a bachelor\'s degree in computer science with a minor in mathematics. I like to experiment with artificial intelligence and make games. Thanks for checking out my website!'
           )
-        )
-      )
-    ),
-    React.createElement('div', { className: 'divider' }),
-    React.createElement(
-      'div',
-      { className: 'section' },
-      React.createElement(
-        'div',
-        { className: 'container' },
-        React.createElement(
-          'p',
-          null,
-          'Hi! I\'m a senior at Texas A&M University. I\'m getting a bachelor\'s degree in computer science with a minor in mathematics. I like to experiment with AI and other random programming things. Check out my games!'
         )
       )
     ),
@@ -59,43 +60,28 @@ module.exports = [React.createElement('header', null), React.createElement(
       React.createElement(
         'div',
         { className: 'row' },
-        React.createElement(
-          'div',
-          { className: 'col s12 m4' },
-          React.createElement(
-            'a',
-            { href: '#' },
+        options.map(function (x, i) {
+          return React.createElement(
+            'div',
+            { key: i, className: 'col s12 m4' },
             React.createElement(
-              'div',
-              { className: 'center' },
-              React.createElement('i', { className: 'fas fa-file-alt', style: { fontSize: "120px" } }),
+              'a',
+              { href: x.to },
               React.createElement(
-                'h3',
-                null,
-                'Resume'
+                'div',
+                { className: "center " + utils.palette.secondaryText },
+                React.createElement('i', { className: x.icon, style: { fontSize: "120px" } }),
+                React.createElement(
+                  'h3',
+                  null,
+                  x.title
+                ),
+                React.createElement('div', { className: 'divider' })
               )
             )
-          )
-        ),
-        React.createElement(
-          'div',
-          { className: 'col s12 m4' },
-          React.createElement(
-            'a',
-            { href: '#' },
-            React.createElement(
-              'div',
-              { className: 'center' },
-              React.createElement('i', { className: 'fab fa-github', style: { fontSize: "120px" } }),
-              React.createElement(
-                'h3',
-                null,
-                'GitHub'
-              )
-            )
-          )
-        )
+          );
+        })
       )
     )
   )
-), React.createElement('footer', null)];
+), utils.footer];

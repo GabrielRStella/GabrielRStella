@@ -1,6 +1,17 @@
 var React = require('react');
 var styled = require('styled-components');
 
+var palette = {
+  "primary": "blue accent-4",
+  "primaryText": "blue-text text-accent-4",
+  "primaryAccent": "indigo darken-4",
+  "primaryAccentText": "indigo-text text-darken-4",
+  "secondary": "deep-orange accent-3",
+  "secondaryText": "deep-orange-text text-accent-3",
+  "secondaryAccent": "red darken-4",
+  "secondaryAccentText": "red-text text-darken-4"
+};
+
 var navLinks = [
   {
     "to": "/",
@@ -29,7 +40,7 @@ var navLinks = [
 
 //TODO: have to test mobile navbar
 var nav = (
-  <nav className="blue accent-4">
+  <nav className={palette.primary}>
     <div className="nav-wrapper container">
       <a href="#" className="brand-logo">Gabriel R Stella</a>
       <ul className="right hide-on-med-and-down">
@@ -43,9 +54,22 @@ var nav = (
   </nav>
 );
 
+var footer = (
+  <footer className={"page-footer " + palette.primaryAccent}>
+    <div className="container">
+      <div className="center section">
+        <p>
+          This site is a work in progress.
+          <br/>
+          &copy; 2017-2018 Gabriel Stella
+        </p>
+      </div>
+    </div>
+  </footer>
+);
+
 module.exports = {
-  test: (
-    <p>Test p</p>
-  ),
-  nav: nav
+  palette: palette,
+  nav: nav,
+  footer: footer
 };

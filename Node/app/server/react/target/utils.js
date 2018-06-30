@@ -3,6 +3,17 @@
 var React = require('react');
 var styled = require('styled-components');
 
+var palette = {
+  "primary": "blue accent-4",
+  "primaryText": "blue-text text-accent-4",
+  "primaryAccent": "indigo darken-4",
+  "primaryAccentText": "indigo-text text-darken-4",
+  "secondary": "deep-orange accent-3",
+  "secondaryText": "deep-orange-text text-accent-3",
+  "secondaryAccent": "red darken-4",
+  "secondaryAccentText": "red-text text-darken-4"
+};
+
 var navLinks = [{
   "to": "/",
   "title": "Home"
@@ -29,7 +40,7 @@ var navLinks = [{
 //TODO: have to test mobile navbar
 var nav = React.createElement(
   'nav',
-  { className: 'blue accent-4' },
+  { className: palette.primary },
   React.createElement(
     'div',
     { className: 'nav-wrapper container' },
@@ -80,11 +91,28 @@ var nav = React.createElement(
   )
 );
 
+var footer = React.createElement(
+  'footer',
+  { className: "page-footer " + palette.primaryAccent },
+  React.createElement(
+    'div',
+    { className: 'container' },
+    React.createElement(
+      'div',
+      { className: 'center section' },
+      React.createElement(
+        'p',
+        null,
+        'This site is a work in progress.',
+        React.createElement('br', null),
+        '\xA9 2017-2018 Gabriel Stella'
+      )
+    )
+  )
+);
+
 module.exports = {
-  test: React.createElement(
-    'p',
-    null,
-    'Test p'
-  ),
-  nav: nav
+  palette: palette,
+  nav: nav,
+  footer: footer
 };
