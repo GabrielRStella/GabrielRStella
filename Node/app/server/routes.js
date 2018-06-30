@@ -35,5 +35,6 @@ function templatePage(name, template) {
 module.exports = function(app, express) {
 
   app.get('/', templatePage('index'));
+  app.get('/games', templatePage('games'));
 
 };
