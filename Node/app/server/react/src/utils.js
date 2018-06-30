@@ -34,6 +34,10 @@ var navLinks = [
   {
     "to": "/toys",
     "title": "Toys"
+  },
+  {
+    "to": "/blog",
+    "title": "Blog"
   }
 */
 ];

@@ -12,7 +12,13 @@ var options = [
     "title": "GitHub",
     "to": "https://github.com/GabrielRStella/",
     "icon": "fab fa-github"
+  },
+  {
+    "title": "Apps",
+    "to": "#",
+    "icon": "fab fa-app-store-ios"
   }
+//others: youtube, twitter, linkedin, ...?
 ];
 
 module.exports = ([

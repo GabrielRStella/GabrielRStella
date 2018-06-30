@@ -12,6 +12,10 @@ var options = [{
   "title": "GitHub",
   "to": "https://github.com/GabrielRStella/",
   "icon": "fab fa-github"
+}, {
+  "title": "Apps",
+  "to": "#",
+  "icon": "fab fa-app-store-ios"
 }];
 
 module.exports = [React.createElement('header', null), React.createElement(
