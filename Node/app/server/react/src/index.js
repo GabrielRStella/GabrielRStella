@@ -37,24 +37,23 @@ module.exports = ([
         </div>
         <div className="divider"></div>
         <div className="section">
+          <br/>
           <div className="row">
             <div className="col s12 m4">
               <a href="#">
-              <h1 className="center">
-                <i className="material-icons" style={{fontSize: "120px"}}>description</i>
-              </h1>
-              <h2 className="center">
-                Resume
-              </h2>
+                <div className="center">
+                  <i className="fas fa-file-alt" style={{fontSize: "120px"}}></i>
+                  <h3>Resume</h3>
+                </div>
               </a>
             </div>
             <div className="col s12 m4">
-              <h1 className="center">
-                <i className="fab fa-github" style={{fontSize: "120px"}}></i>
-              </h1>
-              <h2 className="center">
-                GitHub
-              </h2>
+              <a href="#">
+                <div className="center">
+                  <i className="fab fa-github" style={{fontSize: "120px"}}></i>
+                  <h3>GitHub</h3>
+                </div>
+              </a>
             </div>
           </div>
         </div>

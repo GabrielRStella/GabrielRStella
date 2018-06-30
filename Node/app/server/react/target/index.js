@@ -55,6 +55,7 @@ module.exports = [React.createElement('header', null), React.createElement(
     React.createElement(
       'div',
       { className: 'section' },
+      React.createElement('br', null),
       React.createElement(
         'div',
         { className: 'row' },
@@ -65,18 +66,14 @@ module.exports = [React.createElement('header', null), React.createElement(
             'a',
             { href: '#' },
             React.createElement(
-              'h1',
+              'div',
               { className: 'center' },
+              React.createElement('i', { className: 'fas fa-file-alt', style: { fontSize: "120px" } }),
               React.createElement(
-                'i',
-                { className: 'material-icons', style: { fontSize: "120px" } },
-                'description'
+                'h3',
+                null,
+                'Resume'
               )
-            ),
-            React.createElement(
-              'h2',
-              { className: 'center' },
-              'Resume'
             )
           )
         ),
@@ -84,14 +81,18 @@ module.exports = [React.createElement('header', null), React.createElement(
           'div',
           { className: 'col s12 m4' },
           React.createElement(
-            'h1',
-            { className: 'center' },
-            React.createElement('i', { className: 'fab fa-github', style: { fontSize: "120px" } })
-          ),
-          React.createElement(
-            'h2',
-            { className: 'center' },
-            'GitHub'
+            'a',
+            { href: '#' },
+            React.createElement(
+              'div',
+              { className: 'center' },
+              React.createElement('i', { className: 'fab fa-github', style: { fontSize: "120px" } }),
+              React.createElement(
+                'h3',
+                null,
+                'GitHub'
+              )
+            )
           )
         )
       )
