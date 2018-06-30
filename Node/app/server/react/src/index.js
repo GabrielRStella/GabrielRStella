@@ -21,6 +21,9 @@ var options = [
 //others: youtube, twitter, linkedin, ...?
 ];
 
+//former avatar
+//<img src="img/avatar_old.jpg" alt="A blueberry with a plain facial expression." title="www.mrlovenstein.com" className="responsive-img"></img>
+
 module.exports = ([
   (
     <header>
@@ -33,7 +36,7 @@ module.exports = ([
         <div className="section">
           <div className="row">
             <div className="col s12 m4 push-m8">
-              <img src="img/avatar.jpg" alt="A blueberry with a plain facial expression." title="www.mrlovenstein.com" className="responsive-img"></img>
+              <img src="/avatar" alt="A collection of colliding circles." title="Circles" className="responsive-img"></img>
             </div>
             <div className="col s12 m8 pull-m4">
               <div className="center-align">

@@ -16,7 +16,11 @@ var options = [{
   "title": "Apps",
   "to": "#",
   "icon": "fab fa-app-store-ios"
+  //others: youtube, twitter, linkedin, ...?
 }];
+
+//former avatar
+//<img src="img/avatar_old.jpg" alt="A blueberry with a plain facial expression." title="www.mrlovenstein.com" className="responsive-img"></img>
 
 module.exports = [React.createElement('header', null), React.createElement(
   'main',
@@ -34,7 +38,7 @@ module.exports = [React.createElement('header', null), React.createElement(
         React.createElement(
           'div',
           { className: 'col s12 m4 push-m8' },
-          React.createElement('img', { src: 'img/avatar.jpg', alt: 'A blueberry with a plain facial expression.', title: 'www.mrlovenstein.com', className: 'responsive-img' })
+          React.createElement('img', { src: '/avatar', alt: 'A collection of colliding circles.', title: 'Circles', className: 'responsive-img' })
         ),
         React.createElement(
           'div',

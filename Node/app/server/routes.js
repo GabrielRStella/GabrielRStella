@@ -2,6 +2,7 @@ var bodyParser = require('body-parser');
 var ReactDOMServer = require('react-dom/server');
 
 var templates = require('./templates');
+var random_resource = require('./routes_randomresource');
 
 //performs server-side rendering using a basic template and a named react file
 function templatePage(name, template) {
@@ -36,5 +37,7 @@ module.exports = function(app, express) {
 
   app.get('/', templatePage('index'));
   app.get('/games', templatePage('games'));
+
+  app.get('/avatar', random_resource("/img/avatars", "/img/avatar.png"));
 
 };
