@@ -1,5 +1,7 @@
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var utils = require('./utils.js');
 
 var React = require('react');
@@ -15,18 +17,19 @@ function Games(props) {
     return {
       title: game.title,
       caption: game.caption,
-      url: "/games/" + d.file,
-      thumbnail: "/data/games/" + d.file + "/" + game.thumbnail
+      link: "/games/" + d.file,
+      img: "/data/games/" + d.file + "/" + game.thumbnail,
+      text: game.text || ""
     };
   });
+  //also sort based on date
 
   return React.createElement(
     'div',
     { className: 'row' },
     games.map(function (x, i) {
-      return React.createElement(Game, {
-        key: i, title: x.title, caption: x.caption, link: x.url, img: x.thumbnail
-      });
+      return React.createElement(Game, _extends({
+        key: i }, x));
     })
   );
 }
@@ -34,7 +37,7 @@ function Games(props) {
 function Game(props) {
   return React.createElement(
     'div',
-    { className: 'col s12 m4 l3' },
+    { className: 'col s12 m4' },
     React.createElement(
       'div',
       { className: 'card' },
@@ -44,7 +47,7 @@ function Game(props) {
         React.createElement('img', { src: props.img }),
         React.createElement(
           'span',
-          { className: 'card-title' },
+          { className: "card-title " + props.text },
           props.title
         )
       ),
@@ -62,7 +65,7 @@ function Game(props) {
         { className: 'card-action' },
         React.createElement(
           'a',
-          { href: props.link },
+          { href: props.link, className: utils.palette.secondaryText },
           'Play'
         )
       )

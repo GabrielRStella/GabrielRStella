@@ -13,15 +13,17 @@ function Games(props) {
     return {
       title: game.title,
       caption: game.caption,
-      url: ("/games/" + d.file),
-      thumbnail: ("/data/games/" + d.file + "/" + game.thumbnail)
+      link: ("/games/" + d.file),
+      img: ("/data/games/" + d.file + "/" + game.thumbnail),
+      text: (game.text || "")
     };
   });
+  //also sort based on date
 
   return (
     <div className="row">
       {games.map((x, i) => <Game
-          key={i} title={x.title} caption={x.caption} link={x.url} img={x.thumbnail}
+          key={i} {...x}
         />)}
     </div>
   );
@@ -29,17 +31,17 @@ function Games(props) {
 
 function Game(props) {
   return (
-    <div className="col s12 m4 l3">
+    <div className="col s12 m4">
       <div className="card">
         <div className="card-image">
-          <img src={props.img} />
-          <span className="card-title">{props.title}</span>
+          <img src={props.img}/>
+          <span className={"card-title " + props.text}>{props.title}</span>
         </div>
         <div className="card-content">
           <p>{props.caption}</p>
         </div>
         <div className="card-action">
-          <a href={props.link}>Play</a>
+          <a href={props.link} className={utils.palette.secondaryText}>Play</a>
         </div>
       </div>
     </div>
