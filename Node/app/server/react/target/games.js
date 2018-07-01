@@ -16,27 +16,9 @@ module.exports = [React.createElement('header', null), React.createElement(
       { className: 'section' },
       React.createElement(
         'div',
-        { className: 'container' },
-        React.createElement(
-          'p',
-          null,
-          'Hi! 1'
-        )
-      )
-    ),
-    React.createElement('div', { className: 'divider' }),
-    React.createElement(
-      'div',
-      { className: 'section' },
-      React.createElement(
-        'div',
-        { className: 'container' },
-        React.createElement(
-          'p',
-          null,
-          'Hi! 2'
-        )
+        { className: 'row' },
+        'hi'
       )
     )
   )
-), React.createElement('footer', null)];
+), utils.footer];

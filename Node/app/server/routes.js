@@ -17,7 +17,7 @@ function templatePage(name, template) {
       //get the react component
       var component = require('./react/target/' + name + '.js');
       //render to string
-      var title = "Gabriel R Stella | " + name;
+      var title = "Gabriel R Stella :: " + name;
       var content = ReactDOMServer.renderToString(component);
 
       //send to client

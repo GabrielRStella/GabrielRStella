@@ -24,6 +24,42 @@ var options = [
 //former avatar
 //<img src="img/avatar_old.jpg" alt="A blueberry with a plain facial expression." title="www.mrlovenstein.com" className="responsive-img"></img>
 
+var intro = (
+  <div className="section">
+    <div className="row">
+      <div className="col s12 m4 push-m8">
+        <img src="/avatar" alt="A collection of colliding circles." title="Circles" className="responsive-img"></img>
+      </div>
+      <div className="col s12 m8 pull-m4">
+        <div className="center-align">
+          <h1>Gabriel Stella</h1>
+        </div>
+        <p>
+          Hi!
+          I'm a senior at Texas A&M University.
+          I'm getting a bachelor's degree in computer science with a minor in mathematics.
+          I like to experiment with artificial intelligence and make games.
+          Thanks for checking out my website!
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+function Option(props) {
+  return (
+    <div className="col s12 m4">
+      <a href={props.to}>
+        <div className={"center " + utils.palette.secondaryText}>
+          <i className={props.icon} style={{fontSize: "120px"}}></i>
+          <h3>{props.title}</h3>
+          <div className="divider"></div>
+        </div>
+      </a>
+    </div>
+  );
+}
+
 module.exports = ([
   (
     <header>
@@ -33,40 +69,12 @@ module.exports = ([
     <main>
       {utils.nav}
       <div className="container">
-        <div className="section">
-          <div className="row">
-            <div className="col s12 m4 push-m8">
-              <img src="/avatar" alt="A collection of colliding circles." title="Circles" className="responsive-img"></img>
-            </div>
-            <div className="col s12 m8 pull-m4">
-              <div className="center-align">
-                <h1>Gabriel Stella</h1>
-              </div>
-              <p>
-                Hi!
-               I'm a senior at Texas A&M University.
-                I'm getting a bachelor's degree in computer science with a minor in mathematics.
-                I like to experiment with artificial intelligence and make games.
-                Thanks for checking out my website!
-              </p>
-            </div>
-          </div>
-        </div>
+        {intro}
         <div className="divider"></div>
         <div className="section">
           <br/>
           <div className="row">
-            {options.map((x, i) => (
-              <div key={i} className="col s12 m4">
-                <a href={x.to}>
-                  <div className={"center " + utils.palette.secondaryText}>
-                    <i className={x.icon} style={{fontSize: "120px"}}></i>
-                    <h3>{x.title}</h3>
-                    <div className="divider"></div>
-                  </div>
-                </a>
-              </div>
-            ))}
+            {options.map((x, i) => <Option key={i} {...x}/>)}
           </div>
         </div>
       </div>
