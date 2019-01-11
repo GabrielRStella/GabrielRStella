@@ -26,7 +26,7 @@ function Games(props) {
 
   return React.createElement(
     'div',
-    { className: 'row' },
+    null,
     games.map(function (x, i) {
       return React.createElement(Game, _extends({
         key: i }, x));
@@ -37,36 +37,40 @@ function Games(props) {
 function Game(props) {
   return React.createElement(
     'div',
-    { className: 'col s12 m4' },
+    { className: 'row' },
     React.createElement(
       'div',
-      { className: 'card' },
+      { className: 'col s12' },
       React.createElement(
         'div',
-        { className: 'card-image' },
-        React.createElement('img', { src: props.img }),
+        { className: 'card' },
         React.createElement(
-          'span',
-          { className: "card-title " + props.text },
-          props.title
-        )
-      ),
-      React.createElement(
-        'div',
-        { className: 'card-content' },
+          'div',
+          { className: 'card-image' },
+          React.createElement('img', { src: props.img }),
+          React.createElement(
+            'span',
+            { className: "card-title " + props.text },
+            props.title
+          ),
+          React.createElement(
+            'a',
+            { href: props.link, className: "btn-floating halfway-fab waves-effect waves-light black" },
+            React.createElement(
+              'i',
+              { className: "material-icons" },
+              'play_arrow'
+            )
+          )
+        ),
         React.createElement(
-          'p',
-          null,
-          props.caption
-        )
-      ),
-      React.createElement(
-        'div',
-        { className: 'card-action' },
-        React.createElement(
-          'a',
-          { href: props.link, className: utils.palette.secondaryText },
-          'Play'
+          'div',
+          { className: 'card-content' },
+          React.createElement(
+            'p',
+            null,
+            props.caption
+          )
         )
       )
     )

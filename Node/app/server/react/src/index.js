@@ -15,7 +15,7 @@ var options = [
   },
   {
     "title": "Apps",
-    "to": "#",
+    "to": "https://itunes.apple.com/us/developer/gabriel-stella/id1409925984?ls=1?mt=8",
     "icon": "fab fa-app-store-ios"
   }
 //others: youtube, twitter, linkedin, ...?

@@ -36,7 +36,10 @@ function templatePage(name, template) {
 module.exports = function(app, express) {
 
   app.get('/', templatePage('index'));
-  app.get('/games', templatePage('games'));
+
+  //TODO: figure out how to do pages for individual games using react...
+  //always getting myself into a mess :T
+  //app.get('/games', templatePage('games'));
 
   app.get('/avatar', random_resource("/img/avatars", "/img/avatar.png"));
 

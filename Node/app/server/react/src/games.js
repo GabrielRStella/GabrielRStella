@@ -21,7 +21,7 @@ function Games(props) {
   //also sort based on date
 
   return (
-    <div className="row">
+    <div>
       {games.map((x, i) => <Game
           key={i} {...x}
         />)}
@@ -31,19 +31,19 @@ function Games(props) {
 
 function Game(props) {
   return (
-    <div className="col s12 m4">
+    <div className="row">
+    <div className="col s12">
       <div className="card">
         <div className="card-image">
           <img src={props.img}/>
           <span className={"card-title " + props.text}>{props.title}</span>
+          <a href={props.link} className={"btn-floating halfway-fab waves-effect waves-light black"}><i className={"material-icons"}>play_arrow</i></a>
         </div>
         <div className="card-content">
           <p>{props.caption}</p>
         </div>
-        <div className="card-action">
-          <a href={props.link} className={utils.palette.secondaryText}>Play</a>
-        </div>
       </div>
+    </div>
     </div>
   );
 }

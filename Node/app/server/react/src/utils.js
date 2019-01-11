@@ -17,10 +17,12 @@ var navLinks = [
     "to": "/",
     "title": "Home"
   },
+/*
   {
     "to": "/games",
     "title": "Games"
   }
+*/
 /*
 ,
   {

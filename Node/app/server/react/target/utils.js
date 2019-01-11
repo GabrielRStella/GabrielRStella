@@ -17,28 +17,6 @@ var palette = {
 var navLinks = [{
   "to": "/",
   "title": "Home"
-}, {
-  "to": "/games",
-  "title": "Games"
-  /*
-  ,
-    {
-      "to": "/apps",
-      "title": "Apps"
-    },
-    {
-      "to": "/projects",
-      "title": "Projects"
-    },
-    {
-      "to": "/toys",
-      "title": "Toys"
-    },
-    {
-      "to": "/blog",
-      "title": "Blog"
-    }
-  */
 }];
 
 //TODO: have to test mobile navbar
