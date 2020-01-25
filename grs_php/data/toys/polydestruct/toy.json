@@ -1,0 +1,11 @@
+{
+  "order": "1",
+  "title": "PolyDestruct",
+  "description": "Testing polygon destructibility (uses PolyK.js by IvanK)",
+  "foreground": "#ffffff",
+  "background": "#000000",
+  "dateString": "Thu Jan 11 2018 17:53:01 GMT-0600 (Central Standard Time)",
+  "external": [
+    "http://polyk.ivank.net/polyk.js"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "order": "5",
+  "hidden": "true",
+  "script": "draw.js",
+  "title": "Draw",
+  "caption": "A collaborative drawing game.",
+  "thumbnail": "thumb.png",
+  "text": "black-text",
+  "dateString": "Mon Jan 1 2018 00:00:05 GMT-0600 (Central Standard Time)"
+}
