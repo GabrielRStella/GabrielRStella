@@ -54,7 +54,7 @@ usort($toys, "cmp");
 foreach($toys as $gamedata) {
   //extracted data
   $game_title = $gamedata['title'];
-  $game_link = 'toy.php?toy='.$gamedata['dir'];
+  $game_link = '/toy.php?toy='.$gamedata['dir'];
   $game_caption = $gamedata['description'];
   echo "
     <div class=\"col s12 m6 l4\">

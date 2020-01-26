@@ -55,7 +55,7 @@ foreach($games as $gamedata) {
   $game_img = 'data/games/'.$gamedata['dir'].'/'.$gamedata['thumbnail'];
   $game_text = $gamedata['text'];
   $game_title = $gamedata['title'];
-  $game_link = 'game.php?game='.$gamedata['dir'];
+  $game_link = '/game.php?game='.$gamedata['dir'];
   $game_caption = $gamedata['caption'];
   echo "
     <div class=\"col s12\">
