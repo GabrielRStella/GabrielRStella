@@ -36,7 +36,7 @@ $files = array(
 
 foreach($files as $idx=>$desc) {
   $num = $idx + 1;  
-  $link = "CSCE452/P$num/page.html";
+  $link = "/CSCE452/P$num/page.html";
   $title = "Project $num";
   echo "
     <div class=\"col s12 m6 l4\">

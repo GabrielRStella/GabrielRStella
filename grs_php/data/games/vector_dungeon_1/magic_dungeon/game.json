@@ -1,0 +1,30 @@
+{
+  "order": "4",
+  "title": "Magic Dungeon",
+  "caption": "A procedurally-generated top-down dungeon crawler. Based on a game I made in Dr. Tyagi's CSCE 312 class.",
+  "thumbnail": "thumb.png",
+  "background": "#000000",
+  "text": "black-text",
+  "dateString": "Mon Jan 1 2018 00:00:04 GMT-0600 (Central Standard Time)",
+  "scriptDir": "scripts/",
+  "scripts": [
+    "utilities.js",
+    "images.js",
+    "keys.js",
+    "io.js",
+    "gui.js",
+    "screens.js",
+    "class_element.js",
+    "spells.js",
+    "class_trait.js",
+    "ai.js",
+    "class_monster.js",
+    "class_player.js",
+    "class_state.js",
+    "class_style.js",
+    "class_room.js",
+    "class_world.js",
+    "class_game.js",
+    "game.js"
+    ]
+}
