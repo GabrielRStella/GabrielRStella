@@ -1,4 +1,49 @@
-//keyboard events and keys
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//MOUSE
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+class MouseListener {
+  constructor(canvas, edgePadding) {
+    this.canvas = canvas;
+    this.edgePadding = edgePadding;
+    this.mouse = new Point(0, 0);
+
+    this.listeners = new FakeArray();
+
+    this.eventListenerMove = function(evt) {
+      this.mouse = this.getMousePos(evt);
+    }.bind(this);
+  }
+
+  getMousePos(evt) {
+    var rect = this.canvas.getBoundingClientRect();
+    return new Point(evt.clientX - rect.left - this.edgePadding, evt.clientY - rect.top - this.edgePadding);
+  }
+
+  register() {
+    this.canvas.addEventListener('mousemove', this.eventListenerMove, false);
+  }
+
+  unregister() {
+    this.canvas.removeEventListener('mousemove', this.eventListenerMove);
+  }
+
+  addListener(event, listener) {
+    var entry = {event: event, listener: listener};
+    this.canvas.addEventListener(event, listener, false);
+    return this.listeners.push(entry) - 1;
+  }
+
+  removeListener(listenerId) {
+    var entry = this.listeners.remove(listenerId);
+    this.canvas.removeEventListener(entry.event, entry.listener);
+  }
+  
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//KEYS
+/////////////////////////////////////////////////////////////////////////////////////////////////
 
 var KEY_LEFT = 37;
 var KEY_UP = 38;
@@ -22,6 +67,8 @@ var KEY_A = 65;
 var KEY_S = 83;
 var KEY_D = 68;
 
+//example: key_a = getKeyCode('a');
+//how does this work with capital letters? hm...
 function getKeyCode(keyChar) {
   return keyChar.toUpperCase().charCodeAt(0);
 }

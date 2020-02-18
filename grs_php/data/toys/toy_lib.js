@@ -140,6 +140,14 @@ class Point {
     this.y = Math.sin(r) * m;
   }
 
+  slope() {
+    return this.y / this.x;
+  }
+
+  slopeFrom(p) {
+    return (this.y - p.y) / (this.x - p.x);
+  }
+
   rotate(dr) {
     var cos = Math.cos(dr);
     var sin = Math.sin(dr);
@@ -147,6 +155,12 @@ class Point {
     var yP = sin * this.x + cos * this.y;
     this.x = xP;
     this.y = yP;
+  }
+
+  rotateAround(p, dr) {
+    this.sub(p);
+    this.rotate(dr);
+    this.add(p);
   }
 
   angleTo(other) {
