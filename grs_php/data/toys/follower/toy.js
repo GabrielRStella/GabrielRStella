@@ -12,11 +12,38 @@ function intersection(p1, s1, p2, s2) {
   return new Point(x, y);
 }
 
-var DIST = 10;
-var SIZE = 25;
-var SPEED = 5;
-var PRIMARY = "#ffffff";
-var SECONDARY = "#000000";
+var options = {
+  "GoalRadius": 10,
+  "FSize": 25,
+  "FSpeed": 5,
+  "FPointOffset": 1/4,
+  "FWidth": 1/3,
+  "Primary": "#ffffff",
+  "Secondary": "#000000"
+};
+
+options["Reset"] = function() {
+  options["GoalRadius"] = 10;
+  options["FSize"] = 25;
+  options["FSpeed"] = 5;
+  options["FPointOffset"] = 1/4;
+  options["FWidth"] = 1/3;
+  options["Primary"] = "#ffffff";
+  options["Secondary"] = "#000000";
+};
+
+//let the user control all aspects above
+
+var DAT_GUI = new dat.GUI();
+
+DAT_GUI.add(options, "GoalRadius", 1, 50);
+DAT_GUI.add(options, "FSize", 0, 100);
+DAT_GUI.add(options, "FSpeed", 0, 50);
+DAT_GUI.add(options, "FPointOffset", -1, 1);
+DAT_GUI.add(options, "FWidth", 0, 1);
+DAT_GUI.addColor(options, "Primary");
+DAT_GUI.addColor(options, "Secondary");
+DAT_GUI.add(options, "Reset");
 
 class FollowerGame extends Game {
   constructor() {
@@ -39,19 +66,19 @@ class FollowerGame extends Game {
 
   drawPath(ctx) {
     if(this.path != null) {
-      this.drawPoint(ctx, this.path_center, SECONDARY, PRIMARY);
+      this.drawPoint(ctx, this.path_center, options["Secondary"], options["Primary"]);
       for(var i = this.path_index; i < this.path.length - 1; i++) {
-        this.drawLine(ctx, this.path[i], this.path[i + 1], PRIMARY);
+        this.drawLine(ctx, this.path[i], this.path[i + 1], options["Primary"]);
       }
     }
   }
 
   drawCursor(ctx) {
-    ctx.fillStyle = PRIMARY;
+    ctx.fillStyle = options["Primary"];
 
-    var sz = SIZE;
-    var forward = 1/4;
-    var side = 1/3;
+    var sz = options["FSize"];
+    var forward = options["FPointOffset"];
+    var side = options["FWidth"];
     var delta = new Point(sz, 0); //front corner
     var delta2 = new Point(sz * forward, sz * side); //back left corner
     var delta3 = new Point(sz * forward, -sz * side); //back right corner
@@ -76,7 +103,7 @@ class FollowerGame extends Game {
 
   drawGoal(ctx) {
     if(this.goal) {
-      this.drawPoint(ctx, this.goal, SECONDARY, PRIMARY, DIST);
+      this.drawPoint(ctx, this.goal, options["Secondary"], options["Primary"], options["GoalRadius"]);
     }
   }
 
@@ -96,8 +123,8 @@ class FollowerGame extends Game {
     ctx.rect(0, 0, width, height);
     ctx.closePath();
     ctx.lineWidth = 2; //since this line is on the border, only 1px actually gets drawn
-    ctx.fillStyle = "#ffffff";
-    ctx.strokeStyle = "#ffffff";
+    ctx.fillStyle = options["Secondary"];
+    ctx.strokeStyle = options["Primary"];
     ctx.stroke();
 
     //draw the path we're taking
@@ -121,7 +148,7 @@ class FollowerGame extends Game {
       this.path = null;
     }
     //update goal
-    if(this.goal == null || this.pos.distance(this.goal) < DIST) {
+    if(this.goal == null || this.pos.distance(this.goal) < options["GoalRadius"]) {
       this.goal = randPoint(window);
       this.path = null;
     }
@@ -150,7 +177,7 @@ class FollowerGame extends Game {
       if(goal_rotated.y > 0) dir = 1; //cw
       else dir = -1; //ccw
       this.path_dir = dir;
-      var angle_step = SPEED / radius;
+      var angle_step = options["FSpeed"] / radius;
       var angle_curr = angle_step;
       this.path = [];
 
@@ -161,7 +188,7 @@ class FollowerGame extends Game {
         pt_curr.rotateAround(center, angle_curr * dir);
         angle_curr += angle_step;
         this.path.push(pt_curr);
-        if(pt_curr.distance(this.goal) < DIST) break;
+        if(pt_curr.distance(this.goal) < options["GoalRadius"]) break;
       }
 
       //finalize
