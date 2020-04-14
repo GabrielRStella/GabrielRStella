@@ -77,7 +77,7 @@ class ScreenMain extends Screen {
         //play game
         var game = new Game(b.id /*difficulty = id*/);
         //transition
-        this.gui.push(new ScreenGame(game));
+        this.gui.push(new ScreenGameTransition(game, this.ball, this.ballradius, this.ballspeed));
       }
     }
   } //mouse btn down at start and up at end
@@ -148,6 +148,59 @@ class ScreenMain extends Screen {
   //drawPoint(ctx, p, fill, stroke, radius);
   //drawLine(ctx, a, b, color);
   //drawTextCentered(ctx, text, size, p, fill, stroke);
+}
+
+//a screen that transitions between Main Menu and actual Game screen
+class ScreenGameTransition extends Screen {
+  constructor(game, ball, ballradius, ballspeed) {
+    super();
+    this.game = game;
+    this.ball = ball;
+    this.ballradius = ballradius;
+    //ball to center
+    this.balldir = null;
+    this.ballspeed = ballspeed;
+    this.balldone = false;
+  }
+  
+  enter(gui, window, parent) {
+    this.gui = gui;
+    this.balldir = window.center.copy();
+    this.balldir.sub(this.ball);
+    this.balldir.magnitude = 1;
+  }
+  
+  resize(windowRect) {
+    this.balldir = windowRect.center.copy();
+    this.balldir.sub(this.ball);
+    this.balldir.magnitude = 1;
+  }
+
+  update(tickPart, windowRect, cursor) {
+    if(this.balldir != null) {
+      if(this.ball.distance(windowRect.center) < this.ballspeed) {
+        this.ball = windowRect.center.copy();
+        this.balldir = null;
+        this.balldone = true;
+      } else {
+        this.ball.x += this.balldir.x * this.ballspeed;
+        this.ball.y += this.balldir.y * this.ballspeed;
+      }
+    }
+    if(this.balldone) {
+      this.gui.pop();
+      this.gui.push(new ScreenGame(this.game));
+    }
+  }
+  
+  render(ctx, windowRect) {
+    ctx.save();
+    //decorative ball
+    ctx.lineWidth = 2;
+    if(this.ball != null) this.drawPoint(ctx, this.ball, "#000000", "#ffffff", this.ballradius);
+    ctx.restore();
+  }
+
 }
 
 class ScreenGame extends Screen {
