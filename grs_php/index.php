@@ -51,12 +51,12 @@ $options = array(
       "to"=>"/files/resume.pdf",
       "icon"=>"fas fa-file-alt"
     ),
+    */
     array(
       "title"=>"IRL@TAMU",
       "to"=>"http://irl.cs.tamu.edu/",
       "icon"=>"fas fa-network-wired"
     ),
-    */
     array(
       "title"=>"GitHub",
       "to"=>"https://github.com/GabrielRStella/",

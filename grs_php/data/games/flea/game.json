@@ -1,0 +1,23 @@
+{
+  "order": "6",
+  "title": "The Flea",
+  "caption": "An action-packed blink-based platforming game!",
+  "thumbnail": "thumb.png",
+  "background": "#000000",
+  "text": "white-text",
+  "dateString": "Sat Jan 25 2020 16:45:22 GMT-0600 (Central Standard Time)",
+  "scriptDir": "scripts/",
+  "scripts": [
+    "util.js",
+    "geometry.js",
+    "color.js",
+    "lights.js",
+    "io.js",
+    "img.js",
+    "gui.js",
+    "gui_manager.js",
+    "screens.js",
+    "game.js",
+    "main.js"
+    ]
+}
