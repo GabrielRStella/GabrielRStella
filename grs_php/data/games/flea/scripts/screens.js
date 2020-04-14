@@ -206,5 +206,25 @@ class ScreenGameTransition extends Screen {
 class ScreenGame extends Screen {
   constructor(game) {
     super();
+    this.game = game;
+  }
+  
+  enter(gui, window, parent) {
+    this.gui = gui;
+    this.game.begin(window, window.center);
+  }
+  
+  resize(windowRect) {
+    this.game.resize(windowRect);
+  }
+
+  update(tickPart, windowRect, cursor) {
+    this.game.update(tickPart, windowRect, cursor);
+  }
+  
+  render(ctx, windowRect) {
+    ctx.save();
+    this.game.render(ctx, windowRect);
+    ctx.restore();
   }
 }
