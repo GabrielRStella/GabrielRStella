@@ -96,6 +96,13 @@ TODO
 ---moving from one box to another by being "scooped up"
 -maybe it will automatically walk around on the box it's attached to, towards the mouse? (to prevent getting stuck on a bad side)
 -prettiness
+BACKBURNER:
+-"partial" timers with only some edges active / part of an edge active (and it renders that way as it moves)
+---so the user knows a bit more about where the box will spawn
+---can also make fun patterns :^)
+-different spawning behaviors
+---can transition between modes throughout the game
+-scoring
 */
 
 //encapsulates static data about the game
