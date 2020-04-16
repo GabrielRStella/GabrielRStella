@@ -174,17 +174,37 @@ class Rectangle {
   }
 
   pushPoint(p) {
-    if(p.x < this.point.x) {
-      p.x = this.point.x;
+    var x = this.point.x;
+    var y = this.point.y;
+    //snap to edges from outside
+    if(p.x < x) {
+      p.x = x;
     }
-    if(p.x > this.point.x + this.width) {
-      p.x = this.point.x + this.width;
+    if(p.x > x + this.width) {
+      p.x = x + this.width;
     }
-    if(p.y < this.point.y) {
-      p.y = this.point.y;
+    if(p.y < y) {
+      p.y = y;
     }
-    if(p.y > this.point.y + this.height) {
-      p.y = this.point.y + this.height;
+    if(p.y > y + this.height) {
+      p.y = y + this.height;
+    }
+    //push from inside
+    if(this.contains(p)) {
+      //diagonal quadrants...
+      var side = Math.floor(((Math.floor(GameLib.loopRange(p.angleTo(this.center) / Math.PI / 2, 1) * 8) + 1) % 8) / 2);
+      if(side == 0) {
+        p.x = x;
+      } else if(side == 1) {
+        p.y = y;
+      } else if(side == 2) {
+        p.x = x + this.width;
+      } else if(side == 3) {
+        p.y = y + this.height;
+      } else {
+        //????
+        console.log("hi " + side)
+      }
     }
   }
 

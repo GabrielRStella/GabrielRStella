@@ -30,6 +30,15 @@ RenderHelper.drawLine = function(ctx, a, b, color) {
   ctx.stroke();
   ctx.restore();
 }
+RenderHelper.drawText = function(ctx, text, baseline, align, size, p, fill, stroke) {
+  if(fill) ctx.fillStyle = fill;
+  if(stroke) ctx.strokeStyle = stroke;
+  ctx.font = size + 'px sans-serif';
+  ctx.textBaseline = baseline;
+  ctx.textAlign = align;
+  if(fill) ctx.fillText(text, p.x, p.y);
+  if(stroke) ctx.strokeText(text, p.x, p.y);
+}
 RenderHelper.drawTextCentered = function(ctx, text, size, p, fill, stroke) {
   if(fill) ctx.fillStyle = fill;
   if(stroke) ctx.strokeStyle = stroke;
@@ -85,11 +94,14 @@ class BoxSpawner {
   }
   
   render(ctx, window) {
+    //the background moving was just distracting, so i'm removing it for now
+    /*
     var rect = window.copy();
     rect.width *= this.completion;
     rect.height *= this.completion;
     rect.center = window.center;
     RenderHelper.drawRect(ctx, rect, "#000000", "#ffffff");
+    */
   }
 }
 
@@ -118,15 +130,17 @@ class Game {
   constructor(difficulty) {
     this.difficulty = difficulty;
     //relative constant definitions
-    this.block_move_time = 4 / difficulty; //as the difficulty goes up, the blocks get faster
+    this.block_move_time = 5 / difficulty; //as the difficulty goes up, the blocks get faster
     this.block_size_rel = 1 / 12; //block width/height, as a fraction of room sizeToContent
-    this.block_spawn_time = this.block_move_time / 3; //how often it'll spawn boxes, as a fraction of a second
+    this.block_spawn_time = this.block_move_time / 4; //how often it'll spawn boxes, as a fraction of a second
     //absolute constant definitions
     this.ballradius = 5;
     this.block_move_speed = 0;
     this.block_size = 0;
     //game data
+    this.playing = false;
     this.ball = null;
+    this.ball_move_speed = 0;
     this.game_port = new Rectangle(0, 0, 1, 1);
     this.game_port_local = new Rectangle(0, 0, 1, 1);
     this.game_port_size = 1;
@@ -140,17 +154,21 @@ class Game {
     this.trace_pts = [];
     //having boxes drag the player
     this.grabbed_box = -1;
+    //score (elapsed time in seconds)
+    this.total_time = 0;
+    this.score = 0;
   }
   
   //return the minimum distance [box, index, dist]
-  minDist(pt) {
+  minDist(pt, ignore_index) {
     if(this.boxes.length == 0) {
       return null;
     }
-    var best_index = 0;
-    var best_box = this.boxes[0];
-    var best_dist = best_box.rect.distance(pt);
-    for(var i = 1; i < this.boxes.length; i++) {
+    var best_index = -1;
+    var best_box = null;
+    var best_dist = this.game_port_size * 2; //upper bound
+    for(var i = 0; i < this.boxes.length; i++) {
+      if(i == ignore_index) continue;
       var b = this.boxes[i];
       var d = b.rect.distance(pt);
       if(d < best_dist) {
@@ -159,18 +177,22 @@ class Game {
         best_dist = d;
       }
     }
+    if(best_index < 0) return null;
     return [best_box, best_index, best_dist];
   }
   
   //return [index, point] or null
-  raytrace(begin, delta, precision) {
+  raytrace(begin, delta, ignore_index, precision) {
     delta = delta.copy();
     var curr = begin.copy();
-    delta.magnitude = precision + 1;
+    delta.magnitude = 1;
     curr.add(delta);
+    if(ignore_index >= 0 && this.boxes[ignore_index].rect.contains(curr)) {
+      return null;
+    }
     while(this.game_port_local.contains(curr)) {
       this.trace_pts.push(curr);
-      var triple = this.minDist(curr);
+      var triple = this.minDist(curr, ignore_index);
       if(triple == null) return null;
       var dist = triple[2];
       if(dist < precision) {
@@ -188,13 +210,23 @@ class Game {
     return null;
   }
   
-  begin(window, pt) {
+  begin(gui, window, pt) {
+    this.gui = gui;
     this.resize(window);
     this.ball = pt.copy();
     this.ball.sub(this.game_port.point);
+    this.playing = true;
+  }
+  
+  //you lost :^(
+  end() {
+    this.playing = false;
+    this.gui.pop();
+      this.gui.push(new ScreenGameOver(this));
   }
   
   resize(window) {
+    var prev_size = this.game_port_size;
     RectanglePosition.aspect_fit(window, this.game_port);
     RectanglePosition.center(window, this.game_port);
     this.game_port_size = this.game_port.width; //width = height
@@ -202,6 +234,21 @@ class Game {
     this.game_port_local.height = this.game_port_size;
     this.block_move_speed = this.game_port_size / this.block_move_time / 20; //tick rate
     this.block_size = this.game_port_size * this.block_size_rel;
+    this.ball_move_speed = this.block_move_speed;
+    //fix blocks and such
+    var szmod = this.game_port_size / prev_size;
+    for(var i = 0; i < this.boxes.length; i++) {
+      var b = this.boxes[i];
+      var p = b.pos;
+      p.x *= szmod;
+      p.y *= szmod;
+      b.size = this.block_size;
+      b.vel.magnitude = this.block_move_speed;
+    }
+    if(this.ball != null) {
+      this.ball.x *= szmod;
+      this.ball.y *= szmod;
+    }
   }
   
   spawn_box() {
@@ -240,7 +287,10 @@ class Game {
   }
 
   update(tickPart, window, cursor) {
-    if(this.ball == null) return;
+    if(this.ball == null || !this.playing) return;
+    //score
+    this.total_time += tickPart / 20;
+    this.score = Math.round(this.total_time * 10) / 10; //round to nearest tenth
     //cursor stuff
     this.cursor_local = cursor.copy();
     this.cursor_local.x -= this.game_port.point.x;
@@ -271,31 +321,58 @@ class Game {
       if(i == this.grabbed_box) {
         this.ball.add(delta); //move the player
       }
+      else if(b.rect.contains(this.ball)) {
+        if(this.grabbed_box < 0) this.grabbed_box = i;
+        else if(this.grabbed_box != i) {
+          //multi-box collision!!
+          //either kill player or grab the new box :^)
+          //based on angle between: (this box movement vector) and (player - grabbed box center)
+          var v1 = b.vel;
+          var v2 = this.ball.copy();
+          v2.sub(this.boxes[this.grabbed_box].pos);
+          //make it only directional (snap to 90-degree increments)
+          if(Math.abs(v2.x) < Math.abs(v2.y)) {
+            v2.x = 0;
+          } else {
+            v2.y = 0;
+          }
+          var dot = v1.x * v2.x + v1.y * v2.y;
+          if(dot >= 0) {
+            //aligned, grab new box
+            this.grabbed_box = i;
+          } else {
+            //misaligned, player dies
+            this.end();
+          }
+        }
+      }
       if(this.game_port_local.distance(b.pos) > this.box_size) {
         this.boxes.splice(i, 1);
         i--;
       }
     }
+    if(this.grabbed_box >= 0) {
+      //walk towards cursor
+      var mov = this.ball_move_speed * tickPart;
+      this.ball.x += Math.sign(this.cursor_local.x - this.ball.x) * Math.min(Math.abs(this.cursor_local.x - this.ball.x), mov);
+      this.ball.y += Math.sign(this.cursor_local.y - this.ball.y) * Math.min(Math.abs(this.cursor_local.y - this.ball.y), mov);
+      this.boxes[this.grabbed_box].rect.pushPoint(this.ball);
+    }
     //ray trace
     var cursor_delta = this.cursor_local.copy();
     cursor_delta.sub(this.ball);
     this.trace_pts = []; //reset
-    var trace = this.raytrace(this.ball, cursor_delta, this.ballradius);
+    var trace = this.raytrace(this.ball, cursor_delta, this.grabbed_box, this.ballradius);
     if(trace != null) {
       this.blink_index = trace[0];
       this.blink_point = trace[1];
-      if(this.blink_index == this.grabbed_box) {
-        //"blink" immediately (to walk around the box)
-        this.ball = this.blink_point;
-      }
     } else {
       this.blink_index = null;
       this.blink_point = null;
     }
     //check player death
     if(!this.game_port_local.contains(this.ball)) {
-      this.ball = this.game_port_local.center;
-      this.grabbed_box = -1; //TMP
+      this.end();
     }
   }
   
@@ -323,19 +400,24 @@ class Game {
     //blinking stuff
     if(this.blink_point != null) {
       RenderHelper.drawLine(ctx, this.ball, this.blink_point, "#ffffff");
+      RenderHelper.drawPoint(ctx, this.blink_point, "#000000", "#ffffff", this.ballradius);
     } else if(this.cursor_local) {
       var cursor_delta = this.cursor_local.copy();
       cursor_delta.sub(this.ball);
       cursor_delta.magnitude = 4 * this.game_port_size;
       cursor_delta.add(this.ball);
-      RenderHelper.drawLine(ctx, this.ball, cursor_delta, "#ff0000");
+      //too much clutter
+      //RenderHelper.drawLine(ctx, this.ball, cursor_delta, "#ff0000");
     }
     //the ball
     RenderHelper.drawPoint(ctx, this.ball, "#ffffff", null, this.ballradius);
-    //the cursor
-    if(this.cursor_local != null) RenderHelper.drawPoint(ctx, this.cursor_local, "#000000", "#ffffff", this.ballradius);
     //reset translations
     ctx.restore();
+    //HUD
+    if(this.playing) {
+      //display score
+      RenderHelper.drawText(ctx, "Score: " + this.score, 'top', 'left', 32, new Point(10, 10), "#ffffff", null);
+    }
   }
   
 }

@@ -128,7 +128,7 @@ class ScreenMain extends Screen {
     //title
     //this.drawRect(ctx, this.header, "#000000", "#ffffff");
     ctx.lineWidth = 2;
-    this.drawTextCentered(ctx, "SUP NOOB", 72, this.header.center, "#000000", "#ffffff")
+    this.drawTextCentered(ctx, "THE FLEA", 72, this.header.center, "#000000", "#ffffff")
     //buttons
     for(var i = 0; i < this.buttons.length; i++) {
       ctx.lineWidth = 1;
@@ -211,7 +211,7 @@ class ScreenGame extends Screen {
   
   enter(gui, window, parent) {
     this.gui = gui;
-    this.game.begin(window, window.center);
+    this.game.begin(gui, window, window.center);
   }
   
   resize(windowRect) {
@@ -230,5 +230,35 @@ class ScreenGame extends Screen {
     ctx.save();
     this.game.render(ctx, windowRect);
     ctx.restore();
+  }
+}
+
+class ScreenGameOver extends Screen {
+  constructor(game) {
+    super();
+    this.game = game;
+  }
+  
+  enter(gui, window, parent) {
+    this.gui = gui;
+  }
+  
+  resize(windowRect) {
+    this.game.resize(windowRect);
+  }
+
+  update(tickPart, windowRect, cursor) {
+  }
+  
+  render(ctx, windowRect) {
+    ctx.save();
+    this.game.render(ctx, windowRect);
+    ctx.restore();
+    var p = windowRect.center;
+    ctx.lineWidth = 2;
+    this.drawTextCentered(ctx, "GAME OVER", 72, p, "#000000", "#ffffff");
+    p.y += 50;
+    ctx.lineWidth = 1;
+    this.drawTextCentered(ctx, "Score: " + this.game.score, 32, p, "#000000", "#ffffff");
   }
 }
