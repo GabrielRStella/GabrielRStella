@@ -217,6 +217,10 @@ class ScreenGame extends Screen {
   resize(windowRect) {
     this.game.resize(windowRect);
   }
+  
+  mouseDown(pt) {
+    this.game.mouseDown(pt);
+  } //mouse btn down at a point
 
   update(tickPart, windowRect, cursor) {
     this.game.update(tickPart, windowRect, cursor);

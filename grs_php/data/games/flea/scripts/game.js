@@ -46,17 +46,22 @@ class Box {
     this.size = size;
     this.vel = velocity;
   }
+  
+  get rect() {
+    var r = new Rectangle(0, 0, this.size, this.size);
+    r.center = this.pos;
+    return r;
+  }
 
   update(tickPart, window, cursor) {
     var v = this.vel.copy();
     v.magnitude *= tickPart;
     this.pos.add(v);
+    return v;
   }
   
   render(ctx, window) {
-    var rect = new Rectangle(0, 0, this.size, this.size);
-    rect.center = this.pos;
-    RenderHelper.drawRect(ctx, rect, "#000000", "#ffffff");
+    RenderHelper.drawRect(ctx, this.rect, "#000000", "#ffffff");
   }
 }
 
@@ -128,6 +133,59 @@ class Game {
     this.boxes = [];
     this.timers = [];
     this.next_timer_spawn = 0;
+    //raytracing stuff
+    this.cursor_local = null;
+    this.blink_index = null;
+    this.blink_point = null;
+    this.trace_pts = [];
+    //having boxes drag the player
+    this.grabbed_box = -1;
+  }
+  
+  //return the minimum distance [box, index, dist]
+  minDist(pt) {
+    if(this.boxes.length == 0) {
+      return null;
+    }
+    var best_index = 0;
+    var best_box = this.boxes[0];
+    var best_dist = best_box.rect.distance(pt);
+    for(var i = 1; i < this.boxes.length; i++) {
+      var b = this.boxes[i];
+      var d = b.rect.distance(pt);
+      if(d < best_dist) {
+        best_index = i;
+        best_box = b;
+        best_dist = d;
+      }
+    }
+    return [best_box, best_index, best_dist];
+  }
+  
+  //return [index, point] or null
+  raytrace(begin, delta, precision) {
+    delta = delta.copy();
+    var curr = begin.copy();
+    delta.magnitude = precision + 1;
+    curr.add(delta);
+    while(this.game_port_local.contains(curr)) {
+      this.trace_pts.push(curr);
+      var triple = this.minDist(curr);
+      if(triple == null) return null;
+      var dist = triple[2];
+      if(dist < precision) {
+        //done
+        var box = triple[0];
+        var index = triple[1];
+        box.rect.pushPoint(curr);
+        return [index, curr];
+      } else{
+        //step by dist
+        delta.magnitude = dist;
+        curr.add(delta);
+      }
+    }
+    return null;
   }
   
   begin(window, pt) {
@@ -152,19 +210,19 @@ class Game {
     var v = null;
     if(side == 0) {
       //left
-      pos = new Point(0, GameLib.randomRange(0, 1));
+      pos = new Point(-this.block_size_rel, GameLib.randomRange(0, 1));
       v = new Point(1, 0);
     } else if(side == 1) {
       //right
-      pos = new Point(1, GameLib.randomRange(0, 1));
+      pos = new Point(1+this.block_size_rel, GameLib.randomRange(0, 1));
       v = new Point(-1, 0);
     } else if(side == 2) {
       //top
-      pos = new Point(GameLib.randomRange(0, 1), 0);
+      pos = new Point(GameLib.randomRange(0, 1), -this.block_size_rel);
       v = new Point(0, 1);
     } else if(side == 3) {
       //bottom
-      pos = new Point(GameLib.randomRange(0, 1), 1);
+      pos = new Point(GameLib.randomRange(0, 1), 1+this.block_size_rel);
       v = new Point(0, -1);
     }
     pos.x *= this.game_port_size;
@@ -173,9 +231,20 @@ class Game {
     v.magnitude = this.block_move_speed;
     this.boxes.push(new Box(pos, this.block_size, v))
   }
+  
+  mouseDown(pt) {
+    if(this.blink_point != null) {
+      this.ball = this.blink_point;
+      this.grabbed_box = this.blink_index;
+    }
+  }
 
   update(tickPart, window, cursor) {
     if(this.ball == null) return;
+    //cursor stuff
+    this.cursor_local = cursor.copy();
+    this.cursor_local.x -= this.game_port.point.x;
+    this.cursor_local.y -= this.game_port.point.y;
     //update timers
     for(var i = 0; i < this.timers.length; i++) {
       var t = this.timers[i];
@@ -198,11 +267,35 @@ class Game {
     //update boxes
     for(var i = 0; i < this.boxes.length; i++) {
       var b = this.boxes[i];
-      b.update(tickPart, window, cursor);
-      if(!this.game_port_local.contains(b.pos)) {
+      var delta = b.update(tickPart, window, cursor);
+      if(i == this.grabbed_box) {
+        this.ball.add(delta); //move the player
+      }
+      if(this.game_port_local.distance(b.pos) > this.box_size) {
         this.boxes.splice(i, 1);
         i--;
       }
+    }
+    //ray trace
+    var cursor_delta = this.cursor_local.copy();
+    cursor_delta.sub(this.ball);
+    this.trace_pts = []; //reset
+    var trace = this.raytrace(this.ball, cursor_delta, this.ballradius);
+    if(trace != null) {
+      this.blink_index = trace[0];
+      this.blink_point = trace[1];
+      if(this.blink_index == this.grabbed_box) {
+        //"blink" immediately (to walk around the box)
+        this.ball = this.blink_point;
+      }
+    } else {
+      this.blink_index = null;
+      this.blink_point = null;
+    }
+    //check player death
+    if(!this.game_port_local.contains(this.ball)) {
+      this.ball = this.game_port_local.center;
+      this.grabbed_box = -1; //TMP
     }
   }
   
@@ -210,7 +303,7 @@ class Game {
     if(this.ball == null) return;
     //bg
     ctx.lineWidth = 2;
-    RenderHelper.drawRect(ctx, this.game_port, null, "#ffffff");
+    RenderHelper.drawRect(ctx, this.game_port, null, "#ff0000");
     //translations
     ctx.save();
     ctx.translate(this.game_port.minX, this.game_port.minY);  
@@ -224,10 +317,23 @@ class Game {
     }
     //boxes
     for(var i = 0; i < this.boxes.length; i++) {
-      this.boxes[i].render(ctx, this.game_port_local);
+      var b = this.boxes[i];
+      b.render(ctx, this.game_port_local);
+    }
+    //blinking stuff
+    if(this.blink_point != null) {
+      RenderHelper.drawLine(ctx, this.ball, this.blink_point, "#ffffff");
+    } else if(this.cursor_local) {
+      var cursor_delta = this.cursor_local.copy();
+      cursor_delta.sub(this.ball);
+      cursor_delta.magnitude = 4 * this.game_port_size;
+      cursor_delta.add(this.ball);
+      RenderHelper.drawLine(ctx, this.ball, cursor_delta, "#ff0000");
     }
     //the ball
     RenderHelper.drawPoint(ctx, this.ball, "#ffffff", null, this.ballradius);
+    //the cursor
+    if(this.cursor_local != null) RenderHelper.drawPoint(ctx, this.cursor_local, "#000000", "#ffffff", this.ballradius);
     //reset translations
     ctx.restore();
   }

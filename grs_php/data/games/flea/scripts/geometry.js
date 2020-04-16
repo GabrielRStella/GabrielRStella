@@ -155,8 +155,8 @@ class Rectangle {
   }
 
   distance(p) {
-    var dx = Math.min(this.minX - p.x, 0, p.x - this.maxX);
-    var dy = Math.min(this.minY - p.y, 0, p.y - this.maxY);
+    var dx = Math.max(this.minX - p.x, 0, p.x - this.maxX);
+    var dy = Math.max(this.minY - p.y, 0, p.y - this.maxY);
     return Math.sqrt(dx * dx + dy * dy);
   }
 
