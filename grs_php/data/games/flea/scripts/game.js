@@ -127,8 +127,9 @@ class Game {
   //difficulty starts at 0 (does nothing)
   //and goes up
   //ez=1,med=2,hard=3
-  constructor(difficulty) {
+  constructor(difficulty, color) {
     this.difficulty = difficulty;
+    this.color = color;
     //relative constant definitions
     this.block_move_time = 5 / difficulty; //as the difficulty goes up, the blocks get faster
     this.block_size_rel = 1 / 12; //block width/height, as a fraction of room sizeToContent

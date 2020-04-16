@@ -282,6 +282,9 @@ var RectanglePosition = {
   //moving
   up: function(outer, inner, padding) {
     inner.minY -= padding
+  },
+  down: function(outer, inner, padding) {
+    inner.minY += padding
   }
 };
 

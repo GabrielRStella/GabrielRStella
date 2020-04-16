@@ -75,7 +75,7 @@ class ScreenMain extends Screen {
       if(r.contains(start) && r.contains(end)) {
         this.selected = -1;
         //play game
-        var game = new Game(b.id /*difficulty = id*/);
+        var game = new Game(b.id /*difficulty = id*/, this.modes[i][2]);
         //transition
         this.gui.push(new ScreenGameTransition(game, this.ball, this.ballradius, this.ballspeed));
       }
@@ -237,28 +237,51 @@ class ScreenGameOver extends Screen {
   constructor(game) {
     super();
     this.game = game;
+    this.rect = new Rectangle(0, 0, 250, 70);
+    this.selected = false;
   }
   
   enter(gui, window, parent) {
     this.gui = gui;
+    this.resize(window);
   }
   
   resize(windowRect) {
     this.game.resize(windowRect);
+    RectanglePosition.center(windowRect, this.rect);
+    RectanglePosition.down(windowRect, this.rect, 150);
   }
+  
+  mouseDownUp(start, end) {
+    if(this.rect.contains(start) && this.rect.contains(end)) {
+      this.gui.pop();
+    }
+  } //mouse btn down at start and up at end
 
   update(tickPart, windowRect, cursor) {
+    this.selected = false;
+    if(this.rect.contains(cursor)) {
+      this.selected = true;
+    }
   }
   
   render(ctx, windowRect) {
     ctx.save();
     this.game.render(ctx, windowRect);
     ctx.restore();
+    this.drawRect(ctx, windowRect, "#000000c0", null);
     var p = windowRect.center;
     ctx.lineWidth = 2;
-    this.drawTextCentered(ctx, "GAME OVER", 72, p, "#000000", "#ffffff");
-    p.y += 50;
+    this.drawTextCentered(ctx, "GAME OVER", 72, p, "#000000", this.game.color);
+    p.y += 55;
     ctx.lineWidth = 1;
-    this.drawTextCentered(ctx, "Score: " + this.game.score, 32, p, "#000000", "#ffffff");
+    this.drawTextCentered(ctx, "Score: " + this.game.score, 32, p, "#ffffff", null);
+    //draw the back button
+    ctx.lineWidth = 1;
+    var s = this.selected;
+    if(s) ctx.lineWidth = 2;
+    this.drawRect(ctx, this.rect, "#000000", "#ffffff");
+    ctx.lineWidth = 1;
+    this.drawTextCentered(ctx, "Back", 36, this.rect.center, "#000000", "#ffffff");
   }
 }
