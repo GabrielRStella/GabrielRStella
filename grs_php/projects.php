@@ -35,6 +35,11 @@ $projects = array(
     "description"=>"A client-side GitHub interface. Built using React."
   ),
   array(
+    "to"=>"/webstorage.php",
+    "title"=>"Browser Storage Interface",
+    "description"=>"An interactive viewer/editor for your browser's local storage."
+  ),
+  array(
     "to"=>"",
     "title"=>"",
     "description"=>""
