@@ -68,7 +68,7 @@ class ScreenGame extends Screen {
   }
   
   mouseDownUp(start, end) {
-    
+    this.game.mouseDownUp(start, end);
   } //mouse btn down at start and up at end
 
   update(tickPart, windowRect, cursor) {
