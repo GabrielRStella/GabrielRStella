@@ -25,7 +25,7 @@ make_nav();
         </div>
         <p>
           Hi!
-          I'm a student researcher at Texas A&M University.
+          I'm a computer science PhD student at Texas A&M University.
           I am currently developing theory and algorithms for high-performance Big Data systems.
           I'm interested in external-memory algorithms, distributed computing and artificial intelligence.
           Thanks for checking out my website!
@@ -61,6 +61,11 @@ $options = array(
       "title"=>"GitHub",
       "to"=>"https://github.com/GabrielRStella/",
       "icon"=>"fab fa-github"
+    ),
+    array(
+      "title"=>"itch.io",
+      "to"=>"https://gabrielrstella.itch.io/",
+      "icon"=>"fas fa-gamepad"
     )
 //others: google scholar/papers?
 );

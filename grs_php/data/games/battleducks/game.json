@@ -1,5 +1,6 @@
 {
   "order": "6",
+  "hidden": "true",
   "title": "Battle Ducks",
   "caption": "Better than Battleship!",
   "thumbnail": "thumb.gif",
