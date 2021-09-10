@@ -59,7 +59,7 @@ function make_nav() {
 function make_footer() {
   global $primaryAccent;
   echo
-    "<footer class=\"page-footer $primaryAccent\">
+    "<footer class=\"page-footer $primaryAccent\" style=\"width: 100%; margin-top: auto; padding: 10px;\">
       <div class=\"center container\">
         This site is a work in progress.
         <br/>
