@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <?php
-$title = 'CSCE452';
+$title = 'CSCE645';
 include '../helpers/util.php';
 include '../helpers/header.php';
 include '../helpers/files.php';
