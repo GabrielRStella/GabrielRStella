@@ -12,7 +12,7 @@ make_nav();
 ?>
 <div class="container">
   <div class="section">
-    <div class="row">
+    <div class="row center-align">
       <div class="col s12">
         <div class="center-align">
           <h1>CSCE 452 Projects</h1>

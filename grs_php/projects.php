@@ -16,7 +16,7 @@ make_nav();
       <div class="col s12">
         <h1>Projects</h1>
         <p>
-          An assortment of random things I have made.
+          An assortment of various things I have made.
         </p>
       </div>
     </div>
@@ -24,6 +24,11 @@ make_nav();
 <?php
 
 $projects = array(
+  array(
+    "to"=>"/CSCE645",
+    "title"=>"CSCE 645 Project",
+    "description"=>"My research project for CSCE 645: Geometric Modeling."
+  ),
   array(
     "to"=>"/CSCE452",
     "title"=>"CSCE 452 Robots",
