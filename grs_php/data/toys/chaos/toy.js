@@ -3,6 +3,16 @@ function color(r, g, b, a) {
   return "rgba(" + Math.floor(r * 255) + "," + Math.floor(g * 255) + "," + Math.floor(b * 255) + "," + a + ")";
 }
 
+//https://stackoverflow.com/a/5624139
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16) / 255,
+    g: parseInt(result[2], 16) / 255,
+    b: parseInt(result[3], 16) / 255
+  } : null;
+}
+
 class ChaosGame extends Game {
   constructor() {
     super("chaos");
@@ -20,19 +30,57 @@ class ChaosGame extends Game {
 	var DAT_GUI = new dat.GUI();
 	
 	//options
+	DAT_GUI.add(this, "Reset");
 	this.Vertices = 3;
     DAT_GUI.add(this, "Vertices", 1, 20, 1).onChange(this.Reset); //...
+	this.RenderVertices = true;
+	DAT_GUI.add(this, "RenderVertices");
+	this.RenderTargets = true;
+	DAT_GUI.add(this, "RenderTargets");
 	this.Angle = 0.0;
 	DAT_GUI.add(this, "Angle", 0.0, 1.0, 0.01).onChange(this.Reset); //rotate vertices by this portion of a turn (just rotating the shape)
 	this.Jump = 0.5;
-	DAT_GUI.add(this, "Jump", 0.0, 1.0).onChange(this.Reset); //how much the point moves towards the next point
+	this.guiKeyJump = DAT_GUI.add(this, "Jump", 0.0, 1.0).onChange(this.Reset); //how much the point moves towards the next point
+	this.SetJump = this.SetJump.bind(this);
+	DAT_GUI.add(this, "SetJump");
 	this.N = 100;
 	DAT_GUI.add(this, "N", 1, 1000, 1); //how many points are iterated at a time
+	this.Radius = 0.3;
+	DAT_GUI.add(this, "Radius", 0.2, 1);
+	this.ColorNear = "#0000ff";
+	this.ColorFar = "#ff0000";
+	DAT_GUI.addColor(this, "ColorNear");
+	DAT_GUI.addColor(this, "ColorFar");
   }
   
   //
   Reset() {
     this.paint.clearRect(0, 0, this.paintCanvas.width, this.paintCanvas.height);
+  }
+  
+  
+    // public static double getAlpha(int sides) {
+        // int k = (sides - 1) / 4;
+        // double angle = 360.0 / sides;
+        // double c = 0;
+        // for(int i = 1; i <= k; i++) {
+            // c += Math.cos(Math.toRadians(angle * i));
+        // }
+        // double denom = 2.0 * (1.0 + c);
+        // return 1 - (1.0 / denom);
+    // }
+  
+  SetJump() {
+	  var k = Math.floor((this.Vertices - 1) / 4);
+	  var angle = (Math.PI * 2) / this.Vertices;
+	  var c = 0;
+	  for(var i = 1; i <= k; i++) {
+		  c += Math.cos(angle * i);
+	  }
+	  var denom = 2 * (1 + c);
+	  this.Jump = 1 - (1 / denom);
+	  this.guiKeyJump.updateDisplay();
+	  this.Reset();
   }
   
   //vertices of the polygon
@@ -61,11 +109,24 @@ class ChaosGame extends Game {
 	  return verts[0].distance(verts[Math.floor(this.Vertices / 2)]);
   }
   
+  getColor(dist) {
+	  var d = dist / this.getMaxDist();
+	  var d1 = 1-d;
+	  var c = {
+		  r: this.colorNear.r * d1 + this.colorFar.r * d,
+		  g: this.colorNear.g * d1 + this.colorFar.g * d,
+		  b: this.colorNear.b * d1 + this.colorFar.b * d,
+	  };
+	  return color(c.r, c.g, c.b, 1);
+  }
+  
   //
 
   update(tickPart) {
     this.tick += tickPart;
 	//
+	this.colorNear = hexToRgb(this.ColorNear);
+	this.colorFar = hexToRgb(this.ColorFar);
 	
 	if(this.paintCanvas.width != this.canvas.width || this.paintCanvas.height != this.canvas.height) {
 		this.paintCanvas.width = this.canvas.width;
@@ -102,17 +163,21 @@ class ChaosGame extends Game {
     ctx.strokeStyle = "#ffffff";
     ctx.stroke();
 	
-	// var verts = this.getTargets();
-	// for(var i = 0; i < verts.length; i++) {
-		// var pt = verts[i];
-		// pt.magnitude = this.sz;
-		// pt.add(this.center);
-		// this.drawPoint(ctx, pt, "#808080", 5);
-	// }
-	var verts = this.getVertices();
-	for(var i = 0; i < verts.length; i++) {
-		var pt = verts[i];
-		this.drawPoint(ctx, this.transform(pt), "#ffffff", 10);
+	if(this.RenderTargets) {
+		var verts = this.getTargets();
+		for(var i = 0; i < verts.length; i++) {
+			var pt = verts[i];
+			pt.magnitude = this.sz;
+			pt.add(this.center);
+			this.drawPoint(ctx, pt, "#808080", 5);
+		}
+	}
+	if(this.RenderVertices) {
+		var verts = this.getVertices();
+		for(var i = 0; i < verts.length; i++) {
+			var pt = verts[i];
+			this.drawPoint(ctx, this.transform(pt), "#ffffff", 10);
+		}
 	}
 	
 	//update points
@@ -131,8 +196,7 @@ class ChaosGame extends Game {
 		pt.multiply(1 - this.Jump);
 		next.multiply(this.Jump);
 		pt.add(next);
-		var d = o.distance(no) / this.getMaxDist();
-		this.drawPoint(this.paint, this.transform(pt), color(Math.sqrt(d), 0, Math.sqrt(1-d), 1), 0.5);
+		this.drawPoint(this.paint, this.transform(pt), this.getColor(o.distance(no)), this.Radius);
 		this.points[i] = pt;
 	}
   }
