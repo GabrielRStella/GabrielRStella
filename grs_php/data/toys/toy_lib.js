@@ -50,6 +50,10 @@ GameLib.randomRangeFloor = function(min, max) {
   return Math.floor(this.randomRange(min, max));
 }
 
+GameLib.randomSelect = function(a) {
+	return a[GameLib.randomRangeFloor(0, a.length)];
+}
+
 GameLib.randomUnitPoint = function() {
   var p = new Point(1, 0);
   p.rotate(Math.random() * Math.PI * 2);
