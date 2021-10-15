@@ -74,6 +74,7 @@ class ChaosGame extends Game {
 	fTargets.add(this, "CombinationWeight2", 0, 1).onChange(this.Reset);
 	fTargets.add(this, "CombinationWeight3", 0, 1).onChange(this.Reset);
 	//TODO: make it so the user can enable/disable relative vertex choice (e.g., "once you picked one vertex, the next step you have to pick one that isnt adjacent")
+	//TODO: flag to restrict combinations to only adjacent neighbors within a certain distance (so you can have e.g. just edge interpolation)
   }
   
   //
