@@ -62,7 +62,18 @@ class ChaosGame extends Game {
 	this.Radius = 0.3;
 	fRender.add(this, "Radius", 0.2, 1);
 	
-	//var fTargets = DAT_GUI.addFolder("Targets");
+	var fTargets = DAT_GUI.addFolder("Targets");
+	
+	//targets are a weighted sum of vertices
+	this.Combinations = 1;
+	fTargets.add(this, "Combinations", 1, 3, 1).onChange(this.Reset);
+	this.CombinationWeight1 = 1;
+	this.CombinationWeight2 = 1;
+	this.CombinationWeight3 = 1;
+	fTargets.add(this, "CombinationWeight1", 0, 1).onChange(this.Reset); //TODO reset2, if i can figure out the more complex jump function
+	fTargets.add(this, "CombinationWeight2", 0, 1).onChange(this.Reset);
+	fTargets.add(this, "CombinationWeight3", 0, 1).onChange(this.Reset);
+	//TODO: make it so the user can enable/disable relative vertex choice (e.g., "once you picked one vertex, the next step you have to pick one that isnt adjacent")
   }
   
   //
@@ -112,7 +123,39 @@ class ChaosGame extends Game {
   
   //target points for iteration (in this version of the program, it's just the vertices; later will be combinations)
   getTargets() {
-	  return this.getVertices();
+	  //TODO: cache this stuff
+	  var n = Math.pow(this.Vertices, this.Combinations);
+	  var vertices = this.getVertices();
+	  var targets = [];
+	  for(var i = 0; i < n; i++) {
+		  var j = i;
+		  var x = j % this.Vertices;
+		  j = (j - x) / this.Vertices;
+		  var y = j % this.Vertices;
+		  j = (j - y) / this.Vertices;
+		  var z = j % this.Vertices;
+		  //
+		  var totalWeight = this.CombinationWeight1;
+		  var p = new Point(0, 0);
+		  //
+		  var p1 = vertices[x].copy();
+		  p1.multiply(this.CombinationWeight1);
+		  p.x += p1.x; p.y += p1.y;
+		  if(this.Combinations > 1) {
+			  var p2 = vertices[y].copy();
+			  p2.multiply(this.CombinationWeight2);
+			  p.x += p2.x; p.y += p2.y; totalWeight += this.CombinationWeight2;
+			  if(this.Combinations > 2) {
+				  var p3 = vertices[z].copy();
+				  p3.multiply(this.CombinationWeight3);
+				  p.x += p3.x; p.y += p3.y; totalWeight += this.CombinationWeight3;
+			  }
+		  }
+		  //
+		  p.multiply(1 / totalWeight);
+		  targets.push(p);
+	  }
+	  return targets;
   }
   
   //randomly sample target points
@@ -183,9 +226,7 @@ class ChaosGame extends Game {
 		var verts = this.getTargets();
 		for(var i = 0; i < verts.length; i++) {
 			var pt = verts[i];
-			pt.magnitude = this.sz;
-			pt.add(this.center);
-			this.drawPoint(ctx, pt, "#808080", 5);
+			this.drawPoint(ctx, this.transform(pt), "#808080", 5);
 		}
 	}
 	if(this.RenderVertices) {
