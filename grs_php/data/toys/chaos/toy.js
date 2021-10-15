@@ -26,36 +26,52 @@ class ChaosGame extends Game {
 	this.center = new Point(0, 0);
 	this.points = [];
 	this.Reset = this.Reset.bind(this);
+	this.Reset2 = this.Reset2.bind(this);
 
 	var DAT_GUI = new dat.GUI();
 	
 	//options
-	DAT_GUI.add(this, "Reset");
+	
+	
+	var fShape = DAT_GUI.addFolder("Shape");
+	
 	this.Vertices = 3;
-    DAT_GUI.add(this, "Vertices", 1, 20, 1).onChange(this.Reset); //...
-	this.RenderVertices = true;
-	DAT_GUI.add(this, "RenderVertices");
-	this.RenderTargets = true;
-	DAT_GUI.add(this, "RenderTargets");
-	this.Angle = 0.0;
-	DAT_GUI.add(this, "Angle", 0.0, 1.0, 0.01).onChange(this.Reset); //rotate vertices by this portion of a turn (just rotating the shape)
+    fShape.add(this, "Vertices", 1, 20, 1).onChange(this.Reset2); //...
 	this.Jump = 0.5;
-	this.guiKeyJump = DAT_GUI.add(this, "Jump", 0.0, 1.0).onChange(this.Reset); //how much the point moves towards the next point
+	this.guiKeyJump = fShape.add(this, "Jump", 0.0, 1.0).onChange(this.Reset); //how much the point moves towards the next point
+	this.UpdateJump = true;
+	fShape.add(this, "UpdateJump");
 	this.SetJump = this.SetJump.bind(this);
-	DAT_GUI.add(this, "SetJump");
+	fShape.add(this, "SetJump");
 	this.N = 100;
-	DAT_GUI.add(this, "N", 1, 1000, 1); //how many points are iterated at a time
-	this.Radius = 0.3;
-	DAT_GUI.add(this, "Radius", 0.2, 1);
+	fShape.add(this, "N", 1, 1000, 1); //how many points are iterated at a time
+	this.Angle = 0.0;
+	fShape.add(this, "Angle", 0.0, 1.0, 0.01).onChange(this.Reset); //rotate vertices by this portion of a turn (just rotating the shape)
+	
+	var fRender = DAT_GUI.addFolder("Rendering");
+	
+	fRender.add(this, "Reset");
+	this.RenderVertices = true;
+	fRender.add(this, "RenderVertices");
+	this.RenderTargets = true;
+	fRender.add(this, "RenderTargets");
 	this.ColorNear = "#0000ff";
 	this.ColorFar = "#ff0000";
-	DAT_GUI.addColor(this, "ColorNear");
-	DAT_GUI.addColor(this, "ColorFar");
+	fRender.addColor(this, "ColorNear");
+	fRender.addColor(this, "ColorFar");
+	this.Radius = 0.3;
+	fRender.add(this, "Radius", 0.2, 1);
+	
+	//var fTargets = DAT_GUI.addFolder("Targets");
   }
   
   //
   Reset() {
     this.paint.clearRect(0, 0, this.paintCanvas.width, this.paintCanvas.height);
+  }
+  Reset2() {
+	  this.Reset();
+	  if(this.UpdateJump) this.SetJump(true);
   }
   
   
@@ -70,7 +86,7 @@ class ChaosGame extends Game {
         // return 1 - (1.0 / denom);
     // }
   
-  SetJump() {
+  SetJump(noReset) {
 	  var k = Math.floor((this.Vertices - 1) / 4);
 	  var angle = (Math.PI * 2) / this.Vertices;
 	  var c = 0;
@@ -80,7 +96,7 @@ class ChaosGame extends Game {
 	  var denom = 2 * (1 + c);
 	  this.Jump = 1 - (1 / denom);
 	  this.guiKeyJump.updateDisplay();
-	  this.Reset();
+	  if(!noReset) this.Reset();
   }
   
   //vertices of the polygon
