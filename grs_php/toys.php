@@ -16,7 +16,7 @@ make_nav();
       <div class="col s12">
         <h1>Toys</h1>
         <p>
-          These are mini-projects that I don't consider interesting enough to call games.
+          These are mini-projects that I don't consider complete enough to call games.
           Still, they may be interesting to you.
         </p>
       </div>

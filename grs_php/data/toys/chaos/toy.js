@@ -66,15 +66,25 @@ class ChaosGame extends Game {
 	
 	//targets are a weighted sum of vertices
 	this.Combinations = 1;
-	fTargets.add(this, "Combinations", 1, 3, 1).onChange(this.Reset);
+	fTargets.add(this, "Combinations", 1, 3, 1).onChange(this.Reset); //TODO make this go up to arbitrary # (and have dynamic number of weights)
 	this.CombinationWeight1 = 1;
 	this.CombinationWeight2 = 1;
 	this.CombinationWeight3 = 1;
 	fTargets.add(this, "CombinationWeight1", 0, 1).onChange(this.Reset); //TODO reset2, if i can figure out the more complex jump function
 	fTargets.add(this, "CombinationWeight2", 0, 1).onChange(this.Reset);
 	fTargets.add(this, "CombinationWeight3", 0, 1).onChange(this.Reset);
+	//
+	this.TargetVertices = true;
+	fTargets.add(this, "TargetVertices").onChange(this.Reset);
+	this.TargetEdges = true;
+	fTargets.add(this, "TargetEdges").onChange(this.Reset);
+	this.TargetInside = true;
+	fTargets.add(this, "TargetInside").onChange(this.Reset);
 	//TODO: make it so the user can enable/disable relative vertex choice (e.g., "once you picked one vertex, the next step you have to pick one that isnt adjacent")
 	//TODO: flag to restrict combinations to only adjacent neighbors within a certain distance (so you can have e.g. just edge interpolation)
+	//TODO: efficiency
+	//TODO: cool presets
+	//TODO: target toggles (enable original polygon vertices; enable non-adjacent combinations; ...)
   }
   
   //
@@ -122,6 +132,17 @@ class ChaosGame extends Game {
 	  return verts;
   }
   
+  vDist(x, y) {
+	  return Math.min(Math.abs(x - y), Math.abs(Math.abs(x - y) - this.Vertices));
+  }
+  
+  vComp(dXY) {
+	  if(dXY == 0 && !this.TargetVertices) return false;
+	  else if(dXY == 1 && !this.TargetEdges) return false;
+	  else if(dXY > 1 && !this.TargetInside) return false;
+	  return true;
+  }
+  
   //target points for iteration (in this version of the program, it's just the vertices; later will be combinations)
   getTargets() {
 	  //TODO: cache this stuff
@@ -135,6 +156,13 @@ class ChaosGame extends Game {
 		  var y = j % this.Vertices;
 		  j = (j - y) / this.Vertices;
 		  var z = j % this.Vertices;
+		  //
+		  if(this.Combinations > 1) {
+			  if(!this.vComp(this.vDist(x, y))) continue;
+			  if(this.Combinations > 2) {
+		          if(!this.vComp(this.vDist(x, z)) || !this.vComp(this.vDist(y, z))) continue;
+			  }
+		  }
 		  //
 		  var totalWeight = this.CombinationWeight1;
 		  var p = new Point(0, 0);
@@ -156,6 +184,17 @@ class ChaosGame extends Game {
 		  p.multiply(1 / totalWeight);
 		  targets.push(p);
 	  }
+	  //remove "duplicates"
+	  for(var i = 0; i < targets.length; i++) {
+		  for(var j = i + 1; j < targets.length; j++) {
+			  if(targets[i].distance(targets[j]) < 0.001) {
+				targets.splice(j, 1);
+				j--;
+			  }
+		  }
+	  }
+	  if(targets.length == 0) targets.push(new Point(0, 0));
+	  //
 	  return targets;
   }
   
