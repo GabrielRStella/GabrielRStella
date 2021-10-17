@@ -66,8 +66,8 @@ class FernGame extends Game {
 	this.N = 100;
 	DAT_GUI.add(this, "N", 1, 1000, 1).onChange(this.updateColors); //how many points are iterated at a time
 	
-	this.ColorA = "#0000ff";
-	this.ColorB = "#ff0000";
+	this.ColorA = "#004d04";
+	this.ColorB = "#35b600";
 	DAT_GUI.addColor(this, "ColorA").onChange(this.updateColors);
 	DAT_GUI.addColor(this, "ColorB").onChange(this.updateColors);
 	
