@@ -112,20 +112,59 @@ class Body {
 		v.add(offset);
 		return v;
 	}
+
+	//apply force (and torque) at offset
+	//F is a Point (i.e. vector)
+	applyForce(offset, F) {
+		this.accel.add(F); //ignore mass multiplication lol
+		var torque = offset.magnitude * F.magnitude * Math.sin(offset.angleTo(F));
+		this.angularaccel += torque;
+	}
 	
 	//collide with a particle at a given (world coords) point
 	//tests for collision (overlap) with each of its own constituent particles, then updates force/torque on self (not on other body)
-	collide(p) {
+	collide(p, b) {
 		for(var i = 0; i < this.particles.length; i++) {
 			var selfp = this.getParticlePosition(i);
-			var dist = p.distance(selfp);
+			//
+			var offset = p.copy();
+			offset.sub(selfp);
+			//
+			var dist = offset.magnitude;
 			var overlap = Math.max(0, 2 - dist);
 			if(overlap > 0) {
 				//collision
-				var N = p.copy();
-				N.sub(selfp);
+				//midpoint (approx. collision point)
+				var mp = p.copy();
+				mp.add(selfp);
+				mp.multiply(0.5);
+				//"line of centers"
+				var N = offset.copy();
 				N.magnitude = 1;
-				var V = 0;
+				//
+				var v1 = this.getVelocityAt(mp);
+				var v2 = b.getVelocityAt(mp);
+				//relative velocity at point of contact
+				var V = v1.copy();
+				V.sub(v2);
+				//change in overlap (normal velocity)
+				var doverlap = V.x * N.x + V.y * N.y;
+				//tangent velocity
+				var Vt = V.copy();
+				var tmp = N.copy();
+				tmp.multiply(doverlap);
+				Vt.sub(tmp);
+				//force parameters
+				var kd = 1;
+				var kr = 1;
+				var alpha = 1;
+				var beta = 1;
+				//normal force
+				var fn = -(kd * Math.pow(overlap, alpha) * doverlap + kr * Math.pow(overlap, beta));
+				var Fn = N.copy();
+				Fn.multiply(fn);
+				//
+				this.applyForce(offset, Fn);
 			}
 		}
 	}
@@ -138,12 +177,14 @@ class Body {
 		this.accel.x = 0;
 		this.accel.y = 0;
 		//
+		this.velocity.multiply(0.999); //damping
 		var v = this.velocity.copy();
 		v.multiply(dt);
 		this.position.add(v);
 		//
 		this.angularaccel *= dt;
 		this.angularvelocity += this.angularaccel;
+		this.angularvelocity *= (0.999); //damping
 		this.angle += this.angularvelocity * dt;
 		this.angularaccel = 0;
 	}
@@ -189,7 +230,7 @@ class SandGame extends Game {
 			//possible collision
 			if(b.position.distanceSquared(b2.position) < RADIUS2) {
 				for(var k = 0; k < b2.getParticleCount(); k++) {
-					b.collide(b2.getParticlePosition(k));
+					b.collide(b2.getParticlePosition(k), b2);
 				}
 			}
 		}
