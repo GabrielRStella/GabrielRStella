@@ -170,6 +170,12 @@ class Point {
   angleTo(other) {
     return Math.atan2(other.y - this.y, other.x - this.x);
   }
+  
+  angleBetween(other) {
+	var dot = (this.x * other.x + this.y * other.y);
+	var mags = this.magnitude * other.magnitude;
+	return Math.acos(dot / mags);
+  }
 
   floor() {
     this.x = Math.floor(this.x);

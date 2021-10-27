@@ -68,7 +68,7 @@ function hexToRgb(hex) {
 
 var DIST = 1 / Math.cos(Math.PI / 6); //distance of circle from the origin when in a triangular equilateral arrangement
 var RADIUS = 1 + DIST; //"radius" of a grain (max dist from origin to far side of a member particle)
-var RADIUS2 = RADIUS * RADIUS;
+var RADIUS2 = 4 * RADIUS * RADIUS;
 //a rigid collection of circular particles
 //all particles are assumed to be radius 1
 class Body {
@@ -117,7 +117,7 @@ class Body {
 	//F is a Point (i.e. vector)
 	applyForce(offset, F) {
 		this.accel.add(F); //ignore mass multiplication lol
-		var torque = offset.magnitude * F.magnitude * Math.sin(offset.angleTo(F));
+		var torque = offset.magnitude * F.magnitude * Math.sin(offset.angleBetween(F));
 		this.angularaccel += torque;
 	}
 	
@@ -155,16 +155,18 @@ class Body {
 				tmp.multiply(doverlap);
 				Vt.sub(tmp);
 				//force parameters
-				var kd = 1;
-				var kr = 1;
-				var alpha = 1;
-				var beta = 1;
+				var kd = 0.1;
+				var kr = 0.85;
+				var alpha = 0.5;
+				var beta = 1.5;
 				//normal force
 				var fn = -(kd * Math.pow(overlap, alpha) * doverlap + kr * Math.pow(overlap, beta));
 				var Fn = N.copy();
 				Fn.multiply(fn);
 				//
-				this.applyForce(offset, Fn);
+				var off = mp.copy();
+				off.sub(this.position);
+				this.applyForce(off, Fn);
 			}
 		}
 	}
@@ -177,14 +179,14 @@ class Body {
 		this.accel.x = 0;
 		this.accel.y = 0;
 		//
-		this.velocity.multiply(0.999); //damping
+		this.velocity.multiply(0.995); //damping
 		var v = this.velocity.copy();
 		v.multiply(dt);
 		this.position.add(v);
 		//
 		this.angularaccel *= dt;
-		this.angularvelocity += this.angularaccel;
-		this.angularvelocity *= (0.999); //damping
+		this.angularvelocity += this.angularaccel / 10;
+		this.angularvelocity *= (0.995); //damping
 		this.angle += this.angularvelocity * dt;
 		this.angularaccel = 0;
 	}
@@ -204,9 +206,19 @@ class SandGame extends Game {
 	this.w = 100;
 	this.h = 100;
 	
+	this.dummy = new Body();
+	var step = 2;
+	for(var x = 0; x <= this.w; x += step) {
+		for(var y = 0; y <= this.h; y += step) {
+			this.dummy.particles.push(new Point(x, 0));
+			this.dummy.particles.push(new Point(x, this.h));
+			this.dummy.particles.push(new Point(0, y));
+			this.dummy.particles.push(new Point(this.w, y));
+		}
+	}
 	this.particles = [];
 	
-	for(var i = 0; i < 30; i++) {
+	for(var i = 0; i < 250; i++) {
 		var b = new Body();
 		b.createTriangularParticles();
 		b.position = new Point(Math.random() * this.w, Math.random() * this.h);
@@ -220,33 +232,42 @@ class SandGame extends Game {
   update(tickPart) {
     if(this.Paused) return;
 	
-    
-    //update forces, apply gravity / wall repulsion
-	for(var i = 0; i < this.particles.length; i++) {
-		var b = this.particles[i];
-		for(var j = 0; j < this.particles.length; j++) {
-			if(i == j) continue;
-			var b2 = this.particles[j];
-			//possible collision
-			if(b.position.distanceSquared(b2.position) < RADIUS2) {
-				for(var k = 0; k < b2.getParticleCount(); k++) {
-					b.collide(b2.getParticlePosition(k), b2);
+    if(tickPart > 1) tickPart = 1;
+	
+	var steps = 25;
+	for(var step = 0; step < steps; step++) {
+		//update forces, apply gravity / wall repulsion
+		for(var i = 0; i < this.particles.length; i++) {
+			var b = this.particles[i];
+			for(var j = 0; j < this.particles.length; j++) {
+				if(i == j) continue;
+				var b2 = this.particles[j];
+				//possible collision
+				if(b.position.distanceSquared(b2.position) < RADIUS2) {
+					for(var k = 0; k < b2.getParticleCount(); k++) {
+						b.collide(b2.getParticlePosition(k), b2);
+					}
 				}
 			}
+			b.accel.y += 0.1; //TMP gravity value
 		}
-		b.accel.y += 0.1; //TMP gravity value
-	}
-	
-	//update velocities and positions
-	for(var i = 0; i < this.particles.length; i++) {
-		var b = this.particles[i];
-		//bounds
-		if(b.position.x < 0) b.velocity.x += (0.1);
-		if(b.position.x > this.w) b.velocity.x += (-0.1);
-		if(b.position.y < 0) b.velocity.y += (0.1);
-		if(b.position.y > this.h) b.velocity.y += (-0.1);
-		//update
-		b.update(tickPart);
+		
+		//update velocities and positions
+		for(var i = 0; i < this.particles.length; i++) {
+			var b = this.particles[i];
+			//bounds
+			if(b.position.x < 0) b.velocity.x = (b.velocity.x + 0.1) * 0.95;
+			if(b.position.x > this.w) b.velocity.x = (b.velocity.x - 0.1) * 0.75;
+			if(b.position.y < 0) b.velocity.y = (b.velocity.y + 0.1) * 0.95;
+			if(b.position.y > this.h) b.velocity.y = (b.velocity.y - 0.1) * 0.75;
+			// if(b.position.x < RADIUS2 || b.position.x > (this.w - RADIUS2) || b.position.y < RADIUS2 || b.position.y > (this.h - RADIUS2)) {
+				// for(var k = 0; k < this.dummy.getParticleCount(); k++) {
+					// b.collide(this.dummy.getParticlePosition(k), this.dummy);
+				// }
+			// }
+			//update
+			b.update(tickPart / steps);
+		}
 	}
   }
 
@@ -272,6 +293,7 @@ class SandGame extends Game {
 		var b = this.particles[i];
 		b.render(ctx, stroke);
 	  }
+	  //this.dummy.render(ctx, "#ff0000");
 	  
 	  ctx.restore();
   }
