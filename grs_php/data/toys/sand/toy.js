@@ -155,10 +155,11 @@ class Body {
 				tmp.multiply(doverlap);
 				Vt.sub(tmp);
 				//force parameters
-				var kd = 0.1;
+				var kd = 1;
 				var kr = 0.85;
 				var alpha = 0.5;
 				var beta = 1.5;
+				var u = 0.1;
 				//normal force
 				var fn = -(kd * Math.pow(overlap, alpha) * doverlap + kr * Math.pow(overlap, beta));
 				var Fn = N.copy();
@@ -167,6 +168,12 @@ class Body {
 				var off = mp.copy();
 				off.sub(this.position);
 				this.applyForce(off, Fn);
+				//tangent force (shear friction)
+				var Ft = Vt.copy();
+				if(!Ft.zero) {
+					Ft.magnitude = -u * fn;
+					this.applyForce(off, Ft);
+				}
 			}
 		}
 	}
