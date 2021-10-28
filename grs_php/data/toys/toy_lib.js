@@ -88,6 +88,11 @@ class Point {
     this.y = y || 0;
   }
 
+  get magnitudeSquared() {
+    var m = this.x * this.x + this.y * this.y;
+    return m;
+  }
+
   get magnitude() {
     var m = this.x * this.x + this.y * this.y;
     return Math.sqrt(m);

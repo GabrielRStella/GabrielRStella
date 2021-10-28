@@ -71,6 +71,11 @@ function hexToRgb(hex) {
 var DAT_GUI = new dat.GUI();
 
 var OPTIONS = {
+	ColorHot: "#ff0000",
+	ColorCold: "#0000ff",
+	ColorHot_: hexToRgb("#ff0000"),
+	ColorCold_: hexToRgb("#0000ff"),
+	Heat: 30,
 	kd: 0.9, //collision damping coefficient
 	kr: 0.85, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
@@ -78,11 +83,25 @@ var OPTIONS = {
 	u: 0.5 //shear friction coefficient
 };
 
+DAT_GUI.addColor(OPTIONS, "ColorHot").onChange(function(){OPTIONS.ColorHot_ = hexToRgb(OPTIONS.ColorHot)});
+DAT_GUI.addColor(OPTIONS, "ColorCold").onChange(function(){OPTIONS.ColorCold_ = hexToRgb(OPTIONS.ColorCold)});
+DAT_GUI.add(OPTIONS, "Heat", 1, 100);
 DAT_GUI.add(OPTIONS, "kd", -1, 2);
 DAT_GUI.add(OPTIONS, "kr", -1, 2);
 DAT_GUI.add(OPTIONS, "alpha", 0, 3);
 DAT_GUI.add(OPTIONS, "beta", 0, 3);
 DAT_GUI.add(OPTIONS, "u", -1, 1); //negative = rolly bois
+
+function getColor(energy) {
+  var d = 1 / (energy + 1);
+  var d1 = 1-d;
+  var c = {
+	  r: OPTIONS.ColorHot_.r * d1 + OPTIONS.ColorCold_.r * d,
+	  g: OPTIONS.ColorHot_.g * d1 + OPTIONS.ColorCold_.g * d,
+	  b: OPTIONS.ColorHot_.b * d1 + OPTIONS.ColorCold_.b * d,
+  };
+  return color(c.r, c.g, c.b, 1);
+}
 
 //////
 
@@ -94,6 +113,10 @@ class Body {
 		this.angle = 0;
 		this.angularvelocity = 0;
 		this.angularaccel = 0;
+	}
+	
+	getEnergy() {
+		return this.velocity.magnitudeSquared + this.angularvelocity * this.angularvelocity;
 	}
 	
 	//query velocity at a certain (world coords) point based on vel + angularvel&offset
@@ -185,13 +208,16 @@ class Body {
 		this.angularaccel = 0;
 	}
 	
-	render(ctx, color) {
+	render(ctx) {
+		var color = getColor(this.getEnergy() * OPTIONS.Heat); //the scaling just helps with visualization, found experimentally :)
 		RenderHelper.drawPoint(ctx, this.position, color, null, 1);
 		ctx.save();
 		ctx.translate(this.position.x, this.position.y);
 		ctx.rotate(this.angle);
-		RenderHelper.drawPoint(ctx, new Point(0, 0.5), "#000000", null, 0.5);
-		RenderHelper.drawPoint(ctx, new Point(0, -0.5), "#000000", null, 0.5);
+		ctx.lineWidth = 0.4;
+		RenderHelper.drawLine(ctx, new Point(0, -0.8), new Point(0, 0.8), "#000000");
+		//RenderHelper.drawPoint(ctx, new Point(0, 0.5), "#000000", null, 0.5);
+		//RenderHelper.drawPoint(ctx, new Point(0, -0.5), "#000000", null, 0.5);
 		ctx.restore();
 	}
 }
@@ -206,7 +232,7 @@ class SandGame extends Game {
 	
 	this.particles = [];
 	
-	for(var i = 0; i < 250; i++) {
+	for(var i = 0; i < 300; i++) {
 		var b = new Body();
 		b.position = new Point(Math.random() * this.w, Math.random() * this.h);
 		b.angularvelocity = Math.random() * 0.5 - 0.25;
@@ -291,11 +317,9 @@ class SandGame extends Game {
 	  ctx.lineWidth = 0.1;
 	  RenderHelper.drawRect(ctx, new Rectangle(0, 0, this.w, this.h), null, "#ffffff");
 	  
-	  var fill = "#000000";
-	  var stroke = "#ffffff";
 	  for(var i = 0; i < this.particles.length; i++) {
 		var b = this.particles[i];
-		b.render(ctx, stroke);
+		b.render(ctx);
 	  }
 	  //this.dummy.render(ctx, "#ff0000");
 	  
