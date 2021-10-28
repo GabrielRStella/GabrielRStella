@@ -76,23 +76,30 @@ var OPTIONS = {
 	ColorHot_: hexToRgb("#ff0000"),
 	ColorCold_: hexToRgb("#0000ff"),
 	Heat: 30,
+	Batch: 1, //# spawned at once with click
+	Width: 100,
+	Height: 100,
 	kd: 0.9, //collision damping coefficient
 	kr: 0.85, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
 	beta: 1.5, //normal force modulator (rigidity)
-	u: 0.5, //shear friction coefficient
-	Batch: 1 //# spawned at once with click
+	u: 0.5 //shear friction coefficient
 };
 
 DAT_GUI.addColor(OPTIONS, "ColorHot").onChange(function(){OPTIONS.ColorHot_ = hexToRgb(OPTIONS.ColorHot)});
 DAT_GUI.addColor(OPTIONS, "ColorCold").onChange(function(){OPTIONS.ColorCold_ = hexToRgb(OPTIONS.ColorCold)});
 DAT_GUI.add(OPTIONS, "Heat", 1, 100);
-DAT_GUI.add(OPTIONS, "kd", -1, 2);
-DAT_GUI.add(OPTIONS, "kr", -1, 2);
-DAT_GUI.add(OPTIONS, "alpha", 0, 3);
-DAT_GUI.add(OPTIONS, "beta", 0, 3);
-DAT_GUI.add(OPTIONS, "u", -1, 1); //negative = rolly bois (very dangerous)
 DAT_GUI.add(OPTIONS, "Batch", 1, 20, 1);
+DAT_GUI.add(OPTIONS, "Width", 1, 400, 1);
+DAT_GUI.add(OPTIONS, "Height", 1, 400, 1);
+
+var f = DAT_GUI.addFolder("Parameters");
+
+f.add(OPTIONS, "kd", -1, 2);
+f.add(OPTIONS, "kr", -1, 2);
+f.add(OPTIONS, "alpha", 0, 3);
+f.add(OPTIONS, "beta", 0, 3);
+f.add(OPTIONS, "u", -1, 1); //negative = rolly bois (very dangerous)
 
 function getColor(energy) {
   var d = 1 / (energy + 1);
@@ -229,8 +236,8 @@ class SandGame extends Game {
     super("sand");
 	
 	//physics area bounds
-	this.w = 100;
-	this.h = 100;
+	this.w = OPTIONS.Width;
+	this.h = OPTIONS.Height;
 	
 	this.particles = [];
 	
@@ -271,6 +278,9 @@ class SandGame extends Game {
   }
 
   update(tickPart) {
+	this.w = OPTIONS.Width;
+	this.h = OPTIONS.Height;
+	
     if(this.Paused) return;
 	
     if(tickPart > 1) tickPart = 1;
