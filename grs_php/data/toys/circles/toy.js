@@ -66,6 +66,26 @@ function hexToRgb(hex) {
   } : null;
 }
 
+///////
+
+var DAT_GUI = new dat.GUI();
+
+var OPTIONS = {
+	kd: 0.9, //collision damping coefficient
+	kr: 0.85, //restitution/rigidity coefficient
+	alpha: 0.5, //normal force modulator (energy dissipation)
+	beta: 1.5, //normal force modulator (rigidity)
+	u: 0.5 //shear friction coefficient
+};
+
+DAT_GUI.add(OPTIONS, "kd", -1, 2);
+DAT_GUI.add(OPTIONS, "kr", -1, 2);
+DAT_GUI.add(OPTIONS, "alpha", 0, 3);
+DAT_GUI.add(OPTIONS, "beta", 0, 3);
+DAT_GUI.add(OPTIONS, "u", -1, 1); //negative = rolly bois
+
+//////
+
 class Body {
 	constructor() {
 		this.position = new Point(0, 0);
@@ -127,13 +147,8 @@ class Body {
 			tmp.multiply(doverlap);
 			Vt.sub(tmp);
 			//force parameters
-			var kd = 0.9;
-			var kr = 0.85;
-			var alpha = 0.5;
-			var beta = 1.5;
-			var u = 0.1;
 			//normal force
-			var fn = -(kd * Math.pow(overlap, alpha) * doverlap + kr * Math.pow(overlap, beta));
+			var fn = -(OPTIONS.kd * Math.pow(overlap, OPTIONS.alpha) * doverlap + OPTIONS.kr * Math.pow(overlap, OPTIONS.beta));
 			var Fn = N.copy();
 			Fn.multiply(fn);
 			//console.log(N, fn, overlap, doverlap, Fn);
@@ -144,7 +159,7 @@ class Body {
 			//tangent force (shear friction)
 			var Ft = Vt.copy();
 			if(!Ft.zero) {
-				Ft.magnitude = u * fn;
+				Ft.magnitude = OPTIONS.u * fn;
 				this.applyForce(off, Ft);
 			}
 		}
@@ -158,14 +173,14 @@ class Body {
 		this.accel.x = 0;
 		this.accel.y = 0;
 		//
-		this.velocity.multiply(0.995); //damping
+		//this.velocity.multiply(0.995); //damping
 		var v = this.velocity.copy();
 		v.multiply(dt);
 		this.position.add(v);
 		//
 		this.angularaccel *= dt;
 		this.angularvelocity += this.angularaccel / 10;
-		this.angularvelocity *= (0.995); //damping
+		//this.angularvelocity *= (0.995); //damping
 		this.angle += this.angularvelocity * dt;
 		this.angularaccel = 0;
 	}
@@ -197,8 +212,29 @@ class SandGame extends Game {
 		b.angularvelocity = Math.random() * 0.5 - 0.25;
 		this.particles.push(b);
 	}
-    
-	var DAT_GUI = new dat.GUI();
+  }
+
+  register(keys, mouse) {
+    this.mouse = mouse;
+    this.LISTENER_MOUSE_CLICK = mouse.addListener("click", this.onClick.bind(this));
+  }
+
+  unregister(keys, mouse) {
+    mouse.removeListener(this.LISTENER_MOUSE_CLICK);
+  }
+  
+	  // ctx.translate(this.center.x, this.center.y);
+	  // ctx.scale(this.scale, this.scale);
+	  // ctx.translate(-this.w / 2, -this.h / 2);
+  onClick(evt) {
+    var pos = this.mouse.getMousePos(evt);
+	var x = (pos.x - this.center.x) / this.scale + this.w / 2;
+	var y = (pos.y - this.center.y) / this.scale + this.h / 2;
+	//
+	var b = new Body();
+	b.position = new Point(x, y);
+	b.angularvelocity = Math.random() * 1 - 0.5;
+	this.particles.push(b);
   }
 
   update(tickPart) {
