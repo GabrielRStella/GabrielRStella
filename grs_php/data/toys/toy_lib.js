@@ -172,9 +172,16 @@ class Point {
   }
   
   angleBetween(other) {
-	var dot = (this.x * other.x + this.y * other.y);
-	var mags = this.magnitude * other.magnitude;
-	return Math.acos(dot / mags);
+	  //this has numerical stability issues...
+	// var dot = (this.x * other.x + this.y * other.y);
+	// var mags = this.magnitude * other.magnitude;
+	// console.log(this, other, dot / mags);
+	// if(mags == 0) return 0;
+	// return Math.acos(dot / mags);
+	//https://stackoverflow.com/a/55510185
+	var dot = this.x*other.x + this.y*other.y;
+    var cross = this.x*other.y - this.y*other.x;
+    return Math.atan2(cross, dot);
   }
 
   floor() {
