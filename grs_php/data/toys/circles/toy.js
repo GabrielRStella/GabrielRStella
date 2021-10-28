@@ -80,7 +80,8 @@ var OPTIONS = {
 	kr: 0.85, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
 	beta: 1.5, //normal force modulator (rigidity)
-	u: 0.5 //shear friction coefficient
+	u: 0.5, //shear friction coefficient
+	Batch: 1 //# spawned at once with click
 };
 
 DAT_GUI.addColor(OPTIONS, "ColorHot").onChange(function(){OPTIONS.ColorHot_ = hexToRgb(OPTIONS.ColorHot)});
@@ -90,7 +91,8 @@ DAT_GUI.add(OPTIONS, "kd", -1, 2);
 DAT_GUI.add(OPTIONS, "kr", -1, 2);
 DAT_GUI.add(OPTIONS, "alpha", 0, 3);
 DAT_GUI.add(OPTIONS, "beta", 0, 3);
-DAT_GUI.add(OPTIONS, "u", -1, 1); //negative = rolly bois
+DAT_GUI.add(OPTIONS, "u", -1, 1); //negative = rolly bois (very dangerous)
+DAT_GUI.add(OPTIONS, "Batch", 1, 20, 1);
 
 function getColor(energy) {
   var d = 1 / (energy + 1);
@@ -232,7 +234,7 @@ class SandGame extends Game {
 	
 	this.particles = [];
 	
-	for(var i = 0; i < 300; i++) {
+	for(var i = 0; i < 100; i++) {
 		var b = new Body();
 		b.position = new Point(Math.random() * this.w, Math.random() * this.h);
 		b.angularvelocity = Math.random() * 0.5 - 0.25;
@@ -257,10 +259,15 @@ class SandGame extends Game {
 	var x = (pos.x - this.center.x) / this.scale + this.w / 2;
 	var y = (pos.y - this.center.y) / this.scale + this.h / 2;
 	//
-	var b = new Body();
-	b.position = new Point(x, y);
-	b.angularvelocity = Math.random() * 1 - 0.5;
-	this.particles.push(b);
+	for(var i = 0; i < OPTIONS.Batch; i++) {
+		var b = new Body();
+		var offset = new Point((OPTIONS.Batch - 1) / (OPTIONS.Batch + 1), 0);
+		offset.rotate(Math.random() * 2 * Math.PI);
+		b.position = new Point(x, y);
+		b.position.add(offset);
+		b.angularvelocity = Math.random() * 1 - 0.5;
+		this.particles.push(b);
+	}
   }
 
   update(tickPart) {
@@ -286,9 +293,9 @@ class SandGame extends Game {
 		for(var i = 0; i < this.particles.length; i++) {
 			var b = this.particles[i];
 			//bounds
-			if(b.position.x < 0) b.velocity.x = (b.velocity.x + 0.1) * 0.95;
-			if(b.position.x > this.w) b.velocity.x = (b.velocity.x - 0.1) * 0.75;
-			if(b.position.y < 0) b.velocity.y = (b.velocity.y + 0.1) * 0.95;
+			if(b.position.x < 0) b.velocity.x = (b.velocity.x + 0.1) * 0.9;
+			if(b.position.x > this.w) b.velocity.x = (b.velocity.x - 0.1) * 0.9;
+			if(b.position.y < 0) b.velocity.y = (b.velocity.y + 0.1) * 0.9;
 			if(b.position.y > this.h) b.velocity.y = (b.velocity.y - 0.1) * 0.75;
 			// if(b.position.x < RADIUS2 || b.position.x > (this.w - RADIUS2) || b.position.y < RADIUS2 || b.position.y > (this.h - RADIUS2)) {
 				// for(var k = 0; k < this.dummy.getParticleCount(); k++) {
