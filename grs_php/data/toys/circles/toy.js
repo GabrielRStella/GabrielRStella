@@ -75,7 +75,10 @@ var OPTIONS = {
 	ColorCold: "#0000ff",
 	ColorHot_: hexToRgb("#ff0000"),
 	ColorCold_: hexToRgb("#0000ff"),
+	Opacity: 1,
 	Heat: 30,
+	Glow: 0.3,
+	Grid: true,
 	Batch: 1, //# spawned at once with click
 	Width: 100,
 	Height: 100,
@@ -86,14 +89,22 @@ var OPTIONS = {
 	u: 0.5 //shear friction coefficient
 };
 
-DAT_GUI.addColor(OPTIONS, "ColorHot").onChange(function(){OPTIONS.ColorHot_ = hexToRgb(OPTIONS.ColorHot)});
-DAT_GUI.addColor(OPTIONS, "ColorCold").onChange(function(){OPTIONS.ColorCold_ = hexToRgb(OPTIONS.ColorCold)});
-DAT_GUI.add(OPTIONS, "Heat", 1, 100);
-DAT_GUI.add(OPTIONS, "Batch", 1, 50, 1);
-DAT_GUI.add(OPTIONS, "Width", 1, 400, 1);
-DAT_GUI.add(OPTIONS, "Height", 1, 400, 1);
+var f = DAT_GUI.addFolder("Rendering");
 
-var f = DAT_GUI.addFolder("Parameters");
+f.addColor(OPTIONS, "ColorHot").onChange(function(){OPTIONS.ColorHot_ = hexToRgb(OPTIONS.ColorHot)});
+f.addColor(OPTIONS, "ColorCold").onChange(function(){OPTIONS.ColorCold_ = hexToRgb(OPTIONS.ColorCold)});
+f.add(OPTIONS, "Opacity", 0, 1);
+f.add(OPTIONS, "Heat", 1, 100);
+f.add(OPTIONS, "Grid");
+f.add(OPTIONS, "Glow", 0.1, 2);
+
+f = DAT_GUI.addFolder("World");
+
+f.add(OPTIONS, "Batch", 1, 50, 1);
+f.add(OPTIONS, "Width", 1, 400, 1);
+f.add(OPTIONS, "Height", 1, 400, 1);
+
+f = DAT_GUI.addFolder("Physics");
 
 f.add(OPTIONS, "kd", -1, 2);
 f.add(OPTIONS, "kr", -1, 2);
@@ -109,7 +120,7 @@ function getColor(energy) {
 	  g: OPTIONS.ColorHot_.g * d1 + OPTIONS.ColorCold_.g * d,
 	  b: OPTIONS.ColorHot_.b * d1 + OPTIONS.ColorCold_.b * d,
   };
-  return color(c.r, c.g, c.b, 1);
+  return color(c.r, c.g, c.b, OPTIONS.Opacity);
 }
 
 //////
@@ -254,7 +265,9 @@ class Body {
 		ctx.translate(this.position.x, this.position.y);
 		ctx.rotate(this.angle);
 		ctx.lineWidth = 0.4;
-		RenderHelper.drawLine(ctx, new Point(0, -0.8), new Point(0, 0.8), "#000000");
+		var o = Math.floor(OPTIONS.Opacity * 255).toString(16);
+		if(o.length == 1) o = "0" + o;
+		RenderHelper.drawLine(ctx, new Point(0, -0.8), new Point(0, 0.8), "#000000" + o);
 		//RenderHelper.drawPoint(ctx, new Point(0, 0.5), "#000000", null, 0.5);
 		//RenderHelper.drawPoint(ctx, new Point(0, -0.5), "#000000", null, 0.5);
 		ctx.restore();
@@ -381,11 +394,13 @@ class SandGame extends Game {
 	  ctx.scale(this.scale, this.scale);
 	  ctx.translate(-this.w / 2, -this.h / 2);
 	  
-	  for(var x = 0; x < this.w / this.sz; x++) {
-		  for(var y = 0; y < this.h / this.sz; y++) {
-			  var n = this.grid.at({x: x, y: y}).length;
-			  var c = (1 - 1/Math.sqrt(n+1));
-			  //RenderHelper.drawRect(ctx, new Rectangle(x * this.sz, y * this.sz, this.sz, this.sz), color(c, c, c, 1), null);
+	  if(OPTIONS.Grid) {
+		  for(var x = 0; x < this.w / this.sz; x++) {
+			  for(var y = 0; y < this.h / this.sz; y++) {
+				  var n = this.grid.at({x: x, y: y}).size;
+				  var c = (1 - 1/(n * OPTIONS.Glow + 1));
+				  RenderHelper.drawRect(ctx, new Rectangle(x * this.sz, y * this.sz, this.sz, this.sz), color(c, c, c, 1), null);
+			  }
 		  }
 	  }
 	  
