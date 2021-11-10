@@ -89,7 +89,7 @@ var OPTIONS = {
 DAT_GUI.addColor(OPTIONS, "ColorHot").onChange(function(){OPTIONS.ColorHot_ = hexToRgb(OPTIONS.ColorHot)});
 DAT_GUI.addColor(OPTIONS, "ColorCold").onChange(function(){OPTIONS.ColorCold_ = hexToRgb(OPTIONS.ColorCold)});
 DAT_GUI.add(OPTIONS, "Heat", 1, 100);
-DAT_GUI.add(OPTIONS, "Batch", 1, 20, 1);
+DAT_GUI.add(OPTIONS, "Batch", 1, 50, 1);
 DAT_GUI.add(OPTIONS, "Width", 1, 400, 1);
 DAT_GUI.add(OPTIONS, "Height", 1, 400, 1);
 
@@ -113,6 +113,36 @@ function getColor(energy) {
 }
 
 //////
+
+//for voxelization of space
+var MAX_RADIUS = 1;
+var VOXEL_SIZE = 2 * MAX_RADIUS;
+
+class Grid {
+	constructor(sz) {
+		this.sz = sz;
+		this.grid = {};
+	}
+	
+	pos2index(p) {
+		var x = Math.floor(p.x / this.sz);
+		var y = Math.floor(p.y / this.sz);
+		return {x: x, y: y};
+	}
+	
+	at(index) {
+		//index = this.pos2index(index);
+		index = "" + index.x + "," + index.y;
+		if(!(index in this.grid)) {
+			this.grid[index] = new Set();
+		}
+		return this.grid[index];
+	}
+	
+	clear() {
+		this.grid = {};
+	}
+}
 
 class Body {
 	constructor() {
@@ -238,10 +268,12 @@ class SandGame extends Game {
 	//physics area bounds
 	this.w = OPTIONS.Width;
 	this.h = OPTIONS.Height;
+	this.sz = VOXEL_SIZE;
 	
 	this.particles = [];
+	this.grid = new Grid(this.sz);
 	
-	for(var i = 0; i < 100; i++) {
+	for(var i = 0; i < 300; i++) {
 		var b = new Body();
 		b.position = new Point(Math.random() * this.w, Math.random() * this.h);
 		b.angularvelocity = Math.random() * 0.5 - 0.25;
@@ -268,7 +300,7 @@ class SandGame extends Game {
 	//
 	for(var i = 0; i < OPTIONS.Batch; i++) {
 		var b = new Body();
-		var offset = new Point((OPTIONS.Batch - 1) / (OPTIONS.Batch + 1), 0);
+		var offset = new Point(Math.random() * OPTIONS.Batch / 10, 0);
 		offset.rotate(Math.random() * 2 * Math.PI);
 		b.position = new Point(x, y);
 		b.position.add(offset);
@@ -283,6 +315,8 @@ class SandGame extends Game {
 	
     if(this.Paused) return;
 	
+	tickPart *= 1;
+	
     if(tickPart > 1) tickPart = 1;
 	
 	var steps = 10;
@@ -290,18 +324,29 @@ class SandGame extends Game {
 		//update forces, apply gravity / wall repulsion
 		for(var i = 0; i < this.particles.length; i++) {
 			var b = this.particles[i];
-			for(var j = 0; j < this.particles.length; j++) {
-				if(i == j) continue;
-				var b2 = this.particles[j];
-				//possible collision
-				b.collide(b2.position, b2);
+			var index = this.grid.pos2index(b.position);
+			for(var dx = -1; dx <= 1; dx++) {
+				for(var dy = -1; dy <= 1; dy++) {
+					var index2 = {x: index.x + dx, y: index.y + dy};
+					var neighbors = this.grid.at(index2);
+					for(let b2 of neighbors) {
+						if(b2 == b) continue;
+						//possible collision
+						b.collide(b2.position, b2);
+					}
+				}
 			}
 			b.accel.y += 0.1; //TMP gravity value
 		}
 		
+		//clear grid for updating
+		//TODO: optimized grid updates (only when particle actually moves to new cell)
+		//this.grid.clear();
+		
 		//update velocities and positions
 		for(var i = 0; i < this.particles.length; i++) {
 			var b = this.particles[i];
+			var index = this.grid.pos2index(b.position);
 			//bounds
 			if(b.position.x < 0) b.velocity.x = (b.velocity.x + 0.1) * 0.9;
 			if(b.position.x > this.w) b.velocity.x = (b.velocity.x - 0.1) * 0.9;
@@ -314,6 +359,12 @@ class SandGame extends Game {
 			// }
 			//update
 			b.update(tickPart / steps);
+			//
+			var index2 = this.grid.pos2index(b.position);
+			if(index2.x != index.x || index2.y != index.y) {
+				this.grid.at(index).delete(b);
+				this.grid.at(index2).add(b);
+			}
 		}
 	}
   }
@@ -330,6 +381,14 @@ class SandGame extends Game {
 	  ctx.scale(this.scale, this.scale);
 	  ctx.translate(-this.w / 2, -this.h / 2);
 	  
+	  for(var x = 0; x < this.w / this.sz; x++) {
+		  for(var y = 0; y < this.h / this.sz; y++) {
+			  var n = this.grid.at({x: x, y: y}).length;
+			  var c = (1 - 1/Math.sqrt(n+1));
+			  //RenderHelper.drawRect(ctx, new Rectangle(x * this.sz, y * this.sz, this.sz, this.sz), color(c, c, c, 1), null);
+		  }
+	  }
+	  
 	  //draw area bounds
 	  ctx.lineWidth = 0.1;
 	  RenderHelper.drawRect(ctx, new Rectangle(0, 0, this.w, this.h), null, "#ffffff");
@@ -341,6 +400,8 @@ class SandGame extends Game {
 	  //this.dummy.render(ctx, "#ff0000");
 	  
 	  ctx.restore();
+	  
+	  RenderHelper.drawText(ctx, "" + this.particles.length, "top", "left", 36, new Point(10, 10), "#ffffff", null);
   }
 }
 
