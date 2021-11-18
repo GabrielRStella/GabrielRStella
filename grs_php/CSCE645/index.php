@@ -42,8 +42,8 @@ make_nav();
 		<div class="col s12 m12 l12">
 		  <div class="card">
 			<div class="card-content">
-			  <a href="#"><span class="card-title">Progress Update 2</span></a>
-			  <p>TODO (Nov 18)</p>
+			  <a href="/CSCE645/update2.pdf"><span class="card-title">Progress Update 2</span></a>
+			  <p>This document discusses the work done prior to November 18th.</p>
 			</div>
 		  </div>
 		</div>
