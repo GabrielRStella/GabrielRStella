@@ -83,8 +83,8 @@ var OPTIONS = {
 	NetForce: true,
 	Playing: true,
 	Speed: 1,
-	Width: 10,
-	Height: 10,
+	Width: 100,
+	Height: 100,
 	kd: 0.9, //collision damping coefficient
 	kr: 0.85, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
@@ -477,7 +477,7 @@ class SandGame extends Game {
 	this.particles = [];
 	this.grid = new Grid(this.sz);
 	
-	for(var i = 0; i < 3; i++) {
+	for(var i = 0; i < 100; i++) {
 		var b = new Body();
 		b.position = new Point(Math.random() * this.w, Math.random() * this.h);
 		b.angularvelocity = Math.random() * 0.5 - 0.25;
