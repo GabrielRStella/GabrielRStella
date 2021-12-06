@@ -168,19 +168,20 @@ class Grid {
 		var d = -1;
 		
 		for(let b of particles) {
+			if(!b.kinematic) continue;
 			var dist = p.distance(b.position);
 			if(d < 0 || dist < d) {
 				particle = b;
 				d = dist;
 			}
 		}
-		return {particle: particle, dist: d};
+		return particle ? {particle: particle, dist: d} : null;
 	}
 	
 	//looks in grid cells +=d in both x and y
 	helperGetClosestParticle(p, d) {
 		var particle = null;
-		var pdist = (d+this.sz)*(d+this.sz); //upper bound on distance
+		var pdist = ((d + 1) * this.sz) * ((d + 1) * this.sz); //upper bound on distance
 		//
 		var i = this.pos2index(p);
 		//try corners
@@ -207,23 +208,23 @@ class Grid {
 			}
 		}
 		//try edges
-		for(var i = -d + 1; i < d; i++) {
-			var closest1 = this.closest(p, this.at({x: i.x - d, y: i.y + i}));
+		for(var j = -d + 1; j < d; j++) {
+			var closest1 = this.closest(p, this.at({x: i.x - d, y: i.y + j}));
 			if(closest1 != null && closest1.dist < pdist) {
 				particle = closest1.particle;
 				pdist = closest1.dist;
 			}
-			var closest2 = this.closest(p, this.at({x: i.x + d, y: i.y + i}));
+			var closest2 = this.closest(p, this.at({x: i.x + d, y: i.y + j}));
 			if(closest2 != null && closest2.dist < pdist) {
 				particle = closest2.particle;
 				pdist = closest2.dist;
 			}
-			var closest3 = this.closest(p, this.at({x: i.x + i, y: i.y + d}));
+			var closest3 = this.closest(p, this.at({x: i.x + j, y: i.y - d}));
 			if(closest3 != null && closest3.dist < pdist) {
 				particle = closest3.particle;
 				pdist = closest3.dist;
 			}
-			var closest4 = this.closest(p, this.at({x: i.x + i, y: i.y + d}));
+			var closest4 = this.closest(p, this.at({x: i.x + j, y: i.y + d}));
 			if(closest4 != null && closest4.dist < pdist) {
 				particle = closest4.particle;
 				pdist = closest4.dist;
@@ -254,7 +255,7 @@ class Grid {
 		return particle;
 	}
 	
-	//returns all particles touching a circle centered at p with radius r
+	//returns all particles whose centers are contained within a circle centered at p with radius r (add MAX_RADIUS to r to get all particles touching the circle)
 	getParticlesWithin(p, r) {
 		var ps = new Set();
 		var i = this.pos2index(p);
@@ -263,10 +264,10 @@ class Grid {
 			for(var dy = -ir; dy <= ir; dy++) {
 				var index = {x: i.x + dx, y: i.y + dy};
 				var particles = this.at(index);
-				for(let p of particles) {
+				for(let b of particles) {
 					//possible overlap
-					if(p.position.distance(pBegin) < MAX_RADIUS + r) {
-						ps.add(p);
+					if(b.kinematic && b.position.distance(p) < r) {
+						ps.add(b);
 					}
 				}
 			}
@@ -277,6 +278,8 @@ class Grid {
 
 class Body {
 	constructor() {
+		this.active = true;
+		
 		this.position = new Point(0, 0);
 		this.velocity = new Point(0, 0);
 		this.accel = new Point(0, 0);
@@ -285,6 +288,8 @@ class Body {
 		this.angularaccel = 0;
 		
 		this.forces = []; //list of pairs (position, force vector), re-calculated on each frame
+		
+		this.kinematic = true;
 	}
 	
 	getEnergy() {
@@ -367,20 +372,27 @@ class Body {
 	//update pos + angle and clear accels
 	update(dt) {
 		//
-		this.accel.multiply(dt);
-		this.velocity.add(this.accel);
+		if(this.kinematic) {
+			this.accel.multiply(dt);
+			this.velocity.add(this.accel);
+			//
+			//this.velocity.multiply(0.995); //damping
+			var v = this.velocity.copy();
+			v.multiply(dt);
+			this.position.add(v);
+			//
+			this.angularaccel *= dt;
+			this.angularvelocity += this.angularaccel / 10;
+			//this.angularvelocity *= (0.995); //damping
+			this.angle += this.angularvelocity * dt;
+		} else {
+			this.netForce = new Point(0, 0);
+			this.forces = [];
+			this.velocity = new Point(0, 0);
+			this.angularvelocity = 0;
+		}
 		this.accel.x = 0;
 		this.accel.y = 0;
-		//
-		//this.velocity.multiply(0.995); //damping
-		var v = this.velocity.copy();
-		v.multiply(dt);
-		this.position.add(v);
-		//
-		this.angularaccel *= dt;
-		this.angularvelocity += this.angularaccel / 10;
-		//this.angularvelocity *= (0.995); //damping
-		this.angle += this.angularvelocity * dt;
 		this.angularaccel = 0;
 	}
 	
@@ -414,7 +426,7 @@ class Tool {
 	//also works for click+hold
 	onDragBegin(p, n, r) {
 	}
-	onDrag(pBegin, pEnd, n, r) {
+	onDrag(pBegin, pEnd, n, r, dt) {
 	}
 	onDragEnd(p, n, r) {
 	}
@@ -423,17 +435,39 @@ class Tool {
 class ToolSpawner extends Tool {
 	constructor(game) {
 		super(game);
+		this.MaxSpin = 1;
+		f.add(this, "MaxSpin", 0, 1);
 	}
 	
 	onClick(x, y, n, r) {
+		// for(var i = 0; i < n; i++) {
+			// var b = new Body();
+			// var offset = new Point(Math.random() * r, 0);
+			// offset.rotate(Math.random() * 2 * Math.PI);
+			// b.position = new Point(x, y);
+			// b.position.add(offset);
+			// b.angularvelocity = (Math.random() - 0.5) * this.MaxSpin;
+			// this.game.particles.push(b);
+		// }
+	}
+	
+	onDrag(pBegin, pEnd, n, r, dt) {
 		for(var i = 0; i < n; i++) {
 			var b = new Body();
 			var offset = new Point(Math.random() * r, 0);
 			offset.rotate(Math.random() * 2 * Math.PI);
-			b.position = new Point(x, y);
+			//
+			var blend = Math.random();
+			var src = pBegin.copy();
+			src.multiply(blend);
+			var src2 = pEnd.copy();
+			src2.multiply(1 - blend);
+			src.add(src2);
+			//
+			b.position = src;
 			b.position.add(offset);
-			b.angularvelocity = Math.random() * 1 - 0.5;
-			this.game.particles.push(b);
+			b.angularvelocity = (Math.random() - 0.5) * this.MaxSpin;
+			if(Math.random() < dt * 0.05 * (pEnd.distance(pBegin) + 1)) this.game.particles.push(b);
 		}
 	}
 }
@@ -446,9 +480,10 @@ class ToolSpinner extends Tool {
 	}
 	
 	onDragBegin(p, n, r) {
-		this.dragging = this.game.grid.getClosestParticle(p, 2);
+		var particle = this.game.grid.getClosestParticle(p, 2);
+		if(particle.position.distance(p) < MAX_RADIUS + r) this.dragging = particle;
 	}
-	onDrag(pBegin, pEnd, n, r) {
+	onDrag(pBegin, pEnd, n, r, dt) {
 		if(this.dragging) {
 			this.dragging.angularvelocity += this.SpinRate;
 		}
@@ -458,12 +493,64 @@ class ToolSpinner extends Tool {
 	}
 }
 
+class ToolDragger extends Tool {
+	constructor(game, f) {
+		super(game);
+		this.Strength = 0.1;
+		f.add(this, "Strength", 0, 1);
+	}
+	
+	onDragBegin(p, n, r) {
+		var ps = this.game.grid.getParticlesWithin(p, r);
+		this.dragging = [];
+		for(let b of ps) {
+			var o = b.position.copy();
+			o.sub(p);
+			this.dragging.push({particle: b, offset: o});
+		}
+	}
+	onDrag(pBegin, pEnd, n, r, dt) {
+		if(this.dragging) {
+			for(var i = 0; i < this.dragging.length; i++) {
+				var d = this.dragging[i];
+				var particle = d.particle;
+				var offset = d.offset;
+				//target location
+				var target = offset.copy();
+				target.add(pEnd);
+				//movement
+				var delta = target.copy();
+				delta.sub(particle.position);
+				delta.multiply(this.Strength);
+				//
+				//do some damping so they don't go crazy
+				particle.velocity.multiply(Math.pow(0.9 * Math.sqrt(1 - this.Strength), dt));
+				//
+				particle.applyForce(new Point(0, 0), delta);
+			}
+		}
+	}
+	onDragEnd(p, n, r) {
+		this.dragging = null;
+	}
+}
+
+class ToolDelete extends Tool {
+	constructor(game, f) {
+		super(game);
+	}
+	
+	onDrag(pBegin, pEnd, n, r, dt) {
+		var particles = this.game.grid.getParticlesWithin(pEnd, r);
+		for(let b of particles) {
+			b.active = false;
+		}
+	}
+}
+
 /*
 TODO
--better tools
---delete particles
--rigid world box
--pressure measurement (avg force in horizontal slice)
+-better tools ?
 */
 class SandGame extends Game {
   constructor() {
@@ -475,6 +562,7 @@ class SandGame extends Game {
 	this.sz = VOXEL_SIZE;
 	
 	this.particles = [];
+	this.dummies = []; //dummy particles spaced out evenly along the edge of the world box
 	this.grid = new Grid(this.sz);
 	
 	for(var i = 0; i < 100; i++) {
@@ -483,6 +571,36 @@ class SandGame extends Game {
 		b.angularvelocity = Math.random() * 0.5 - 0.25;
 		this.particles.push(b);
 	}
+	
+	//init dummy walls
+	var nDummies =  this.w * 2 + (this.h * 2) + 3;
+	for(var i = 0; i < nDummies; i++) {
+		var b = new Body();
+		b.kinematic = false;
+		var x = 0;
+		var y = 0;
+		var j = i;
+		if(j <= this.w) {
+			//top wall
+			x = j;
+		} else if(j >= (this.w + this.h * 2 + 3)) {
+			//bottom wall
+			j -= this.w + this.h * 2 + 3;
+			x = j;
+			y = this.h;
+		} else {
+			j -= this.w + 1;
+			//sides
+			if(j >= this.h) {
+				x = this.w;
+				j -= this.h;
+			}
+			y = j;
+		}
+		b.position = new Point(x, y);
+		this.dummies.push(b);
+	}
+	this.dummySet = false;
 	
 	//create tools and gui
 
@@ -495,6 +613,14 @@ class SandGame extends Game {
 	this.toolSpinner = new ToolSpinner(this, f);
 	this.Spinner = function(){this.tool = this.toolSpinner}.bind(this);
 	f.add(this, "Spinner");
+	
+	this.toolDragger = new ToolDragger(this, f);
+	this.Dragger = function(){this.tool = this.toolDragger}.bind(this);
+	f.add(this, "Dragger");
+	
+	this.toolDelete = new ToolDelete(this, f);
+	this.Delete = function(){this.tool = this.toolDelete}.bind(this);
+	f.add(this, "Delete");
 	//
 	this.toolSize = 1;
 	this.tool = this.toolSpawner;
@@ -566,8 +692,61 @@ class SandGame extends Game {
   }
 
   update(tickPart) {
-	this.w = OPTIONS.Width;
-	this.h = OPTIONS.Height;
+	//reorganize dummy cells if size changes
+	if(!this.dummySet || OPTIONS.Width != this.w || OPTIONS.Height != this.h) {
+		this.w = OPTIONS.Width;
+		this.h = OPTIONS.Height;
+		//add/remove dummies to proper new amt
+		var nDummies =  this.w * 2 + (this.h * 2) + 3;
+		while(this.dummies.length > nDummies) {
+			var b = this.dummies.pop();
+			if(b.prevIndex) this.grid.at(b.prevIndex).delete(b);
+		}
+		while(this.dummies.length < nDummies) {
+			var b = new Body();
+			b.kinematic = false;
+			this.dummies.push(b);
+		}
+		//
+		for(var i = 0; i < this.dummies.length; i++) {
+			var b = this.dummies[i];
+			//update
+			b.update(0);
+			//TODO: recalc edge position here
+			var x = 0;
+			var y = 0;
+			var j = i;
+			if(j <= this.w) {
+				//top wall
+				x = j;
+			} else if(j >= (this.w + this.h * 2 + 3)) {
+				//bottom wall
+				j -= this.w + this.h * 2 + 3;
+				x = j;
+				y = this.h;
+			} else {
+				j -= this.w + 1;
+				//sides
+				if(j >= this.h) {
+					x = this.w;
+					j -= this.h;
+				}
+				y = j;
+			}
+			b.position = new Point(x, y);
+			//
+			var index = b.prevIndex;
+			var index2 = this.grid.pos2index(b.position);
+			//
+			if(index) this.grid.at(index).delete(b);
+			this.grid.at(index2).add(b);
+			b.prevIndex = index2;
+		}
+		//
+		this.dummySet = true;
+	}
+	
+	tickPart *= OPTIONS.Speed;
 	
 	  if(this.dragging) {
 		var pos = this.mouse.mouse;
@@ -576,14 +755,12 @@ class SandGame extends Game {
 		var dragdst = new Point(x, y);
 		var n = this.toolSize;
 		var r = Math.sqrt(n / Math.PI);
-		this.tool.onDrag(this.dragsrc, dragdst, n, r);
+		this.tool.onDrag(this.dragsrc, dragdst, n, r, tickPart);
 		this.dragsrc = dragdst;
 	  }
+	  
 	
     if(!OPTIONS.Playing) return;
-	
-	
-	tickPart *= OPTIONS.Speed;
 	
     if(tickPart > 1) tickPart = 1;
 	
@@ -618,23 +795,21 @@ class SandGame extends Game {
 			var b = this.particles[i];
 			var index = b.prevIndex;
 			//bounds
-			if(b.position.x < 0) b.velocity.x = (b.velocity.x + 0.1) * 0.9;
-			if(b.position.x > this.w) b.velocity.x = (b.velocity.x - 0.1) * 0.9;
-			if(b.position.y < 0) b.velocity.y = (b.velocity.y + 0.1) * 0.9;
-			if(b.position.y > this.h) b.velocity.y = (b.velocity.y - 0.1) * 0.75;
-			// if(b.position.x < RADIUS2 || b.position.x > (this.w - RADIUS2) || b.position.y < RADIUS2 || b.position.y > (this.h - RADIUS2)) {
-				// for(var k = 0; k < this.dummy.getParticleCount(); k++) {
-					// b.collide(this.dummy.getParticlePosition(k), this.dummy);
-				// }
-			// }
-			//update
-			b.update(tickPart / steps);
-			//
-			var index2 = this.grid.pos2index(b.position);
-			if(!index || index2.x != index.x || index2.y != index.y) {
+			if(!b.active || b.position.x < 0 || b.position.x > this.w || b.position.y < 0 || b.position.y > this.h) {
+				//out of bounds
 				if(index) this.grid.at(index).delete(b);
-				this.grid.at(index2).add(b);
-				b.prevIndex = index2;
+				this.particles.splice(i, 1);
+				i--;
+			} else {
+				//update
+				b.update(tickPart / steps);
+				//
+				var index2 = this.grid.pos2index(b.position);
+				if(!index || index2.x != index.x || index2.y != index.y) {
+					if(index) this.grid.at(index).delete(b);
+					this.grid.at(index2).add(b);
+					b.prevIndex = index2;
+				}
 			}
 		}
 	}
@@ -666,6 +841,11 @@ class SandGame extends Game {
 	  ctx.lineWidth = 0.1;
 	  RenderHelper.drawRect(ctx, new Rectangle(0, 0, this.w, this.h), null, "#ffffff");
 	  
+	  for(var i = 0; i < this.dummies.length; i++) {
+		var b = this.dummies[i];
+		b.render(ctx);
+	  }
+	  
 	  var totalEnergy = 0;
 	  for(var i = 0; i < this.particles.length; i++) {
 		var b = this.particles[i];
@@ -691,7 +871,6 @@ class SandGame extends Game {
 			RenderHelper.drawLine(ctx, begin, end, "#ffffff");
 		}
 	  }
-	  //this.dummy.render(ctx, "#ff0000");
 	  
       var pos = this.mouse.mouse;
 	  var x = (pos.x - this.center.x) / this.scale + this.w / 2;
