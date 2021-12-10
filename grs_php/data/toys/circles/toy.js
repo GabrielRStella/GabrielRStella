@@ -77,6 +77,11 @@ var OPTIONS = {
 	ColorCold_: hexToRgb("#0000ff"),
 	Opacity: 1,
 	Heat: 30,
+	DummyHot: "#ffffff",
+	DummyCold: "#101010",
+	ColorDummyHot_: hexToRgb("#ffffff"),
+	ColorDummyCold_: hexToRgb("#101010"),
+	DummyHeat: 0.1,
 	Glow: 0.3,
 	Grid: true,
 	Forces: false,
@@ -98,6 +103,9 @@ f.addColor(OPTIONS, "ColorHot").onChange(function(){OPTIONS.ColorHot_ = hexToRgb
 f.addColor(OPTIONS, "ColorCold").onChange(function(){OPTIONS.ColorCold_ = hexToRgb(OPTIONS.ColorCold)});
 f.add(OPTIONS, "Opacity", 0, 1);
 f.add(OPTIONS, "Heat", 1, 100);
+f.addColor(OPTIONS, "DummyHot").onChange(function(){OPTIONS.ColorDummyHot_ = hexToRgb(OPTIONS.DummyHot)});
+f.addColor(OPTIONS, "DummyCold").onChange(function(){OPTIONS.ColorDummyCold_ = hexToRgb(OPTIONS.DummyCold)});
+f.add(OPTIONS, "DummyHeat", 0.01, 1);
 f.add(OPTIONS, "Grid");
 f.add(OPTIONS, "Glow", 0.1, 2);
 f.add(OPTIONS, "Forces");
@@ -127,6 +135,17 @@ function getColor(energy) {
 	  b: OPTIONS.ColorHot_.b * d1 + OPTIONS.ColorCold_.b * d,
   };
   return color(c.r, c.g, c.b, OPTIONS.Opacity);
+}
+
+function getDummyColor(energy) {
+  var d = 1 / (energy + 1);
+  var d1 = 1-d;
+  var c = {
+	  r: OPTIONS.ColorDummyHot_.r * d1 + OPTIONS.ColorDummyCold_.r * d,
+	  g: OPTIONS.ColorDummyHot_.g * d1 + OPTIONS.ColorDummyCold_.g * d,
+	  b: OPTIONS.ColorDummyHot_.b * d1 + OPTIONS.ColorDummyCold_.b * d,
+  };
+  return color(c.r, c.g, c.b, 1);
 }
 
 //////
@@ -360,6 +379,7 @@ class Body {
 			off.sub(this.position);
 			//this.forces.push([off, v1]);
 			this.applyForce(off, Fn);
+			if(!b.kinematic) b.netForce.add(Fn);
 			//tangent force (shear friction)
 			var Ft = Vt.copy();
 			if(!Ft.zero) {
@@ -397,20 +417,27 @@ class Body {
 	}
 	
 	render(ctx) {
-		var e = this.getEnergy();
-		var color = getColor(e * OPTIONS.Heat); //the scaling just helps with visualization, found experimentally :)
+		var color = "#ffffff";
+		if(this.kinematic) {
+			var e = this.getEnergy();
+			color = getColor(e * OPTIONS.Heat); //the heat scaling just helps with visualization, found experimentally :)
+		} else {
+			var e = this.netForce.magnitude;
+			color = getDummyColor(e * OPTIONS.DummyHeat);
+		}
 		RenderHelper.drawPoint(ctx, this.position, color, null, 1);
-		ctx.save();
-		ctx.translate(this.position.x, this.position.y);
-		ctx.rotate(this.angle);
-		ctx.lineWidth = 0.4;
-		var o = Math.floor(OPTIONS.Opacity * 255).toString(16);
-		if(o.length == 1) o = "0" + o;
-		RenderHelper.drawLine(ctx, new Point(0, -0.8), new Point(0, 0.8), "#000000" + o);
-		//RenderHelper.drawPoint(ctx, new Point(0, 0.5), "#000000", null, 0.5);
-		//RenderHelper.drawPoint(ctx, new Point(0, -0.5), "#000000", null, 0.5);
-		ctx.restore();
-		
+		//draw orientation line
+		if(this.kinematic) {
+			ctx.save();
+			ctx.translate(this.position.x, this.position.y);
+			ctx.rotate(this.angle);
+			ctx.lineWidth = 0.4;
+			var o = Math.floor(OPTIONS.Opacity * 255).toString(16);
+			if(o.length == 1) o = "0" + o;
+			RenderHelper.drawLine(ctx, new Point(0, -0.8), new Point(0, 0.8), "#000000" + o);
+			ctx.restore();
+		}
+		//
 		return e;
 	}
 }
@@ -437,6 +464,7 @@ class ToolSpawner extends Tool {
 		super(game);
 		this.MaxSpin = 1;
 		f.add(this, "MaxSpin", 0, 1);
+		this.dtWait = 10;
 	}
 	
 	onClick(x, y, n, r) {
@@ -451,7 +479,24 @@ class ToolSpawner extends Tool {
 		// }
 	}
 	
+	onDragBegin(p, n, r) {
+		for(var i = 0; i < n; i++) {
+			var b = new Body();
+			var offset = new Point(Math.random() * r, 0);
+			offset.rotate(Math.random() * 2 * Math.PI);
+			b.position = p.copy();
+			b.position.add(offset);
+			b.angularvelocity = (Math.random() - 0.5) * this.MaxSpin;
+			this.game.particles.push(b);
+		}
+		this.dtWait = 10;
+	}
+	
 	onDrag(pBegin, pEnd, n, r, dt) {
+		this.dtWait -= dt;
+		if(pEnd.distance(pBegin) > 1) this.dtWait = 0;
+		if(this.dtWait > 0) return;
+		//
 		for(var i = 0; i < n; i++) {
 			var b = new Body();
 			var offset = new Point(Math.random() * r, 0);
@@ -496,7 +541,7 @@ class ToolSpinner extends Tool {
 class ToolDragger extends Tool {
 	constructor(game, f) {
 		super(game);
-		this.Strength = 0.1;
+		this.Strength = 1;
 		f.add(this, "Strength", 0, 1);
 	}
 	
@@ -524,7 +569,7 @@ class ToolDragger extends Tool {
 				delta.multiply(this.Strength);
 				//
 				//do some damping so they don't go crazy
-				particle.velocity.multiply(Math.pow(0.9 * Math.sqrt(1 - this.Strength), dt));
+				particle.velocity.multiply(0.9 / (this.Strength + 1));
 				//
 				particle.applyForce(new Point(0, 0), delta);
 			}
@@ -550,7 +595,11 @@ class ToolDelete extends Tool {
 
 /*
 TODO
+-runge-kutta integration
+-better physics (no squishy particles...)
+-polyspheres
 -better tools ?
+-C++ impl
 */
 class SandGame extends Game {
   constructor() {
@@ -764,6 +813,11 @@ class SandGame extends Game {
 	
     if(tickPart > 1) tickPart = 1;
 	
+	for(var i = 0; i < this.dummies.length; i++) {
+		var b = this.dummies[i];
+		b.update(tickPart);
+	}
+	
 	var steps = 10;
 	for(var step = 0; step < steps; step++) {
 		//update forces, apply gravity / wall repulsion
@@ -795,7 +849,26 @@ class SandGame extends Game {
 			var b = this.particles[i];
 			var index = b.prevIndex;
 			//bounds
-			if(!b.active || b.position.x < 0 || b.position.x > this.w || b.position.y < 0 || b.position.y > this.h) {
+			var b1 = (b.position.x < 0);
+			var b2 = (b.position.x > this.w);
+			var b3 = (b.position.y < 0);
+			var b4 = (b.position.y > this.h);
+			if(b1 || b2 || b3 || b4) {
+				b.velocity.multiply(0.95);
+				if(b1) {
+					b.position.x += this.w;
+				}
+				else if(b2) {
+					b.position.x -= this.w;
+				}
+				if(b3) {
+					b.position.y += this.h;
+				}
+				else if(b4) {
+					b.position.y -= this.h;
+				}
+			}
+			if(!b.active) {
 				//out of bounds
 				if(index) this.grid.at(index).delete(b);
 				this.particles.splice(i, 1);
