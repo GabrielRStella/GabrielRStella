@@ -140,12 +140,14 @@ class Body {
 		Vt.sub(tmp);
 		//move positions back in time to when contact occurred, and keep track of how much we have to move forward
 		var overlaptime = overlap / Vn;
-		tmp = this.velocity.copy();
-		tmp.multiply(-overlaptime);
-		this.position.add(tmp);
-		tmp = b.velocity.copy();
-		tmp.multiply(-overlaptime);
-		b.position.add(tmp);
+		if(Vn > 0.01) {
+			tmp = this.velocity.copy();
+			tmp.multiply(-overlaptime);
+			this.position.add(tmp);
+			tmp = b.velocity.copy();
+			tmp.multiply(-overlaptime);
+			b.position.add(tmp);
+		}
 		//swap velocities
 		var Cr = OPTIONS.Restitution; //coefficient of restitution
 		var vBase = v1.copy();
@@ -163,12 +165,14 @@ class Body {
 		this.velocity = v1p;
 		b.velocity = v2p;
 		//move forward by however much we went back
-		tmp = this.velocity.copy();
-		tmp.multiply(overlaptime);
-		this.position.add(tmp);
-		tmp = b.velocity.copy();
-		tmp.multiply(overlaptime);
-		b.position.add(tmp);
+		if(Vn > 0.01) {
+			tmp = this.velocity.copy();
+			tmp.multiply(overlaptime);
+			this.position.add(tmp);
+			tmp = b.velocity.copy();
+			tmp.multiply(overlaptime);
+			b.position.add(tmp);
+		}
 		
 		
 		// if(overlap > 0) {
