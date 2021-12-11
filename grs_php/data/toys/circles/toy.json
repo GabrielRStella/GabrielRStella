@@ -1,7 +1,7 @@
 {
   "order": "10",
   "title": "Circles",
-  "description": "Circle Physics Simulator",
+  "description": "Soft Circle Physics",
   "foreground": "#ffffff",
   "background": "#000000",
   "dateString": "Thu Oct 28 2021 00:59:34 GMT-0500 (Central Daylight Time)"
