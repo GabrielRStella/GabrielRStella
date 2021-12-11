@@ -74,6 +74,9 @@ var OPTIONS = {
 	Width: 20,
 	Height: 20,
 	Gravity: 0,
+	//
+	Speed: 1,
+	Collisions: true,
 };
 
 var f = DAT_GUI.addFolder("World");
@@ -81,6 +84,8 @@ var f = DAT_GUI.addFolder("World");
 f.add(OPTIONS, "Width", 10, 100, 1);
 f.add(OPTIONS, "Height", 10, 100, 1);
 f.add(OPTIONS, "Gravity", 0, 1, 0.001);
+f.add(OPTIONS, "Speed", 0, 1, 0.001);
+f.add(OPTIONS, "Collisions");
 
 //////
 
@@ -200,7 +205,6 @@ class ToolSpawner extends Tool {
 	onClick(x, y) {
 		var b = new Body();
 		b.position = new Point(x, y);
-		b.position.add(offset);
 		this.game.particles.push(b);
 	}
 }
@@ -216,7 +220,7 @@ class ToolDragger extends Tool {
 	
 	onDrag(pBegin, pEnd, dt) {
 		if(this.dragging) {
-			//TODO drag particle towards pEnd, with upper bound on force magnitude
+			//drag particle towards pEnd, with upper bound on force magnitude
 			var delta = pEnd.copy();
 			delta.sub(this.dragging.position);
 			if(delta.magnitude > 1) delta.magnitude = 1;
@@ -235,6 +239,7 @@ class ToolDelete extends Tool {
 	
 	onDrag(pBegin, pEnd, dt) {
 		var b = this.game.getClosestParticleTouching(pEnd);
+		if(b != null) b.active = false;
 	}
 }
 
@@ -349,7 +354,7 @@ class BallGame extends Game {
 	  this.w = OPTIONS.Width;
 	  this.h = OPTIONS.Height;
 	
-	//tickPart *= OPTIONS.Speed;
+	tickPart *= OPTIONS.Speed;
 	
 	  if(this.dragging) {
 		var pos = this.mouse.mouse;
@@ -371,15 +376,17 @@ class BallGame extends Game {
 			var b = this.particles[i];
 			b.forces = [];
 			b.netForce = new Point(0, 0);
-			for(var j = i + 1; j < this.particles.length; j++) {
-				var b2 = this.particles[j];
-				//possible collision
-				if(b.position.distance(b2.position) < 2) {
-					b.collide(b2.position, b2);
+			if(OPTIONS.Collisions) {
+				for(var j = i + 1; j < this.particles.length; j++) {
+					var b2 = this.particles[j];
+					//possible collision
+					if(b.position.distance(b2.position) < 2) {
+						b.collide(b2.position, b2);
+					}
 				}
 			}
 			//if gravity enabled, add downwards force
-			b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity));
+			if(OPTIONS.Gravity > 0) b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity));
 		}
 		
 		//update velocities and positions
