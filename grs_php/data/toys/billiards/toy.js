@@ -74,6 +74,7 @@ var OPTIONS = {
 	Width: 20,
 	Height: 20,
 	Gravity: 0,
+	Restitution: 1,
 	//
 	Speed: 1,
 	Collisions: true,
@@ -84,6 +85,7 @@ var f = DAT_GUI.addFolder("World");
 f.add(OPTIONS, "Width", 10, 100, 1);
 f.add(OPTIONS, "Height", 10, 100, 1);
 f.add(OPTIONS, "Gravity", 0, 1, 0.001);
+f.add(OPTIONS, "Restitution", 0, 1, 0.001);
 f.add(OPTIONS, "Speed", 0, 1, 0.001);
 f.add(OPTIONS, "Collisions");
 
@@ -145,9 +147,21 @@ class Body {
 		tmp.multiply(-overlaptime);
 		b.position.add(tmp);
 		//swap velocities
-		tmp = b.velocity;
-		b.velocity = this.velocity;
-		this.velocity = tmp;
+		var Cr = OPTIONS.Restitution; //coefficient of restitution
+		var vBase = v1.copy();
+		vBase.add(v2);
+		var vDiff = v1.copy();
+		vDiff.sub(v2);
+		vDiff.multiply(Cr);
+		//
+		var v1p = vBase.copy();
+		v1p.sub(vDiff);
+		v1p.multiply(0.5);
+		var v2p = vBase.copy();
+		v2p.add(vDiff);
+		v2p.multiply(0.5);
+		this.velocity = v1p;
+		b.velocity = v2p;
 		//move forward by however much we went back
 		tmp = this.velocity.copy();
 		tmp.multiply(overlaptime);
@@ -247,11 +261,13 @@ class ToolDragger extends Tool {
 	}
 	
 	onDrag(pBegin, pEnd, dt) {
+		var dmax = 1;
 		if(this.dragging) {
 			//drag particle towards pEnd, with upper bound on force magnitude
 			var delta = pEnd.copy();
 			delta.sub(this.dragging.position);
-			if(delta.magnitude > 1) delta.magnitude = 1;
+			if(delta.magnitude > dmax) delta.magnitude = dmax;
+			delta.add(new Point(0, -OPTIONS.Gravity));
 			this.dragging.applyForce(new Point(0, 0), delta);
 		}
 	}
@@ -414,7 +430,7 @@ class BallGame extends Game {
 				}
 			}
 			//if gravity enabled, add downwards force
-			if(OPTIONS.Gravity > 0) b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity));
+			if(OPTIONS.Gravity > 0) b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity / steps));
 		}
 		
 		//update velocities and positions
@@ -427,7 +443,7 @@ class BallGame extends Game {
 			var b3 = (b.position.y < 1);
 			var b4 = (b.position.y > this.h - 1);
 			if(b1 || b2 || b3 || b4) {
-				//b.velocity.multiply(0.95);
+				b.velocity.multiply(OPTIONS.Restitution);
 				if(b1) {
 					b.position.x = 2 - b.position.x;
 					b.velocity.x = - b.velocity.x;
