@@ -108,28 +108,56 @@ class Body {
 		this.netForce.add(F);
 	}
 	
-	//collide with a particle at a given (world coords) point
-	//tests for collision (overlap) with each of its own constituent particles, then updates force/torque on self (not on other body)
+	//assumes collision is checked (overlap)
 	collide(p, b) {
-		// var offset = p.copy();
-		// offset.sub(this.position);
-		// //
-		// var dist = offset.magnitude;
-		// var overlap = Math.max(0, 2 - dist);
+		//no forces; just directly exchange momentum/energy and fix overlap
+		
+		//positions
+		var midpoint = p.copy(); //midpoint (center of contact)
+		midpoint.add(this.position);
+		midpoint.multiply(0.5);
+		var offset = p.copy(); //offset (vec from this to other)
+		offset.sub(this.position);
+		var N = offset.copy(); //normalized offset ("line of centers")
+		N.magnitude = 1;
+		//overlap
+		var dist = offset.magnitude; //distance between centers
+		var overlap = Math.max(0, 2 - dist); //length of overlap
+		//velocities
+		var v1 = this.velocity.copy(); //technically may want to use getVelocityAtPoint(mp) here, if rotation is allowed
+		var v2 = b.velocity.copy();
+		//relative velocity
+		var V = v1.copy(); //relative velocity at point of contact
+		V.sub(v2);
+		//normal component of relative velocity (change in overlap)
+		var Vn = V.x * N.x + V.y * N.y;
+		//tangent component of relative velocity
+		var Vt = V.copy();
+		var tmp = N.copy();
+		tmp.multiply(Vn);
+		Vt.sub(tmp);
+		//move positions back in time to when contact occurred, and keep track of how much we have to move forward
+		var overlaptime = overlap / Vn;
+		tmp = this.velocity.copy();
+		tmp.multiply(-overlaptime);
+		this.position.add(tmp);
+		tmp = b.velocity.copy();
+		tmp.multiply(-overlaptime);
+		b.position.add(tmp);
+		//swap velocities
+		tmp = b.velocity;
+		b.velocity = this.velocity;
+		this.velocity = tmp;
+		//move forward by however much we went back
+		tmp = this.velocity.copy();
+		tmp.multiply(overlaptime);
+		this.position.add(tmp);
+		tmp = b.velocity.copy();
+		tmp.multiply(overlaptime);
+		b.position.add(tmp);
+		
+		
 		// if(overlap > 0) {
-			// //collision
-			// //midpoint (approx. collision point)
-			// var mp = p.copy();
-			// mp.add(this.position);
-			// mp.multiply(0.5);
-			// //"line of centers"
-			// var N = offset.copy();
-			// N.magnitude = 1;
-			// //
-			// //console.log(mp, v1, v2);
-			// //relative velocity at point of contact
-			// var V = this.velocity.copy();
-			// V.sub(b.velocity);
 			// //change in overlap (normal velocity)
 			// var doverlap = V.x * N.x + V.y * N.y;
 			// //tangent velocity
