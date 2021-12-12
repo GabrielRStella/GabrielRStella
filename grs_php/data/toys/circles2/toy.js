@@ -435,13 +435,7 @@ class Body {
 			velBlend.multiply(1 - OPTIONS.kr);
 			velCorrect.add(velBlend);
 			this.velocity = velCorrect;
-			//correct position
-			var netForceDelta = newNetForce.copy();
-			netForceDelta.sub(this.netForce);
-			netForceDelta.multiply(OPTIONS.kr);
-			//this.position.add(netForceDelta);
-			this.applyForce(new Point(0, 0), netForceDelta);
-			//this.applyForce(new Point(0, 0), newNetForce);
+			//correct position/net force?
 			//
 			this.accel.multiply(dt);
 			this.velocity.add(this.accel);
