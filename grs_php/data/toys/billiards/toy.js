@@ -160,19 +160,19 @@ class Body {
 		}
 		//swap velocities (TODO make this an actual reflection alg - so each maintains its tangential velocity but they swap normal velocities)
 		var Cr = OPTIONS.Restitution; //coefficient of restitution
-		var vBase = v1.copy();
-		vBase.add(v2);
-		var vDiff = v1.copy();
-		vDiff.sub(v2);
-		vDiff.multiply(Cr);
 		//
-		var v1p = vBase.copy();
-		v1p.sub(vDiff);
-		v1p.multiply(0.5);
-		var v2p = vBase.copy();
-		v2p.add(vDiff);
-		v2p.multiply(0.5);
+		var vn1 = N.project(v1);
+		vn1.multiply(Cr);
+		var vt1 = N.reject(v1);
+		var vn2 = N.project(v2);
+		vn2.multiply(Cr);
+		var vt2 = N.reject(v2);
+		//
+		var v1p = vt1;
+		v1p.add(vn2);
 		this.velocity = v1p;
+		var v2p = vt2;
+		v2p.add(vn1);
 		b.velocity = v2p;
 		//move forward by however much we went back
 		if(Vn > 0.1) {
@@ -232,7 +232,7 @@ class Body {
 		var color = "#ffffff";
 		RenderHelper.drawPoint(ctx, this.position, color, null, 1);
 		//
-		return 0;
+		return this.velocity.magnitudeSquared;
 	}
 }
 
@@ -512,7 +512,8 @@ class BallGame extends Game {
 	  var totalEnergy = 0;
 	  for(var i = 0; i < this.particles.length; i++) {
 		var b = this.particles[i];
-		totalEnergy += b.render(ctx);
+		var potentialenergy = 0;//OPTIONS.Gravity * ((this.h - 1) - b.position.y) / 10;
+		totalEnergy += b.render(ctx) + potentialenergy;
 	  }
 	  
 	  ctx.restore();

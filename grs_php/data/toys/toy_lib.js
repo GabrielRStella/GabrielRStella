@@ -175,6 +175,22 @@ class Point {
   dot(other) {
 	return this.x*other.x + this.y*other.y;
   }
+  
+  //vector projection
+  project(other) {
+	  var N = this.copy();
+	  N.magnitude = 1;
+	  N.multiply(N.dot(other));
+	  return N;
+  }
+  
+  //vector rejection
+  reject(other) {
+	  var projection = this.project(other);
+	  projection.sub(other);
+	  projection.multiply(-1);
+	  return projection;
+  }
 
   angleTo(other) {
     return Math.atan2(other.y - this.y, other.x - this.x);
