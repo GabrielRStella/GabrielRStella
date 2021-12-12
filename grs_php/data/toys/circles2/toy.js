@@ -430,12 +430,17 @@ class Body {
 			var velCorrect = contactDir.copy();
 			velCorrect.multiply(Math.max(0, contactDir.dot(this.velocity)));
 			velCorrect.add(velReject);
+			velCorrect.multiply(OPTIONS.kr);
+			var velBlend = this.velocity.copy();
+			velBlend.multiply(1 - OPTIONS.kr);
+			velCorrect.add(velBlend);
 			this.velocity = velCorrect;
 			//correct position
-			// var netForceDelta = newNetForce.copy();
-			// netForceDelta.sub(this.netForce);
-			// netForceDelta.multiply(dt * OPTIONS.kr);
-			// this.position.add(netForceDelta);
+			var netForceDelta = newNetForce.copy();
+			netForceDelta.sub(this.netForce);
+			netForceDelta.multiply(OPTIONS.kr);
+			//this.position.add(netForceDelta);
+			this.applyForce(new Point(0, 0), netForceDelta);
 			//this.applyForce(new Point(0, 0), newNetForce);
 			//
 			this.accel.multiply(dt);
