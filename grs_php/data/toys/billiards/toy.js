@@ -140,13 +140,23 @@ class Body {
 		Vt.sub(tmp);
 		//move positions back in time to when contact occurred, and keep track of how much we have to move forward
 		var overlaptime = overlap / Vn;
-		if(Vn > 0.01) {
+		if(Vn > 0.1) {
 			tmp = this.velocity.copy();
 			tmp.multiply(-overlaptime);
 			this.position.add(tmp);
 			tmp = b.velocity.copy();
 			tmp.multiply(-overlaptime);
 			b.position.add(tmp);
+		}
+		//if they are still overlapping, have to manually move them - in this case, just move evenly apart
+		overlap = 2 - b.position.distance(this.position);
+		if(overlap > 0) {
+			var delta = this.position.copy();
+			delta.sub(b.position);
+			delta.magnitude = overlap;
+			delta.multiply(0.5);
+			this.position.add(delta);
+			b.position.sub(delta);
 		}
 		//swap velocities
 		var Cr = OPTIONS.Restitution; //coefficient of restitution
@@ -165,7 +175,7 @@ class Body {
 		this.velocity = v1p;
 		b.velocity = v2p;
 		//move forward by however much we went back
-		if(Vn > 0.01) {
+		if(Vn > 0.1) {
 			tmp = this.velocity.copy();
 			tmp.multiply(overlaptime);
 			this.position.add(tmp);
@@ -267,12 +277,18 @@ class ToolDragger extends Tool {
 	onDrag(pBegin, pEnd, dt) {
 		var dmax = 1;
 		if(this.dragging) {
-			//drag particle towards pEnd, with upper bound on force magnitude
-			var delta = pEnd.copy();
-			delta.sub(this.dragging.position);
-			if(delta.magnitude > dmax) delta.magnitude = dmax;
-			delta.add(new Point(0, -OPTIONS.Gravity));
-			this.dragging.applyForce(new Point(0, 0), delta);
+			if(OPTIONS.Speed > 0) {
+				//drag particle towards pEnd, with upper bound on force magnitude
+				var delta = pEnd.copy();
+				delta.sub(this.dragging.position);
+				if(delta.magnitude > dmax) delta.magnitude = dmax;
+				delta.add(new Point(0, -OPTIONS.Gravity));
+				delta.multiply(1 / OPTIONS.Speed);
+				this.dragging.applyForce(new Point(0, 0), delta);
+			} else {
+				this.dragging.velocity = new Point(0, 0);
+				this.dragging.position = pEnd;
+			}
 		}
 	}
 	onDragEnd(p) {
