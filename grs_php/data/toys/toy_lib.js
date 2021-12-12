@@ -171,6 +171,10 @@ class Point {
     this.rotate(dr);
     this.add(p);
   }
+  
+  dot(other) {
+	return this.x*other.x + this.y*other.y;
+  }
 
   angleTo(other) {
     return Math.atan2(other.y - this.y, other.x - this.x);

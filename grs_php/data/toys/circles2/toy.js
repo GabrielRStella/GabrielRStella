@@ -88,8 +88,8 @@ var OPTIONS = {
 	NetForce: false,
 	Playing: true,
 	Speed: 1,
-	Width: 100,
-	Height: 100,
+	Width: 16,
+	Height: 16,
 	kd: 0.9, //collision damping coefficient
 	kr: 0.85, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
@@ -383,103 +383,10 @@ class Body {
 			//tangent force (shear friction)
 			var Ft = Vt.copy();
 			if(!Ft.zero) {
-				Ft.magnitude = OPTIONS.u * fn;
+				Ft.magnitude = Math.max(-Ft.magnitude, OPTIONS.u * fn);
 				this.applyForce(off, Ft);
 			}
-		}
-	}
-	
-	//elastic collision
-	collide_rigid(p, b) {
-		//no forces; just directly exchange momentum/energy and fix overlap
-		var radius = 0.9; //dont do rigid collisions on actual outside (experimenting)
-		var diameter = radius * 2;
-		//positions
-		var offset = p.copy(); //offset (vec from this to other)
-		offset.sub(this.position);
-		var N = offset.copy(); //normalized offset ("line of centers")
-		N.magnitude = 1;
-		//overlap
-		var dist = offset.magnitude; //distance between centers
-		var overlap = Math.max(0, diameter - dist); //length of overlap
-		//
-		if(overlap <= 0) return;
-		//
-		var midpoint = p.copy(); //midpoint (center of contact)
-		midpoint.add(this.position);
-		midpoint.multiply(0.5);
-		//velocities
-		var v1 = this.velocity.copy(); //technically may want to use getVelocityAtPoint(mp) here, if rotation is allowed
-		var v2 = b.velocity.copy();
-		//relative velocity
-		var V = v1.copy(); //relative velocity at point of contact
-		V.sub(v2);
-		//normal component of relative velocity (change in overlap)
-		var Vn = V.x * N.x + V.y * N.y;
-		//tangent component of relative velocity
-		var Vt = V.copy();
-		var tmp = N.copy();
-		tmp.multiply(Vn);
-		Vt.sub(tmp);
-		if(b.kinematic) {
-			//move positions back in time to when contact occurred, and keep track of how much we have to move forward
-			var overlaptime = overlap / Vn;
-			if(Vn > 0.1) {
-				tmp = this.velocity.copy();
-				tmp.multiply(-overlaptime);
-				this.position.add(tmp);
-				tmp = b.velocity.copy();
-				tmp.multiply(-overlaptime);
-				b.position.add(tmp);
-			}
-			//if they are still overlapping, have to manually move them - in this case, just move evenly apart
-			overlap = diameter - b.position.distance(this.position);
-			if(overlap > 0) {
-				var delta = this.position.copy();
-				delta.sub(b.position);
-				delta.magnitude = overlap;
-				delta.multiply(0.5);
-				this.position.add(delta);
-				b.position.sub(delta);
-			}
-			//swap velocities
-			var Cr = OPTIONS.kr; //coefficient of restitution
-			var vBase = v1.copy();
-			vBase.add(v2);
-			var vDiff = v1.copy();
-			vDiff.sub(v2);
-			vDiff.multiply(Cr);
-			//
-			var v1p = vBase.copy();
-			v1p.sub(vDiff);
-			v1p.multiply(0.5);
-			var v2p = vBase.copy();
-			v2p.add(vDiff);
-			v2p.multiply(0.5);
-			this.velocity = v1p;
-			b.velocity = v2p;
-			//move forward by however much we went back
-			if(Vn > 0.1) {
-				tmp = this.velocity.copy();
-				tmp.multiply(overlaptime);
-				this.position.add(tmp);
-				tmp = b.velocity.copy();
-				tmp.multiply(overlaptime);
-				b.position.add(tmp);
-			}
-		} else {
-			//hitting dummy particle; just rewind self and reflect velocity
-			var beginvel = this.velocity.magnitude;
-			offset.magnitude = overlap;
-			this.position.sub(offset);
-			var vnew = Vt.copy();
-			vnew.multiply(OPTIONS.u);
-			if(Vn > 0) Vn = -Vn;
-			var tmp = N.copy();
-			tmp.magnitude = Vn * OPTIONS.kr;
-			vnew.add(tmp);
-			this.velocity = vnew;
-			//console.log(beginvel - this.velocity.magnitude);
+			this.collisions.push(b);
 		}
 	}
 	
@@ -487,6 +394,50 @@ class Body {
 	update(dt) {
 		//
 		if(this.kinematic) {
+			//resolve rigid-ish contact forces
+			var contactSum = new Point(0, 0);
+			console.log(this.collisions.length);
+			for(let c of this.collisions) {
+				var tmp = this.position.copy();
+				tmp.sub(c.position);
+				tmp.magnitude = Math.max(0, 2 - this.position.distance(c.position));
+				// if(tmp.dot(c.velocity) > 0) {
+					// //add normal portion of velocity, if pointing towards self
+					// var tmp2 = tmp.copy();
+					// tmp2.magnitude = 1;
+					// tmp2.magnitude = tmp2.dot(c.velocity);
+					// tmp.add(tmp2);
+				// }
+				contactSum.add(tmp);
+			}
+			//make sure total force is not pointing against contactSum
+			var contactDir = contactSum.copy();
+			contactDir.magnitude = 1;
+			var forceProject = contactDir.copy();
+			forceProject.multiply(contactDir.dot(this.netForce));
+			var forceReject = this.netForce.copy();
+			forceReject.sub(forceProject);
+			var newNetForce = contactDir.copy();
+			console.log(contactSum.magnitude, contactDir.dot(this.netForce));
+			newNetForce.multiply(Math.max(contactSum.magnitude, contactDir.dot(this.netForce)));
+			newNetForce.add(forceReject);
+			this.newNetForce = newNetForce.copy();
+			//make sure velocity isn't pointing against contactSum
+			var velProject = contactDir.copy();
+			velProject.multiply(contactDir.dot(this.velocity));
+			var velReject = this.velocity.copy();
+			velReject.sub(velProject);
+			var velCorrect = contactDir.copy();
+			velCorrect.multiply(Math.max(0, contactDir.dot(this.velocity)));
+			velCorrect.add(velReject);
+			this.velocity = velCorrect;
+			//correct position
+			// var netForceDelta = newNetForce.copy();
+			// netForceDelta.sub(this.netForce);
+			// netForceDelta.multiply(dt * OPTIONS.kr);
+			// this.position.add(netForceDelta);
+			//this.applyForce(new Point(0, 0), newNetForce);
+			//
 			this.accel.multiply(dt);
 			this.velocity.add(this.accel);
 			//
@@ -716,7 +667,7 @@ class SandGame extends Game {
 	this.dummies = []; //dummy particles spaced out evenly along the edge of the world box
 	this.grid = new Grid(this.sz);
 	
-	for(var i = 0; i < 100; i++) {
+	for(var i = 0; i < 50; i++) {
 		var b = new Body();
 		b.position = new Point(Math.random() * this.w, Math.random() * this.h);
 		b.angularvelocity = Math.random() * 0.5 - 0.25;
@@ -927,6 +878,7 @@ class SandGame extends Game {
 			var b = this.particles[i];
 			b.forces = [];
 			b.netForce = new Point(0, 0);
+			b.collisions = [];
 			var index = this.grid.pos2index(b.position);
 			for(var dx = -1; dx <= 1; dx++) {
 				for(var dy = -1; dy <= 1; dy++) {
@@ -936,7 +888,7 @@ class SandGame extends Game {
 						if(b2 == b) continue;
 						//possible collision
 						b.collide_soft(b2.position, b2);
-						b.collide_rigid(b2.position, b2);
+						//b.collide_rigid(b2.position, b2);
 					}
 				}
 			}
@@ -1045,6 +997,11 @@ class SandGame extends Game {
 			end.add(b.netForce);
 			RenderHelper.drawPoint(ctx, begin, "#ffffff", null, 0.03);
 			RenderHelper.drawLine(ctx, begin, end, "#ffffff");
+			
+			var begin = b.position.copy();
+			var end = begin.copy();
+			end.add(b.newNetForce);
+			RenderHelper.drawLine(ctx, begin, end, "#00ff00");
 		}
 	  }
 	  
