@@ -158,7 +158,7 @@ class Body {
 			this.position.add(delta);
 			b.position.sub(delta);
 		}
-		//swap velocities
+		//swap velocities (TODO make this an actual reflection alg - so each maintains its tangential velocity but they swap normal velocities)
 		var Cr = OPTIONS.Restitution; //coefficient of restitution
 		var vBase = v1.copy();
 		vBase.add(v2);
