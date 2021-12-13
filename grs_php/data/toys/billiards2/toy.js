@@ -74,6 +74,7 @@ var OPTIONS = {
 	Width: 20,
 	Height: 20,
 	Gravity: 0,
+	Friction: 1,
 	Restitution: 1,
 	//
 	Speed: 1,
@@ -84,7 +85,8 @@ var f = DAT_GUI.addFolder("World");
 
 f.add(OPTIONS, "Width", 10, 100, 1);
 f.add(OPTIONS, "Height", 10, 100, 1);
-f.add(OPTIONS, "Gravity", 0, 1, 0.001);
+f.add(OPTIONS, "Gravity", -1, 1, 0.001);
+f.add(OPTIONS, "Friction", 0, 1, 0.001);
 f.add(OPTIONS, "Restitution", 0, 1, 0.001);
 f.add(OPTIONS, "Speed", 0, 1, 0.001);
 f.add(OPTIONS, "Collisions");
@@ -98,6 +100,10 @@ class Body {
 		this.position = new Point(0, 0);
 		this.velocity = new Point(0, 0);
 		this.accel = new Point(0, 0);
+		
+		this.angle = 0;
+		this.angularvelocity = 0;
+		this.angularaccel = 0;
 		
 		this.forces = []; //list of pairs (position, force vector), re-calculated on each frame
 		this.netForce = new Point(0, 0);
@@ -203,6 +209,13 @@ class Body {
 	render(ctx) {
 		var color = "#ffffff";
 		RenderHelper.drawPoint(ctx, this.position, color, null, 1);
+		//
+		ctx.save();
+		ctx.translate(this.position.x, this.position.y);
+		ctx.rotate(this.angle);
+		ctx.lineWidth = 0.4;
+		RenderHelper.drawLine(ctx, new Point(-0.8, 0), new Point(0.8, 0), "#000000");
+		ctx.restore();
 		//
 		return this.velocity.magnitudeSquared;
 	}
@@ -422,7 +435,7 @@ class BallGame extends Game {
 				}
 			}
 			//if gravity enabled, add downwards force
-			if(OPTIONS.Gravity > 0) b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity / steps));
+			if(OPTIONS.Gravity != 0) b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity / steps));
 		}
 		
 		//update velocities and positions
@@ -486,7 +499,7 @@ class BallGame extends Game {
 	  for(var i = 0; i < this.particles.length; i++) {
 		var b = this.particles[i];
 		kineticEnergy += b.render(ctx);
-		potentialEnergy += OPTIONS.Gravity * ((this.h - 1) - b.position.y) / 10 * 2; // /10 to account for number of steps; *2 to account for my slightly incorrect energy formula :^)
+		potentialEnergy += Math.abs(OPTIONS.Gravity) * (OPTIONS.Gravity > 0 ? ((this.h - 1) - b.position.y) : (b.position.y - 1)) / 10 * 2; // /10 to account for number of steps; *2 to account for my slightly incorrect energy formula :^)
 	  }
 	  
 	  ctx.restore();
