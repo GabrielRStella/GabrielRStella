@@ -158,7 +158,7 @@ class Body {
 			this.position.add(delta);
 			b.position.sub(delta);
 		}
-		//swap velocities (TODO make this an actual reflection alg - so each maintains its tangential velocity but they swap normal velocities)
+		//swap velocities
 		var Cr = OPTIONS.Restitution; //coefficient of restitution
 		//
 		var vn1 = N.project(v1);
@@ -183,34 +183,6 @@ class Body {
 			tmp.multiply(overlaptime);
 			b.position.add(tmp);
 		}
-		
-		
-		// if(overlap > 0) {
-			// //change in overlap (normal velocity)
-			// var doverlap = V.x * N.x + V.y * N.y;
-			// //tangent velocity
-			// var Vt = V.copy();
-			// var tmp = N.copy();
-			// tmp.multiply(doverlap);
-			// Vt.sub(tmp);
-			// //force parameters
-			// //normal force
-			// var fn = -(OPTIONS.kd * Math.pow(overlap, OPTIONS.alpha) * doverlap + OPTIONS.kr * Math.pow(overlap, OPTIONS.beta));
-			// var Fn = N.copy();
-			// Fn.multiply(fn);
-			// //console.log(N, fn, overlap, doverlap, Fn);
-			// //
-			// var off = mp.copy();
-			// off.sub(this.position);
-			// //this.forces.push([off, v1]);
-			// this.applyForce(off, Fn);
-			// //tangent force (shear friction)
-			// var Ft = Vt.copy();
-			// if(!Ft.zero) {
-				// Ft.magnitude = OPTIONS.u * fn;
-				// this.applyForce(off, Ft);
-			// }
-		// }
 	}
 	
 	//update pos + angle and clear accels
@@ -509,17 +481,18 @@ class BallGame extends Game {
 	  ctx.lineWidth = 0.1;
 	  RenderHelper.drawRect(ctx, new Rectangle(0, 0, this.w, this.h), null, "#ffffff");
 	  
-	  var totalEnergy = 0;
+	  var kineticEnergy = 0;
+	  var potentialEnergy = 0;
 	  for(var i = 0; i < this.particles.length; i++) {
 		var b = this.particles[i];
-		var potentialenergy = 0;//OPTIONS.Gravity * ((this.h - 1) - b.position.y) / 10;
-		totalEnergy += b.render(ctx) + potentialenergy;
+		kineticEnergy += b.render(ctx);
+		potentialEnergy += OPTIONS.Gravity * ((this.h - 1) - b.position.y) / 10 * 2; // /10 to account for number of steps; *2 to account for my slightly incorrect energy formula :^)
 	  }
 	  
 	  ctx.restore();
 	  
 	  RenderHelper.drawText(ctx, "" + this.particles.length, "top", "left", 36, new Point(10, 10), "#ffffff", null);
-	  RenderHelper.drawText(ctx, "" + (Math.floor(totalEnergy * 1000) / 1000), "top", "left", 36, new Point(10, 50), "#ffffff", null);
+	  RenderHelper.drawText(ctx, "" + kineticEnergy.toFixed(3) + " + " + potentialEnergy.toFixed(3) + " = " + (kineticEnergy + potentialEnergy).toFixed(3), "top", "left", 36, new Point(10, 50), "#ffffff", null);
   }
 }
 
