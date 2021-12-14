@@ -444,9 +444,10 @@ class Body {
 			this.velocity = velCorrect;
 			//correct position/net force?
 			var forceCorrection = newNetForce.copy();
+			forceCorrection.multiply(0.5);
 			forceCorrection.sub(this.netForce);
 			forceCorrection.multiply(OPTIONS.kr);
-			this.applyForce(new Point(0, 0), forceCorrection);
+			//this.applyForce(new Point(0, 0), forceCorrection);
 			//
 			this.accel.multiply(dt);
 			this.velocity.add(this.accel);
