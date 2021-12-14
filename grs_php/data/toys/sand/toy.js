@@ -615,15 +615,16 @@ class ToolDragger extends Tool {
 				//target location
 				var target = offset.copy();
 				target.add(pEnd);
-				if(OPTIONS.Speed) {
+				if(OPTIONS.Speed && OPTIONS.Playing) {
 					//movement
 					var delta = target.copy();
 					delta.sub(particle.position);
 					delta.multiply(this.Strength);
-					//
+					//pull fast
 					if(delta.magnitude > 2) delta.magnitude = 2;
-					delta.add(new Point(0, -1));
 					delta.multiply(1 / OPTIONS.Speed);
+					//account for gravity
+					delta.add(new Point(0, -OPTIONS.Gravity));
 					//do some damping so they don't go crazy
 					particle.velocity.multiply(0.99);
 					//
