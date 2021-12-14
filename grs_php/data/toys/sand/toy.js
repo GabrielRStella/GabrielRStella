@@ -71,12 +71,13 @@ function hexToRgb(hex) {
 var DAT_GUI = new dat.GUI();
 
 var OPTIONS = {
-	ColorHot: "#ff0000",
-	ColorCold: "#0000ff",
-	ColorHot_: hexToRgb("#ff0000"),
-	ColorCold_: hexToRgb("#0000ff"),
+	ColorHot: "#ff7800",
+	ColorCold: "#ffd280",
+	ColorHot_: hexToRgb("#ff7800"),
+	ColorCold_: hexToRgb("#ffd280"),
 	Opacity: 1,
 	Heat: 30,
+	Overline: false,
 	DummyHot: "#ffffff",
 	DummyCold: "#101010",
 	ColorDummyHot_: hexToRgb("#ffffff"),
@@ -87,16 +88,17 @@ var OPTIONS = {
 	Forces: false,
 	NetForce: false,
 	Playing: true,
-	Steps: 10,
+	Steps: 20,
 	Speed: 1,
-	Width: 32,
-	Height: 32,
+	Width: 80,
+	Height: 80,
+	Starticles: 100, //get it? starting particles? :^D
 	Gravity: 1,
-	kd: 0.9, //collision damping coefficient
-	kr: 0.85, //restitution/rigidity coefficient
+	Damping: 0.9, //collision damping coefficient
+	Restitution: 0.85, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
 	beta: 1.5, //normal force modulator (rigidity)
-	u: 0.5 //shear friction coefficient
+	Friction: 0.9 //shear friction coefficient
 };
 
 var f = DAT_GUI.addFolder("Rendering");
@@ -105,11 +107,12 @@ f.addColor(OPTIONS, "ColorHot").onChange(function(){OPTIONS.ColorHot_ = hexToRgb
 f.addColor(OPTIONS, "ColorCold").onChange(function(){OPTIONS.ColorCold_ = hexToRgb(OPTIONS.ColorCold)});
 f.add(OPTIONS, "Opacity", 0, 1);
 f.add(OPTIONS, "Heat", 1, 100);
+f.add(OPTIONS, "Overline");
 f.addColor(OPTIONS, "DummyHot").onChange(function(){OPTIONS.ColorDummyHot_ = hexToRgb(OPTIONS.DummyHot)});
 f.addColor(OPTIONS, "DummyCold").onChange(function(){OPTIONS.ColorDummyCold_ = hexToRgb(OPTIONS.DummyCold)});
 f.add(OPTIONS, "DummyHeat", 0.01, 1);
-f.add(OPTIONS, "Grid");
 f.add(OPTIONS, "Glow", 0.1, 2);
+f.add(OPTIONS, "Grid");
 f.add(OPTIONS, "Forces");
 f.add(OPTIONS, "NetForce");
 
@@ -124,11 +127,11 @@ f.add(OPTIONS, "Height", 1, 400, 1);
 f = DAT_GUI.addFolder("Physics");
 
 f.add(OPTIONS, "Gravity", -1, 1, 0.001);
-f.add(OPTIONS, "kd", -1, 1);
-f.add(OPTIONS, "kr", -1, 1);
+f.add(OPTIONS, "Damping", -1, 1);
+f.add(OPTIONS, "Restitution", -1, 1);
 f.add(OPTIONS, "alpha", 0, 3);
 f.add(OPTIONS, "beta", 0, 3);
-f.add(OPTIONS, "u", -1, 1); //negative = rolly bois (very dangerous)
+f.add(OPTIONS, "Friction", -1, 1); //negative = rolly bois (very dangerous)
 
 function getColor(energy) {
   var d = 1 / (energy + 1);
@@ -403,7 +406,7 @@ class Body {
 				Vt.sub(tmp);
 				//force parameters
 				//normal force
-				var fn = -(OPTIONS.kd * Math.pow(overlap, OPTIONS.alpha) * doverlap + OPTIONS.kr * Math.pow(overlap, OPTIONS.beta));
+				var fn = -(OPTIONS.Damping * Math.pow(overlap, OPTIONS.alpha) * doverlap + OPTIONS.Restitution * Math.pow(overlap, OPTIONS.beta));
 				var Fn = N.copy();
 				Fn.multiply(fn);
 				//console.log(N, fn, overlap, doverlap, Fn);
@@ -416,7 +419,7 @@ class Body {
 				//tangent force (shear friction)
 				var Ft = Vt.copy();
 				if(!Ft.zero) {
-					Ft.magnitude = Math.max(-Ft.magnitude, OPTIONS.u * fn);
+					Ft.magnitude = Math.max(-Ft.magnitude, OPTIONS.Friction * fn);
 					this.applyForce(off, Ft);
 				}
 			}
@@ -466,14 +469,24 @@ class Body {
 		//RenderHelper.drawPoint(ctx, this.position, color, null, 1);
 		//draw orientation line
 		//TODO better orientation symbol for 3-particle bodies
-		if(this.kinematic) {
+		if(this.kinematic && OPTIONS.Overline) {
 			ctx.save();
 			ctx.translate(this.position.x, this.position.y);
 			ctx.rotate(this.angle);
+			//
 			ctx.lineWidth = 0.4;
 			var o = Math.floor(OPTIONS.Opacity * 255).toString(16);
 			if(o.length == 1) o = "0" + o;
-			RenderHelper.drawLine(ctx, new Point(0, -0.8), new Point(0, 0.8), "#000000" + o);
+		    ctx.strokeStyle = "#000000" + o;
+			//
+		    ctx.beginPath();
+		    ctx.moveTo(this.particles[0].x, this.particles[0].y);
+			for(var i = 1; i < this.particles.length; i++) {
+				ctx.lineTo(this.particles[i].x, this.particles[i].y);
+			}
+			ctx.lineTo(this.particles[0].x, this.particles[0].y);
+		    ctx.closePath();
+		    ctx.stroke();
 			ctx.restore();
 		}
 		//
@@ -661,9 +674,9 @@ class SandGame extends Game {
 	this.dummies = []; //dummy particles spaced out evenly along the edge of the world box
 	this.grid = new Grid(this.sz);
 	
-	for(var i = 0; i < 50; i++) {
+	for(var i = 0; i < OPTIONS.Starticles; i++) {
 		var b = new Body();
-		b.position = new Point(Math.random() * this.w, Math.random() * this.h);
+		b.position = new Point(RADIUS + Math.random() * (this.w - 2 * RADIUS), RADIUS + Math.random() * (this.h - 2 * RADIUS));
 		b.angularvelocity = Math.random() * 0.5 - 0.25;
 		this.particles.push(b);
 	}
@@ -980,7 +993,7 @@ class SandGame extends Game {
 	  for(var i = 0; i < this.particles.length; i++) {
 		var b = this.particles[i];
 		kineticEnergy += b.render(ctx);
-		potentialEnergy += OPTIONS.Gravity * ((this.h - 1) - b.position.y) / OPTIONS.Steps;
+		potentialEnergy += Math.abs(OPTIONS.Gravity) * (OPTIONS.Gravity > 0 ? ((this.h - 1) - b.position.y) : (b.position.y - 1)) / OPTIONS.Steps;
 		if(OPTIONS.Forces) {
 			ctx.lineWidth = 0.01;
 			for(var j = 0; j < b.forces.length; j++) {
