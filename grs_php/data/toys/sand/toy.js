@@ -600,7 +600,7 @@ class ToolDragger extends Tool {
 				var particle = d.particle;
 				var offset = d.offset;
 				//target location
-				var target = offset.copy();	
+				var target = offset.copy();
 				target.add(pEnd);
 				if(OPTIONS.Speed) {
 					//movement
@@ -1007,7 +1007,7 @@ class SandGame extends Game {
 	  var x = (pos.x - this.center.x) / this.scale + this.w / 2;
 	  var y = (pos.y - this.center.y) / this.scale + this.h / 2;
 	  ctx.lineWidth = 0.05;
-	  RenderHelper.drawPoint(ctx, new Point(x, y), null, "#ffffff", Math.sqrt(this.toolSize / Math.PI));
+	  RenderHelper.drawPoint(ctx, new Point(x, y), null, "#ffffff", 2 * Math.sqrt(this.toolSize / Math.PI));
 	  
 	  ctx.restore();
 	  
