@@ -424,30 +424,13 @@ class Body {
 				}
 				//add to the total
 				contactSum.add(overlap);
+				//orrr just
+				var offset = begin.copy();
+				offset.sub(this.position);
+				this.applyForce(offset, overlap);
 			}
-			//make sure total force is not pointing against contactSum
-			var contactDir = contactSum.copy();
-			contactDir.magnitude = 1;
-			var newNetForce = contactDir.copy();
-			newNetForce.multiply(Math.max(contactSum.magnitude, contactDir.dot(this.netForce)));
-			newNetForce.add(contactDir.reject(this.netForce));
-			this.newNetForce = newNetForce.copy();
-			//make sure velocity isn't pointing against contactSum
-			var velCorrect = contactDir.copy();
-			velCorrect.multiply(Math.max(0, contactDir.dot(this.velocity)));
-			velCorrect.add(contactDir.reject(this.velocity));
-			var blend = 1;
-			velCorrect.multiply(blend);
-			var velBlend = this.velocity.copy();
-			velBlend.multiply(1 - blend);
-			velCorrect.add(velBlend);
-			this.velocity = velCorrect;
-			//correct position/net force?
-			var forceCorrection = newNetForce.copy();
-			forceCorrection.multiply(0.5);
-			forceCorrection.sub(this.netForce);
-			forceCorrection.multiply(OPTIONS.kr);
-			//this.applyForce(new Point(0, 0), forceCorrection);
+			//
+			this.newNetForce = contactSum;
 			//
 			this.accel.multiply(dt);
 			this.velocity.add(this.accel);
