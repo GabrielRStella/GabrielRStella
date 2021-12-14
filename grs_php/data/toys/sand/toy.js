@@ -83,13 +83,14 @@ var OPTIONS = {
 	ColorDummyCold_: hexToRgb("#101010"),
 	DummyHeat: 0.1,
 	Glow: 0.3,
-	Grid: true,
+	Grid: false,
 	Forces: false,
 	NetForce: false,
 	Playing: true,
+	Steps: 10,
 	Speed: 1,
-	Width: 16,
-	Height: 16,
+	Width: 32,
+	Height: 32,
 	Gravity: 1,
 	kd: 0.9, //collision damping coefficient
 	kr: 0.85, //restitution/rigidity coefficient
@@ -115,6 +116,7 @@ f.add(OPTIONS, "NetForce");
 f = DAT_GUI.addFolder("World");
 
 f.add(OPTIONS, "Playing");
+f.add(OPTIONS, "Steps", 1, 100);
 f.add(OPTIONS, "Speed", 0, 1);
 f.add(OPTIONS, "Width", 1, 400, 1);
 f.add(OPTIONS, "Height", 1, 400, 1);
@@ -153,7 +155,7 @@ function getDummyColor(energy) {
 //////
 
 //for voxelization of space
-var MAX_RADIUS = 1;
+var MAX_RADIUS = 2;
 var VOXEL_SIZE = 2 * MAX_RADIUS;
 
 class Grid {
@@ -297,9 +299,23 @@ class Grid {
 	}
 }
 
+var DIST = 1 / Math.cos(Math.PI / 6); //distance of circle from the origin when in a triangular equilateral arrangement
+var RADIUS = 1 + DIST; //"radius" of a grain (max dist from origin to far side of a member particle)
+var RADIUS2 = 4 * RADIUS * RADIUS;
+var I = 3 * (1/2 + DIST * DIST); //moment of inertia of our three-particle blobs, assuming each has unit mass
+
 class Body {
 	constructor() {
 		this.active = true;
+		
+		//equilateral triangle arrangement
+		this.particles = []; //list of member particle offsets
+		var p = new Point(0, DIST);
+		this.particles.push(p.copy());
+		p.rotate(Math.PI * 2 / 3); //rotate 120 degrees
+		this.particles.push(p.copy());
+		p.rotate(Math.PI * 2 / 3); //another 120 degrees
+		this.particles.push(p.copy());
 		
 		this.position = new Point(0, 0);
 		this.velocity = new Point(0, 0);
@@ -313,8 +329,20 @@ class Body {
 		this.kinematic = true;
 	}
 	
+	getParticleCount() {
+		return this.particles.length;
+	}
+	
+	getParticlePosition(index) {
+		var pos = this.particles[index].copy();
+		pos.rotate(this.angle);
+		pos.add(this.position);
+		return pos;
+	}
+	
+	//kinetic energy
 	getEnergy() {
-		return this.velocity.magnitudeSquared + this.angularvelocity * this.angularvelocity;
+		return (this.velocity.magnitudeSquared + I * (this.angularvelocity * this.angularvelocity)) / 2;
 	}
 	
 	//query velocity at a certain (world coords) point based on vel + angularvel&offset
@@ -333,7 +361,7 @@ class Body {
 	applyForce(offset, F) {
 		this.accel.add(F); //ignore mass multiplication lol
 		var torque = offset.magnitude * F.magnitude * Math.sin(offset.angleBetween(F));
-		this.angularaccel += torque;
+		this.angularaccel += torque / I;
 		//
 		this.forces.push([offset, F]);
 		this.netForce.add(F);
@@ -342,53 +370,56 @@ class Body {
 	//collide with a particle at a given (world coords) point
 	//tests for collision (overlap) with each of its own constituent particles, then updates force/torque on self (not on other body)
 	collide_soft(p, b) {
-		var offset = p.copy();
-		offset.sub(this.position);
-		//
-		var dist = offset.magnitude;
-		var overlap = Math.max(0, 2 - dist);
-		if(overlap > 0) {
-			//collision
-			//midpoint (approx. collision point)
-			var mp = p.copy();
-			mp.add(this.position);
-			mp.multiply(0.5);
-			//"line of centers"
-			var N = offset.copy();
-			N.magnitude = 1;
+		for(var i = 0; i < this.particles.length; i++) {
+			var selfp = this.getParticlePosition(i);
 			//
-			var v1 = this.getVelocityAt(mp);
-			var v2 = b.getVelocityAt(mp);// : new Point(0, 0);
-			//console.log(mp, v1, v2);
-			//relative velocity at point of contact
-			var V = v1.copy();
-			V.sub(v2);
-			//change in overlap (normal velocity)
-			var doverlap = V.x * N.x + V.y * N.y;
-			//tangent velocity
-			var Vt = V.copy();
-			var tmp = N.copy();
-			tmp.multiply(doverlap);
-			Vt.sub(tmp);
-			//force parameters
-			//normal force
-			var fn = -(OPTIONS.kd * Math.pow(overlap, OPTIONS.alpha) * doverlap + OPTIONS.kr * Math.pow(overlap, OPTIONS.beta));
-			var Fn = N.copy();
-			Fn.multiply(fn);
-			//console.log(N, fn, overlap, doverlap, Fn);
+			var offset = p.copy();
+			offset.sub(selfp);
 			//
-			var off = mp.copy();
-			off.sub(this.position);
-			//this.forces.push([off, v1]);
-			this.applyForce(off, Fn);
-			if(!b.kinematic) b.netForce.add(Fn);
-			//tangent force (shear friction)
-			var Ft = Vt.copy();
-			if(!Ft.zero) {
-				Ft.magnitude = Math.max(-Ft.magnitude, OPTIONS.u * fn);
-				this.applyForce(off, Ft);
+			var dist = offset.magnitude;
+			var overlap = Math.max(0, 2 - dist);
+			if(overlap > 0) {
+				//collision
+				//midpoint (approx. collision point)
+				var mp = p.copy();
+				mp.add(selfp);
+				mp.multiply(0.5);
+				//"line of centers"
+				var N = offset.copy();
+				N.magnitude = 1;
+				//
+				var v1 = this.getVelocityAt(mp);
+				var v2 = b.getVelocityAt(mp);// : new Point(0, 0);
+				//console.log(mp, v1, v2);
+				//relative velocity at point of contact
+				var V = v1.copy();
+				V.sub(v2);
+				//change in overlap (normal velocity)
+				var doverlap = V.x * N.x + V.y * N.y;
+				//tangent velocity
+				var Vt = V.copy();
+				var tmp = N.copy();
+				tmp.multiply(doverlap);
+				Vt.sub(tmp);
+				//force parameters
+				//normal force
+				var fn = -(OPTIONS.kd * Math.pow(overlap, OPTIONS.alpha) * doverlap + OPTIONS.kr * Math.pow(overlap, OPTIONS.beta));
+				var Fn = N.copy();
+				Fn.multiply(fn);
+				//console.log(N, fn, overlap, doverlap, Fn);
+				//
+				var off = mp.copy();
+				off.sub(this.position);
+				//this.forces.push([off, v1]);
+				this.applyForce(off, Fn);
+				if(!b.kinematic) b.netForce.add(Fn);
+				//tangent force (shear friction)
+				var Ft = Vt.copy();
+				if(!Ft.zero) {
+					Ft.magnitude = Math.max(-Ft.magnitude, OPTIONS.u * fn);
+					this.applyForce(off, Ft);
+				}
 			}
-			this.collisions.push(b);
 		}
 	}
 	
@@ -396,43 +427,6 @@ class Body {
 	update(dt) {
 		//
 		if(this.kinematic) {
-			//resolve rigid-ish contact forces
-			var contactSum = new Point(0, 0);
-			for(let c of this.collisions) {
-				//basic overlap vector
-				var direction = this.position.copy();
-				direction.sub(c.position);
-				direction.magnitude = 1;
-				//overlap
-				
-				//closest point on this disk to the other's center
-				var begin = this.position.copy();
-				begin.sub(direction);
-				//closest point on the other disk to this one's center
-				var end = c.position.copy();
-				end.add(direction);
-				//add normal portions of velocities to adjust for increase/decrease in overlap
-				begin.add(direction.project(this.velocity));
-				end.add(direction.project(c.velocity));
-				//get the direction of the future overlap
-				var nextoverlap = end.copy();
-				nextoverlap.sub(begin);
-				//get directed overlap vector
-				var overlap = direction.copy();
-				overlap.magnitude = end.distance(begin);
-				//if the actual overlap is in the opposite direction, then the two disks are moving apart; we don't need any correction term
-				if(overlap.dot(nextoverlap) < 0) {
-					overlap.x = overlap.y = 0;
-				}
-				//add to the total
-				contactSum.add(overlap);
-				//orrr just
-				var offset = begin.copy();
-				offset.sub(this.position);
-				this.applyForce(offset, overlap);
-			}
-			//
-			this.newNetForce = contactSum;
 			//
 			this.accel.multiply(dt);
 			this.velocity.add(this.accel);
@@ -466,8 +460,12 @@ class Body {
 			var e = this.netForce.magnitude;
 			color = getDummyColor(e * OPTIONS.DummyHeat);
 		}
-		RenderHelper.drawPoint(ctx, this.position, color, null, 1);
+		for(var i = 0; i < this.particles.length; i++) {
+			RenderHelper.drawPoint(ctx, this.getParticlePosition(i), color, null, 1);
+		}
+		//RenderHelper.drawPoint(ctx, this.position, color, null, 1);
 		//draw orientation line
+		//TODO better orientation symbol for 3-particle bodies
 		if(this.kinematic) {
 			ctx.save();
 			ctx.translate(this.position.x, this.position.y);
@@ -567,7 +565,7 @@ class ToolSpinner extends Tool {
 	
 	onDragBegin(p, n, r) {
 		var particle = this.game.grid.getClosestParticle(p, 2);
-		if(particle && particle.position.distance(p) < MAX_RADIUS + r) this.dragging = particle;
+		if(particle && particle.position.distance(p) < RADIUS + r) this.dragging = particle;
 	}
 	onDrag(pBegin, pEnd, n, r, dt) {
 		if(this.dragging) {
@@ -696,6 +694,7 @@ class SandGame extends Game {
 			y = j;
 		}
 		b.position = new Point(x, y);
+		b.angle = Math.random() * 2 * Math.PI;
 		this.dummies.push(b);
 	}
 	this.dummySet = false;
@@ -746,7 +745,7 @@ class SandGame extends Game {
 	var x = (pos.x - this.center.x) / this.scale + this.w / 2;
 	var y = (pos.y - this.center.y) / this.scale + this.h / 2;
 	var n = this.toolSize;
-	var r = Math.sqrt(n / Math.PI);
+	var r = 2 * Math.sqrt(n / Math.PI);
 	//
 	this.tool.onClick(x, y, n, r);
   }
@@ -759,7 +758,7 @@ class SandGame extends Game {
 		this.dragsrc = new Point(x, y);
 		
 		var n = this.toolSize;
-		var r = Math.sqrt(n / Math.PI);
+		var r = 2 * Math.sqrt(n / Math.PI);
 		this.tool.onDragBegin(this.dragsrc, n, r);
   }
   
@@ -770,7 +769,7 @@ class SandGame extends Game {
 		var y = (pos.y - this.center.y) / this.scale + this.h / 2;
 		
 		var n = this.toolSize;
-		var r = Math.sqrt(n / Math.PI);
+		var r = 2 * Math.sqrt(n / Math.PI);
 		this.tool.onDragEnd(new Point(x, y), n, r);
 	}
 	this.dragging = false;
@@ -779,7 +778,7 @@ class SandGame extends Game {
   onDrag(evt) {
 	console.log(evt);
 	var n = this.toolSize;
-	var r = Math.sqrt(n / Math.PI);
+	var r = 2 * Math.sqrt(n / Math.PI);
 	//
 	this.tool.onClick(x, y, n, r);
   }
@@ -803,6 +802,7 @@ class SandGame extends Game {
 		while(this.dummies.length < nDummies) {
 			var b = new Body();
 			b.kinematic = false;
+			b.angle = Math.random() * 2 * Math.PI;
 			this.dummies.push(b);
 		}
 		//
@@ -852,7 +852,7 @@ class SandGame extends Game {
 		var y = (pos.y - this.center.y) / this.scale + this.h / 2;
 		var dragdst = new Point(x, y);
 		var n = this.toolSize;
-		var r = Math.sqrt(n / Math.PI);
+		var r = 2 * Math.sqrt(n / Math.PI);
 		this.tool.onDrag(this.dragsrc, dragdst, n, r, tickPart);
 		this.dragsrc = dragdst;
 	  }
@@ -867,8 +867,7 @@ class SandGame extends Game {
 		b.update(tickPart);
 	}
 	
-	var steps = 10;
-	for(var step = 0; step < steps; step++) {
+	for(var step = 0; step < OPTIONS.Steps; step++) {
 		//update forces, apply gravity / wall repulsion
 		for(var i = 0; i < this.particles.length; i++) {
 			var b = this.particles[i];
@@ -883,12 +882,15 @@ class SandGame extends Game {
 					for(let b2 of neighbors) {
 						if(b2 == b) continue;
 						//possible collision
-						b.collide_soft(b2.position, b2);
-						//b.collide_rigid(b2.position, b2);
+						if(b.position.distanceSquared(b2.position) < RADIUS2) {
+							for(var k = 0; k < b2.getParticleCount(); k++) {
+								b.collide_soft(b2.getParticlePosition(k), b2);
+							}
+						}
 					}
 				}
 			}
-			b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity / steps));
+			b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity / OPTIONS.Steps));
 		}
 		
 		//clear grid for updating
@@ -926,7 +928,7 @@ class SandGame extends Game {
 				i--;
 			} else {
 				//update
-				b.update(tickPart / steps);
+				b.update(tickPart / OPTIONS.Steps);
 				//
 				var index2 = this.grid.pos2index(b.position);
 				if(!index || index2.x != index.x || index2.y != index.y) {
@@ -978,7 +980,7 @@ class SandGame extends Game {
 	  for(var i = 0; i < this.particles.length; i++) {
 		var b = this.particles[i];
 		kineticEnergy += b.render(ctx);
-		potentialEnergy += OPTIONS.Gravity * ((this.h - 1) - b.position.y) / 10 * 2; // /10 to account for number of steps; *2 to account for my slightly incorrect energy formula :^)
+		potentialEnergy += OPTIONS.Gravity * ((this.h - 1) - b.position.y) / OPTIONS.Steps;
 		if(OPTIONS.Forces) {
 			ctx.lineWidth = 0.01;
 			for(var j = 0; j < b.forces.length; j++) {
@@ -998,11 +1000,6 @@ class SandGame extends Game {
 			end.add(b.netForce);
 			RenderHelper.drawPoint(ctx, begin, "#ffffff", null, 0.03);
 			RenderHelper.drawLine(ctx, begin, end, "#ffffff");
-			
-			var begin = b.position.copy();
-			var end = begin.copy();
-			end.add(b.newNetForce);
-			RenderHelper.drawLine(ctx, begin, end, "#00ff00");
 		}
 	  }
 	  
