@@ -396,46 +396,57 @@ class Body {
 		if(this.kinematic) {
 			//resolve rigid-ish contact forces
 			var contactSum = new Point(0, 0);
-			console.log(this.collisions.length);
 			for(let c of this.collisions) {
-				var tmp = this.position.copy();
-				tmp.sub(c.position);
-				tmp.magnitude = Math.max(0, 2 - this.position.distance(c.position));
-				// if(tmp.dot(c.velocity) > 0) {
-					// //add normal portion of velocity, if pointing towards self
-					// var tmp2 = tmp.copy();
-					// tmp2.magnitude = 1;
-					// tmp2.magnitude = tmp2.dot(c.velocity);
-					// tmp.add(tmp2);
-				// }
-				contactSum.add(tmp);
+				//basic overlap vector
+				var direction = this.position.copy();
+				direction.sub(c.position);
+				direction.magnitude = 1;
+				//overlap
+				
+				//closest point on this disk to the other's center
+				var begin = this.position.copy();
+				begin.sub(direction);
+				//closest point on the other disk to this one's center
+				var end = c.position.copy();
+				end.add(direction);
+				//add normal portions of velocities to adjust for increase/decrease in overlap
+				begin.add(direction.project(this.velocity));
+				end.add(direction.project(c.velocity));
+				//get the direction of the future overlap
+				var nextoverlap = end.copy();
+				nextoverlap.sub(begin);
+				//get directed overlap vector
+				var overlap = direction.copy();
+				overlap.magnitude = end.distance(begin);
+				//if the actual overlap is in the opposite direction, then the two disks are moving apart; we don't need any correction term
+				if(overlap.dot(nextoverlap) < 0) {
+					overlap.x = overlap.y = 0;
+				}
+				//add to the total
+				contactSum.add(overlap);
 			}
 			//make sure total force is not pointing against contactSum
 			var contactDir = contactSum.copy();
 			contactDir.magnitude = 1;
-			var forceProject = contactDir.copy();
-			forceProject.multiply(contactDir.dot(this.netForce));
-			var forceReject = this.netForce.copy();
-			forceReject.sub(forceProject);
 			var newNetForce = contactDir.copy();
-			console.log(contactSum.magnitude, contactDir.dot(this.netForce));
 			newNetForce.multiply(Math.max(contactSum.magnitude, contactDir.dot(this.netForce)));
-			newNetForce.add(forceReject);
+			newNetForce.add(contactDir.reject(this.netForce));
 			this.newNetForce = newNetForce.copy();
 			//make sure velocity isn't pointing against contactSum
-			var velProject = contactDir.copy();
-			velProject.multiply(contactDir.dot(this.velocity));
-			var velReject = this.velocity.copy();
-			velReject.sub(velProject);
 			var velCorrect = contactDir.copy();
 			velCorrect.multiply(Math.max(0, contactDir.dot(this.velocity)));
-			velCorrect.add(velReject);
-			velCorrect.multiply(OPTIONS.kr);
+			velCorrect.add(contactDir.reject(this.velocity));
+			var blend = 1;
+			velCorrect.multiply(blend);
 			var velBlend = this.velocity.copy();
-			velBlend.multiply(1 - OPTIONS.kr);
+			velBlend.multiply(1 - blend);
 			velCorrect.add(velBlend);
 			this.velocity = velCorrect;
 			//correct position/net force?
+			var forceCorrection = newNetForce.copy();
+			forceCorrection.sub(this.netForce);
+			forceCorrection.multiply(OPTIONS.kr);
+			this.applyForce(new Point(0, 0), forceCorrection);
 			//
 			this.accel.multiply(dt);
 			this.velocity.add(this.accel);
