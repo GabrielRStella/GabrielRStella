@@ -66,40 +66,255 @@ function hexToRgb(hex) {
   } : null;
 }
 
-var DIST = 1 / Math.cos(Math.PI / 6); //distance of circle from the origin when in a triangular equilateral arrangement
-var RADIUS = 1 + DIST; //"radius" of a grain (max dist from origin to far side of a member particle)
-var RADIUS2 = 4 * RADIUS * RADIUS;
-//a rigid collection of circular particles
-//all particles are assumed to be radius 1
+///////
+
+var DAT_GUI = new dat.GUI();
+
+var OPTIONS = {
+	ColorHot: "#ff0000",
+	ColorCold: "#0000ff",
+	ColorHot_: hexToRgb("#ff0000"),
+	ColorCold_: hexToRgb("#0000ff"),
+	Opacity: 1,
+	Heat: 30,
+	DummyHot: "#ffffff",
+	DummyCold: "#101010",
+	ColorDummyHot_: hexToRgb("#ffffff"),
+	ColorDummyCold_: hexToRgb("#101010"),
+	DummyHeat: 0.1,
+	Glow: 0.3,
+	Grid: true,
+	Forces: false,
+	NetForce: false,
+	Playing: true,
+	Speed: 1,
+	Width: 16,
+	Height: 16,
+	Gravity: 1,
+	kd: 0.9, //collision damping coefficient
+	kr: 0.85, //restitution/rigidity coefficient
+	alpha: 0.5, //normal force modulator (energy dissipation)
+	beta: 1.5, //normal force modulator (rigidity)
+	u: 0.5 //shear friction coefficient
+};
+
+var f = DAT_GUI.addFolder("Rendering");
+
+f.addColor(OPTIONS, "ColorHot").onChange(function(){OPTIONS.ColorHot_ = hexToRgb(OPTIONS.ColorHot)});
+f.addColor(OPTIONS, "ColorCold").onChange(function(){OPTIONS.ColorCold_ = hexToRgb(OPTIONS.ColorCold)});
+f.add(OPTIONS, "Opacity", 0, 1);
+f.add(OPTIONS, "Heat", 1, 100);
+f.addColor(OPTIONS, "DummyHot").onChange(function(){OPTIONS.ColorDummyHot_ = hexToRgb(OPTIONS.DummyHot)});
+f.addColor(OPTIONS, "DummyCold").onChange(function(){OPTIONS.ColorDummyCold_ = hexToRgb(OPTIONS.DummyCold)});
+f.add(OPTIONS, "DummyHeat", 0.01, 1);
+f.add(OPTIONS, "Grid");
+f.add(OPTIONS, "Glow", 0.1, 2);
+f.add(OPTIONS, "Forces");
+f.add(OPTIONS, "NetForce");
+
+f = DAT_GUI.addFolder("World");
+
+f.add(OPTIONS, "Playing");
+f.add(OPTIONS, "Speed", 0, 1);
+f.add(OPTIONS, "Width", 1, 400, 1);
+f.add(OPTIONS, "Height", 1, 400, 1);
+
+f = DAT_GUI.addFolder("Physics");
+
+f.add(OPTIONS, "Gravity", -1, 1, 0.001);
+f.add(OPTIONS, "kd", -1, 1);
+f.add(OPTIONS, "kr", -1, 1);
+f.add(OPTIONS, "alpha", 0, 3);
+f.add(OPTIONS, "beta", 0, 3);
+f.add(OPTIONS, "u", -1, 1); //negative = rolly bois (very dangerous)
+
+function getColor(energy) {
+  var d = 1 / (energy + 1);
+  var d1 = 1-d;
+  var c = {
+	  r: OPTIONS.ColorHot_.r * d1 + OPTIONS.ColorCold_.r * d,
+	  g: OPTIONS.ColorHot_.g * d1 + OPTIONS.ColorCold_.g * d,
+	  b: OPTIONS.ColorHot_.b * d1 + OPTIONS.ColorCold_.b * d,
+  };
+  return color(c.r, c.g, c.b, OPTIONS.Opacity);
+}
+
+function getDummyColor(energy) {
+  var d = 1 / (energy + 1);
+  var d1 = 1-d;
+  var c = {
+	  r: OPTIONS.ColorDummyHot_.r * d1 + OPTIONS.ColorDummyCold_.r * d,
+	  g: OPTIONS.ColorDummyHot_.g * d1 + OPTIONS.ColorDummyCold_.g * d,
+	  b: OPTIONS.ColorDummyHot_.b * d1 + OPTIONS.ColorDummyCold_.b * d,
+  };
+  return color(c.r, c.g, c.b, 1);
+}
+
+//////
+
+//for voxelization of space
+var MAX_RADIUS = 1;
+var VOXEL_SIZE = 2 * MAX_RADIUS;
+
+class Grid {
+	constructor(sz) {
+		this.sz = sz;
+		this.grid = {};
+	}
+	
+	pos2index(p) {
+		var x = Math.floor(p.x / this.sz);
+		var y = Math.floor(p.y / this.sz);
+		return {x: x, y: y};
+	}
+	
+	at(index) {
+		//index = this.pos2index(index);
+		index = "" + index.x + "," + index.y;
+		if(!(index in this.grid)) {
+			this.grid[index] = new Set();
+		}
+		return this.grid[index];
+	}
+	
+	clear() {
+		this.grid = {};
+	}
+	
+	//helper functions
+	
+	closest(p, particles) {
+		if(!particles || particles.size == 0) return null;
+		var particle = null;
+		var d = -1;
+		
+		for(let b of particles) {
+			if(!b.kinematic) continue;
+			var dist = p.distance(b.position);
+			if(d < 0 || dist < d) {
+				particle = b;
+				d = dist;
+			}
+		}
+		return particle ? {particle: particle, dist: d} : null;
+	}
+	
+	//looks in grid cells +=d in both x and y
+	helperGetClosestParticle(p, d) {
+		var particle = null;
+		var pdist = ((d + 1) * this.sz) * ((d + 1) * this.sz); //upper bound on distance
+		//
+		var i = this.pos2index(p);
+		//try corners
+		var closest1 = this.closest(p, this.at({x: i.x - d, y: i.y - d}));
+		if(closest1 != null && closest1.dist < pdist) {
+			particle = closest1.particle;
+			pdist = closest1.dist;
+		}
+		if(d > 0) {
+			var closest2 = this.closest(p, this.at({x: i.x + d, y: i.y - d}));
+			if(closest2 != null && closest2.dist < pdist) {
+				particle = closest2.particle;
+				pdist = closest2.dist;
+			}
+			var closest3 = this.closest(p, this.at({x: i.x - d, y: i.y + d}));
+			if(closest3 != null && closest3.dist < pdist) {
+				particle = closest3.particle;
+				pdist = closest3.dist;
+			}
+			var closest4 = this.closest(p, this.at({x: i.x + d, y: i.y + d}));
+			if(closest4 != null && closest4.dist < pdist) {
+				particle = closest4.particle;
+				pdist = closest4.dist;
+			}
+		}
+		//try edges
+		for(var j = -d + 1; j < d; j++) {
+			var closest1 = this.closest(p, this.at({x: i.x - d, y: i.y + j}));
+			if(closest1 != null && closest1.dist < pdist) {
+				particle = closest1.particle;
+				pdist = closest1.dist;
+			}
+			var closest2 = this.closest(p, this.at({x: i.x + d, y: i.y + j}));
+			if(closest2 != null && closest2.dist < pdist) {
+				particle = closest2.particle;
+				pdist = closest2.dist;
+			}
+			var closest3 = this.closest(p, this.at({x: i.x + j, y: i.y - d}));
+			if(closest3 != null && closest3.dist < pdist) {
+				particle = closest3.particle;
+				pdist = closest3.dist;
+			}
+			var closest4 = this.closest(p, this.at({x: i.x + j, y: i.y + d}));
+			if(closest4 != null && closest4.dist < pdist) {
+				particle = closest4.particle;
+				pdist = closest4.dist;
+			}
+		}
+		return particle;
+	}
+	
+	//returns the partcle whose center is closest to the given point
+	getClosestParticle(p, dmax) {
+		dmax = dmax || 1;
+		var d = 0;
+		var particle = null;
+		var pdist = -1;
+		while(d <= dmax) {
+			var particle2 = this.helperGetClosestParticle(p, d);
+			if(particle2) {
+				var dist = p.distance(particle2.position);
+				if(pdist < 0 || dist < pdist) {
+					particle = particle2;
+					pdist = dist;
+				}
+			}
+			d++;
+		}
+		//none found within range; could look through all particles in grid
+		//but we'll just... not
+		return particle;
+	}
+	
+	//returns all particles whose centers are contained within a circle centered at p with radius r (add MAX_RADIUS to r to get all particles touching the circle)
+	getParticlesWithin(p, r) {
+		var ps = new Set();
+		var i = this.pos2index(p);
+		var ir = Math.ceil(r);
+		for(var dx = -ir; dx <= ir; dx++) {
+			for(var dy = -ir; dy <= ir; dy++) {
+				var index = {x: i.x + dx, y: i.y + dy};
+				var particles = this.at(index);
+				for(let b of particles) {
+					//possible overlap
+					if(b.kinematic && b.position.distance(p) < r) {
+						ps.add(b);
+					}
+				}
+			}
+		}
+		return ps;
+	}
+}
+
 class Body {
 	constructor() {
-		this.particles = []; //list of member particle offsets
+		this.active = true;
+		
 		this.position = new Point(0, 0);
 		this.velocity = new Point(0, 0);
 		this.accel = new Point(0, 0);
 		this.angle = 0;
 		this.angularvelocity = 0;
 		this.angularaccel = 0;
+		
+		this.forces = []; //list of pairs (position, force vector), re-calculated on each frame
+		
+		this.kinematic = true;
 	}
 	
-	createTriangularParticles() {
-	  var p = new Point(0, DIST);
-	  this.particles.push(p.copy());
-	  p.rotate(Math.PI * 2 / 3); //rotate 120 degrees
-	  this.particles.push(p.copy());
-	  p.rotate(Math.PI * 2 / 3); //another 120 degrees
-	  this.particles.push(p.copy());
-	}
-	
-	getParticleCount() {
-		return this.particles.length;
-	}
-	
-	getParticlePosition(index) {
-		var pos = this.particles[index].copy();
-		pos.rotate(this.angle);
-		pos.add(this.position);
-		return pos;
+	getEnergy() {
+		return this.velocity.magnitudeSquared + this.angularvelocity * this.angularvelocity;
 	}
 	
 	//query velocity at a certain (world coords) point based on vel + angularvel&offset
@@ -107,7 +322,7 @@ class Body {
 		var v = this.velocity.copy();
 		var offset = p.copy();
 		offset.sub(this.position);
-		offset.rotate(Math.PI / 4);
+		offset.rotate(Math.PI / 2);
 		offset.multiply(this.angularvelocity);
 		v.add(offset);
 		return v;
@@ -119,161 +334,607 @@ class Body {
 		this.accel.add(F); //ignore mass multiplication lol
 		var torque = offset.magnitude * F.magnitude * Math.sin(offset.angleBetween(F));
 		this.angularaccel += torque;
+		//
+		this.forces.push([offset, F]);
+		this.netForce.add(F);
 	}
 	
 	//collide with a particle at a given (world coords) point
 	//tests for collision (overlap) with each of its own constituent particles, then updates force/torque on self (not on other body)
-	collide(p, b) {
-		for(var i = 0; i < this.particles.length; i++) {
-			var selfp = this.getParticlePosition(i);
+	collide_soft(p, b) {
+		var offset = p.copy();
+		offset.sub(this.position);
+		//
+		var dist = offset.magnitude;
+		var overlap = Math.max(0, 2 - dist);
+		if(overlap > 0) {
+			//collision
+			//midpoint (approx. collision point)
+			var mp = p.copy();
+			mp.add(this.position);
+			mp.multiply(0.5);
+			//"line of centers"
+			var N = offset.copy();
+			N.magnitude = 1;
 			//
-			var offset = p.copy();
-			offset.sub(selfp);
+			var v1 = this.getVelocityAt(mp);
+			var v2 = b.getVelocityAt(mp);// : new Point(0, 0);
+			//console.log(mp, v1, v2);
+			//relative velocity at point of contact
+			var V = v1.copy();
+			V.sub(v2);
+			//change in overlap (normal velocity)
+			var doverlap = V.x * N.x + V.y * N.y;
+			//tangent velocity
+			var Vt = V.copy();
+			var tmp = N.copy();
+			tmp.multiply(doverlap);
+			Vt.sub(tmp);
+			//force parameters
+			//normal force
+			var fn = -(OPTIONS.kd * Math.pow(overlap, OPTIONS.alpha) * doverlap + OPTIONS.kr * Math.pow(overlap, OPTIONS.beta));
+			var Fn = N.copy();
+			Fn.multiply(fn);
+			//console.log(N, fn, overlap, doverlap, Fn);
 			//
-			var dist = offset.magnitude;
-			var overlap = Math.max(0, 2 - dist);
-			if(overlap > 0) {
-				//collision
-				//midpoint (approx. collision point)
-				var mp = p.copy();
-				mp.add(selfp);
-				mp.multiply(0.5);
-				//"line of centers"
-				var N = offset.copy();
-				N.magnitude = 1;
-				//
-				var v1 = this.getVelocityAt(mp);
-				var v2 = b.getVelocityAt(mp);
-				//relative velocity at point of contact
-				var V = v1.copy();
-				V.sub(v2);
-				//change in overlap (normal velocity)
-				var doverlap = V.x * N.x + V.y * N.y;
-				//tangent velocity
-				var Vt = V.copy();
-				var tmp = N.copy();
-				tmp.multiply(doverlap);
-				Vt.sub(tmp);
-				//force parameters
-				var kd = 1;
-				var kr = 0.85;
-				var alpha = 0.5;
-				var beta = 1.5;
-				var u = 0.1;
-				//normal force
-				var fn = -(kd * Math.pow(overlap, alpha) * doverlap + kr * Math.pow(overlap, beta));
-				var Fn = N.copy();
-				Fn.multiply(fn);
-				//
-				var off = mp.copy();
-				off.sub(this.position);
-				this.applyForce(off, Fn);
-				//tangent force (shear friction)
-				var Ft = Vt.copy();
-				if(!Ft.zero) {
-					Ft.magnitude = -u * fn;
-					this.applyForce(off, Ft);
-				}
+			var off = mp.copy();
+			off.sub(this.position);
+			//this.forces.push([off, v1]);
+			this.applyForce(off, Fn);
+			if(!b.kinematic) b.netForce.add(Fn);
+			//tangent force (shear friction)
+			var Ft = Vt.copy();
+			if(!Ft.zero) {
+				Ft.magnitude = Math.max(-Ft.magnitude, OPTIONS.u * fn);
+				this.applyForce(off, Ft);
 			}
+			this.collisions.push(b);
 		}
 	}
 	
 	//update pos + angle and clear accels
 	update(dt) {
 		//
-		this.accel.multiply(dt);
-		this.velocity.add(this.accel);
+		if(this.kinematic) {
+			//resolve rigid-ish contact forces
+			var contactSum = new Point(0, 0);
+			for(let c of this.collisions) {
+				//basic overlap vector
+				var direction = this.position.copy();
+				direction.sub(c.position);
+				direction.magnitude = 1;
+				//overlap
+				
+				//closest point on this disk to the other's center
+				var begin = this.position.copy();
+				begin.sub(direction);
+				//closest point on the other disk to this one's center
+				var end = c.position.copy();
+				end.add(direction);
+				//add normal portions of velocities to adjust for increase/decrease in overlap
+				begin.add(direction.project(this.velocity));
+				end.add(direction.project(c.velocity));
+				//get the direction of the future overlap
+				var nextoverlap = end.copy();
+				nextoverlap.sub(begin);
+				//get directed overlap vector
+				var overlap = direction.copy();
+				overlap.magnitude = end.distance(begin);
+				//if the actual overlap is in the opposite direction, then the two disks are moving apart; we don't need any correction term
+				if(overlap.dot(nextoverlap) < 0) {
+					overlap.x = overlap.y = 0;
+				}
+				//add to the total
+				contactSum.add(overlap);
+				//orrr just
+				var offset = begin.copy();
+				offset.sub(this.position);
+				this.applyForce(offset, overlap);
+			}
+			//
+			this.newNetForce = contactSum;
+			//
+			this.accel.multiply(dt);
+			this.velocity.add(this.accel);
+			//
+			//this.velocity.multiply(0.995); //damping
+			var v = this.velocity.copy();
+			v.multiply(dt);
+			this.position.add(v);
+			//
+			this.angularaccel *= dt;
+			this.angularvelocity += this.angularaccel / 10;
+			//this.angularvelocity *= (0.995); //damping
+			this.angle += this.angularvelocity * dt;
+		} else {
+			this.netForce = new Point(0, 0);
+			this.forces = [];
+			this.velocity = new Point(0, 0);
+			this.angularvelocity = 0;
+		}
 		this.accel.x = 0;
 		this.accel.y = 0;
-		//
-		this.velocity.multiply(0.995); //damping
-		var v = this.velocity.copy();
-		v.multiply(dt);
-		this.position.add(v);
-		//
-		this.angularaccel *= dt;
-		this.angularvelocity += this.angularaccel / 10;
-		this.angularvelocity *= (0.995); //damping
-		this.angle += this.angularvelocity * dt;
 		this.angularaccel = 0;
 	}
 	
-	render(ctx, color) {
-		for(var i = 0; i < this.particles.length; i++) {
-			RenderHelper.drawPoint(ctx, this.getParticlePosition(i), color, null, 1);
+	render(ctx) {
+		var color = "#ffffff";
+		if(this.kinematic) {
+			var e = this.getEnergy();
+			color = getColor(e * OPTIONS.Heat); //the heat scaling just helps with visualization, found experimentally :)
+		} else {
+			var e = this.netForce.magnitude;
+			color = getDummyColor(e * OPTIONS.DummyHeat);
+		}
+		RenderHelper.drawPoint(ctx, this.position, color, null, 1);
+		//draw orientation line
+		if(this.kinematic) {
+			ctx.save();
+			ctx.translate(this.position.x, this.position.y);
+			ctx.rotate(this.angle);
+			ctx.lineWidth = 0.4;
+			var o = Math.floor(OPTIONS.Opacity * 255).toString(16);
+			if(o.length == 1) o = "0" + o;
+			RenderHelper.drawLine(ctx, new Point(0, -0.8), new Point(0, 0.8), "#000000" + o);
+			ctx.restore();
+		}
+		//
+		return e;
+	}
+}
+
+class Tool {
+	constructor(game) {
+		this.game = game;
+	}
+	
+	onClick(x, y, n, r) {
+	}
+	
+	//also works for click+hold
+	onDragBegin(p, n, r) {
+	}
+	onDrag(pBegin, pEnd, n, r, dt) {
+	}
+	onDragEnd(p, n, r) {
+	}
+}
+
+class ToolSpawner extends Tool {
+	constructor(game) {
+		super(game);
+		this.MaxSpin = 1;
+		f.add(this, "MaxSpin", 0, 1);
+		this.dtWait = 10;
+	}
+	
+	onClick(x, y, n, r) {
+		// for(var i = 0; i < n; i++) {
+			// var b = new Body();
+			// var offset = new Point(Math.random() * r, 0);
+			// offset.rotate(Math.random() * 2 * Math.PI);
+			// b.position = new Point(x, y);
+			// b.position.add(offset);
+			// b.angularvelocity = (Math.random() - 0.5) * this.MaxSpin;
+			// this.game.particles.push(b);
+		// }
+	}
+	
+	onDragBegin(p, n, r) {
+		for(var i = 0; i < n; i++) {
+			var b = new Body();
+			var offset = new Point(Math.random() * r, 0);
+			offset.rotate(Math.random() * 2 * Math.PI);
+			b.position = p.copy();
+			b.position.add(offset);
+			b.angularvelocity = (Math.random() - 0.5) * this.MaxSpin;
+			this.game.particles.push(b);
+		}
+		this.dtWait = 10;
+	}
+	
+	onDrag(pBegin, pEnd, n, r, dt) {
+		this.dtWait -= dt;
+		if(pEnd.distance(pBegin) > 1) this.dtWait = 0;
+		if(this.dtWait > 0) return;
+		//
+		for(var i = 0; i < n; i++) {
+			var b = new Body();
+			var offset = new Point(Math.random() * r, 0);
+			offset.rotate(Math.random() * 2 * Math.PI);
+			//
+			var blend = Math.random();
+			var src = pBegin.copy();
+			src.multiply(blend);
+			var src2 = pEnd.copy();
+			src2.multiply(1 - blend);
+			src.add(src2);
+			//
+			b.position = src;
+			b.position.add(offset);
+			b.angularvelocity = (Math.random() - 0.5) * this.MaxSpin;
+			if(Math.random() < dt * 0.05 * (pEnd.distance(pBegin) + 1)) this.game.particles.push(b);
 		}
 	}
 }
 
+class ToolSpinner extends Tool {
+	constructor(game, f) {
+		super(game);
+		this.SpinRate = 0.01;
+		f.add(this, "SpinRate", -0.2, 0.2);
+	}
+	
+	onDragBegin(p, n, r) {
+		var particle = this.game.grid.getClosestParticle(p, 2);
+		if(particle && particle.position.distance(p) < MAX_RADIUS + r) this.dragging = particle;
+	}
+	onDrag(pBegin, pEnd, n, r, dt) {
+		if(this.dragging) {
+			this.dragging.angularvelocity += this.SpinRate;
+		}
+	}
+	onDragEnd(p, n, r) {
+		this.dragging = null;
+	}
+}
+
+class ToolDragger extends Tool {
+	constructor(game, f) {
+		super(game);
+		this.Strength = 1;
+		f.add(this, "Strength", 0, 1);
+	}
+	
+	onDragBegin(p, n, r) {
+		var ps = this.game.grid.getParticlesWithin(p, r);
+		this.dragging = [];
+		for(let b of ps) {
+			var o = b.position.copy();
+			o.sub(p);
+			this.dragging.push({particle: b, offset: o});
+		}
+	}
+	onDrag(pBegin, pEnd, n, r, dt) {
+		if(this.dragging) {
+			for(var i = 0; i < this.dragging.length; i++) {
+				var d = this.dragging[i];
+				var particle = d.particle;
+				var offset = d.offset;
+				//target location
+				var target = offset.copy();	
+				target.add(pEnd);
+				if(OPTIONS.Speed) {
+					//movement
+					var delta = target.copy();
+					delta.sub(particle.position);
+					delta.multiply(this.Strength);
+					//
+					if(delta.magnitude > 2) delta.magnitude = 2;
+					delta.add(new Point(0, -1));
+					delta.multiply(1 / OPTIONS.Speed);
+					//do some damping so they don't go crazy
+					particle.velocity.multiply(0.99);
+					//
+					particle.applyForce(new Point(0, 0), delta);
+				} else {
+					particle.velocity = new Point(0, 0);
+					particle.position = target;
+				}
+			}
+		}
+	}
+	onDragEnd(p, n, r) {
+		this.dragging = null;
+	}
+}
+
+class ToolDelete extends Tool {
+	constructor(game, f) {
+		super(game);
+	}
+	
+	onDrag(pBegin, pEnd, n, r, dt) {
+		var particles = this.game.grid.getParticlesWithin(pEnd, r);
+		for(let b of particles) {
+			b.active = false;
+		}
+	}
+}
+
+/*
+TODO
+-runge-kutta integration
+-better physics (no squishy particles...)
+-polyspheres
+-better tools ?
+-C++ impl
+*/
 class SandGame extends Game {
   constructor() {
     super("sand");
 	
 	//physics area bounds
-	this.w = 100;
-	this.h = 100;
+	this.w = OPTIONS.Width;
+	this.h = OPTIONS.Height;
+	this.sz = VOXEL_SIZE;
 	
-	this.dummy = new Body();
-	var step = 2;
-	for(var x = 0; x <= this.w; x += step) {
-		for(var y = 0; y <= this.h; y += step) {
-			this.dummy.particles.push(new Point(x, 0));
-			this.dummy.particles.push(new Point(x, this.h));
-			this.dummy.particles.push(new Point(0, y));
-			this.dummy.particles.push(new Point(this.w, y));
-		}
-	}
 	this.particles = [];
+	this.dummies = []; //dummy particles spaced out evenly along the edge of the world box
+	this.grid = new Grid(this.sz);
 	
-	for(var i = 0; i < 250; i++) {
+	for(var i = 0; i < 50; i++) {
 		var b = new Body();
-		b.createTriangularParticles();
 		b.position = new Point(Math.random() * this.w, Math.random() * this.h);
 		b.angularvelocity = Math.random() * 0.5 - 0.25;
 		this.particles.push(b);
 	}
-    
-	var DAT_GUI = new dat.GUI();
+	
+	//init dummy walls
+	var nDummies =  this.w * 2 + (this.h * 2) + 3;
+	for(var i = 0; i < nDummies; i++) {
+		var b = new Body();
+		b.kinematic = false;
+		var x = 0;
+		var y = 0;
+		var j = i;
+		if(j <= this.w) {
+			//top wall
+			x = j;
+		} else if(j >= (this.w + this.h * 2 + 3)) {
+			//bottom wall
+			j -= this.w + this.h * 2 + 3;
+			x = j;
+			y = this.h;
+		} else {
+			j -= this.w + 1;
+			//sides
+			if(j >= this.h) {
+				x = this.w;
+				j -= this.h;
+			}
+			y = j;
+		}
+		b.position = new Point(x, y);
+		this.dummies.push(b);
+	}
+	this.dummySet = false;
+	
+	//create tools and gui
+
+	f = DAT_GUI.addFolder("Tool");
+	
+	this.toolSpawner = new ToolSpawner(this);
+	this.Spawner = function(){this.tool = this.toolSpawner}.bind(this);
+	f.add(this, "Spawner");
+	
+	this.toolSpinner = new ToolSpinner(this, f);
+	this.Spinner = function(){this.tool = this.toolSpinner}.bind(this);
+	f.add(this, "Spinner");
+	
+	this.toolDragger = new ToolDragger(this, f);
+	this.Dragger = function(){this.tool = this.toolDragger}.bind(this);
+	f.add(this, "Dragger");
+	
+	this.toolDelete = new ToolDelete(this, f);
+	this.Delete = function(){this.tool = this.toolDelete}.bind(this);
+	f.add(this, "Delete");
+	//
+	this.toolSize = 1;
+	this.tool = this.toolSpawner;
+	this.dragging = false;
+	
+  }
+
+  register(keys, mouse) {
+    this.mouse = mouse;
+    this.LISTENER_MOUSE_CLICK = mouse.addListener("click", this.onClick.bind(this));
+    this.LISTENER_MOUSE_MDOWN = mouse.addListener("mousedown", this.onMouseDown.bind(this));
+    this.LISTENER_MOUSE_MUP = mouse.addListener("mouseup", this.onMouseUp.bind(this));
+    this.LISTENER_MOUSE_WHEEL = mouse.addListener("wheel", this.onWheel.bind(this));
+  }
+
+  unregister(keys, mouse) {
+    mouse.removeListener(this.LISTENER_MOUSE_CLICK);
+    mouse.removeListener(this.LISTENER_MOUSE_MDOWN);
+    mouse.removeListener(this.LISTENER_MOUSE_MUP);
+    mouse.removeListener(this.LISTENER_MOUSE_WHEEL);
+  }
+  
+  onClick(evt) {
+    var pos = this.mouse.getMousePos(evt);
+	var x = (pos.x - this.center.x) / this.scale + this.w / 2;
+	var y = (pos.y - this.center.y) / this.scale + this.h / 2;
+	var n = this.toolSize;
+	var r = Math.sqrt(n / Math.PI);
+	//
+	this.tool.onClick(x, y, n, r);
+  }
+  
+  onMouseDown(evt) {
+	  this.dragging = true;
+		var pos = this.mouse.getMousePos(evt);
+		var x = (pos.x - this.center.x) / this.scale + this.w / 2;
+		var y = (pos.y - this.center.y) / this.scale + this.h / 2;
+		this.dragsrc = new Point(x, y);
+		
+		var n = this.toolSize;
+		var r = Math.sqrt(n / Math.PI);
+		this.tool.onDragBegin(this.dragsrc, n, r);
+  }
+  
+  onMouseUp(evt) {
+	if(this.dragging) {
+		var pos = this.mouse.getMousePos(evt);
+		var x = (pos.x - this.center.x) / this.scale + this.w / 2;
+		var y = (pos.y - this.center.y) / this.scale + this.h / 2;
+		
+		var n = this.toolSize;
+		var r = Math.sqrt(n / Math.PI);
+		this.tool.onDragEnd(new Point(x, y), n, r);
+	}
+	this.dragging = false;
+  }
+  
+  onDrag(evt) {
+	console.log(evt);
+	var n = this.toolSize;
+	var r = Math.sqrt(n / Math.PI);
+	//
+	this.tool.onClick(x, y, n, r);
+  }
+  
+  onWheel(evt) {
+	  var dir = Math.sign(evt.deltaY); //1 = down, -1 = up
+	  this.toolSize = Math.max(1, this.toolSize - dir);
   }
 
   update(tickPart) {
-    if(this.Paused) return;
+	//reorganize dummy cells if size changes
+	if(!this.dummySet || OPTIONS.Width != this.w || OPTIONS.Height != this.h) {
+		this.w = OPTIONS.Width;
+		this.h = OPTIONS.Height;
+		//add/remove dummies to proper new amt
+		var nDummies =  this.w * 2 + (this.h * 2) + 3;
+		while(this.dummies.length > nDummies) {
+			var b = this.dummies.pop();
+			if(b.prevIndex) this.grid.at(b.prevIndex).delete(b);
+		}
+		while(this.dummies.length < nDummies) {
+			var b = new Body();
+			b.kinematic = false;
+			this.dummies.push(b);
+		}
+		//
+		for(var i = 0; i < this.dummies.length; i++) {
+			var b = this.dummies[i];
+			//update
+			b.update(0);
+			//TODO: recalc edge position here
+			var x = 0;
+			var y = 0;
+			var j = i;
+			if(j <= this.w) {
+				//top wall
+				x = j;
+			} else if(j >= (this.w + this.h * 2 + 3)) {
+				//bottom wall
+				j -= this.w + this.h * 2 + 3;
+				x = j;
+				y = this.h;
+			} else {
+				j -= this.w + 1;
+				//sides
+				if(j >= this.h) {
+					x = this.w;
+					j -= this.h;
+				}
+				y = j;
+			}
+			b.position = new Point(x, y);
+			//
+			var index = b.prevIndex;
+			var index2 = this.grid.pos2index(b.position);
+			//
+			if(index) this.grid.at(index).delete(b);
+			this.grid.at(index2).add(b);
+			b.prevIndex = index2;
+		}
+		//
+		this.dummySet = true;
+	}
+	
+	tickPart *= OPTIONS.Speed;
+	
+	  if(this.dragging) {
+		var pos = this.mouse.mouse;
+		var x = (pos.x - this.center.x) / this.scale + this.w / 2;
+		var y = (pos.y - this.center.y) / this.scale + this.h / 2;
+		var dragdst = new Point(x, y);
+		var n = this.toolSize;
+		var r = Math.sqrt(n / Math.PI);
+		this.tool.onDrag(this.dragsrc, dragdst, n, r, tickPart);
+		this.dragsrc = dragdst;
+	  }
+	  
+	
+    if(!OPTIONS.Playing) return;
 	
     if(tickPart > 1) tickPart = 1;
 	
-	var steps = 25;
+	for(var i = 0; i < this.dummies.length; i++) {
+		var b = this.dummies[i];
+		b.update(tickPart);
+	}
+	
+	var steps = 10;
 	for(var step = 0; step < steps; step++) {
 		//update forces, apply gravity / wall repulsion
 		for(var i = 0; i < this.particles.length; i++) {
 			var b = this.particles[i];
-			for(var j = 0; j < this.particles.length; j++) {
-				if(i == j) continue;
-				var b2 = this.particles[j];
-				//possible collision
-				if(b.position.distanceSquared(b2.position) < RADIUS2) {
-					for(var k = 0; k < b2.getParticleCount(); k++) {
-						b.collide(b2.getParticlePosition(k), b2);
+			b.forces = [];
+			b.netForce = new Point(0, 0);
+			b.collisions = [];
+			var index = this.grid.pos2index(b.position);
+			for(var dx = -1; dx <= 1; dx++) {
+				for(var dy = -1; dy <= 1; dy++) {
+					var index2 = {x: index.x + dx, y: index.y + dy};
+					var neighbors = this.grid.at(index2);
+					for(let b2 of neighbors) {
+						if(b2 == b) continue;
+						//possible collision
+						b.collide_soft(b2.position, b2);
+						//b.collide_rigid(b2.position, b2);
 					}
 				}
 			}
-			b.accel.y += 0.1; //TMP gravity value
+			b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity / steps));
 		}
+		
+		//clear grid for updating
+		//TODO: optimized grid updates (only when particle actually moves to new cell)
+		//this.grid.clear();
 		
 		//update velocities and positions
 		for(var i = 0; i < this.particles.length; i++) {
 			var b = this.particles[i];
+			var index = b.prevIndex;
 			//bounds
-			if(b.position.x < 0) b.velocity.x = (b.velocity.x + 0.1) * 0.95;
-			if(b.position.x > this.w) b.velocity.x = (b.velocity.x - 0.1) * 0.75;
-			if(b.position.y < 0) b.velocity.y = (b.velocity.y + 0.1) * 0.95;
-			if(b.position.y > this.h) b.velocity.y = (b.velocity.y - 0.1) * 0.75;
-			// if(b.position.x < RADIUS2 || b.position.x > (this.w - RADIUS2) || b.position.y < RADIUS2 || b.position.y > (this.h - RADIUS2)) {
-				// for(var k = 0; k < this.dummy.getParticleCount(); k++) {
-					// b.collide(this.dummy.getParticlePosition(k), this.dummy);
-				// }
-			// }
-			//update
-			b.update(tickPart / steps);
+			var b1 = (b.position.x < 0);
+			var b2 = (b.position.x > this.w);
+			var b3 = (b.position.y < 0);
+			var b4 = (b.position.y > this.h);
+			if(b1 || b2 || b3 || b4) {
+				b.velocity.multiply(0.95);
+				if(b1) {
+					b.position.x += this.w;
+				}
+				else if(b2) {
+					b.position.x -= this.w;
+				}
+				if(b3) {
+					b.position.y += this.h;
+				}
+				else if(b4) {
+					b.position.y -= this.h;
+				}
+			}
+			if(!b.active) {
+				//out of bounds
+				if(index) this.grid.at(index).delete(b);
+				this.particles.splice(i, 1);
+				i--;
+			} else {
+				//update
+				b.update(tickPart / steps);
+				//
+				var index2 = this.grid.pos2index(b.position);
+				if(!index || index2.x != index.x || index2.y != index.y) {
+					if(index) this.grid.at(index).delete(b);
+					this.grid.at(index2).add(b);
+					b.prevIndex = index2;
+				}
+			}
 		}
 	}
   }
@@ -290,19 +951,71 @@ class SandGame extends Game {
 	  ctx.scale(this.scale, this.scale);
 	  ctx.translate(-this.w / 2, -this.h / 2);
 	  
+	  if(OPTIONS.Grid) {
+		  for(var x = 0; x < this.w / this.sz; x++) {
+			  for(var y = 0; y < this.h / this.sz; y++) {
+				  var n = this.grid.at({x: x, y: y}).size;
+				  var c = (1 - 1/(n * OPTIONS.Glow + 1));
+				  RenderHelper.drawRect(ctx, new Rectangle(x * this.sz, y * this.sz, this.sz, this.sz), color(c, c, c, 1), null);
+			  }
+		  }
+	  }
+	  
 	  //draw area bounds
 	  ctx.lineWidth = 0.1;
 	  RenderHelper.drawRect(ctx, new Rectangle(0, 0, this.w, this.h), null, "#ffffff");
 	  
-	  var fill = "#000000";
-	  var stroke = "#ffffff";
+	  for(var i = 0; i < this.dummies.length; i++) {
+		var b = this.dummies[i];
+		b.render(ctx);
+	  }
+	  
+	  var kineticEnergy = 0;
+	  var potentialEnergy = 0;
 	  for(var i = 0; i < this.particles.length; i++) {
 		var b = this.particles[i];
-		b.render(ctx, stroke);
 	  }
-	  //this.dummy.render(ctx, "#ff0000");
+	  for(var i = 0; i < this.particles.length; i++) {
+		var b = this.particles[i];
+		kineticEnergy += b.render(ctx);
+		potentialEnergy += OPTIONS.Gravity * ((this.h - 1) - b.position.y) / 10 * 2; // /10 to account for number of steps; *2 to account for my slightly incorrect energy formula :^)
+		if(OPTIONS.Forces) {
+			ctx.lineWidth = 0.01;
+			for(var j = 0; j < b.forces.length; j++) {
+				var f = b.forces[j];
+				var begin = f[0].copy();
+				begin.add(b.position);
+				var end = begin.copy();
+				end.add(f[1]);
+				RenderHelper.drawPoint(ctx, begin, "#ffffff", null, 0.02);
+				RenderHelper.drawLine(ctx, begin, end, "#ffffff");
+			}
+		}
+		if(OPTIONS.NetForce && b.netForce) {
+			ctx.lineWidth = 0.02;
+			var begin = b.position.copy();
+			var end = begin.copy();
+			end.add(b.netForce);
+			RenderHelper.drawPoint(ctx, begin, "#ffffff", null, 0.03);
+			RenderHelper.drawLine(ctx, begin, end, "#ffffff");
+			
+			var begin = b.position.copy();
+			var end = begin.copy();
+			end.add(b.newNetForce);
+			RenderHelper.drawLine(ctx, begin, end, "#00ff00");
+		}
+	  }
+	  
+      var pos = this.mouse.mouse;
+	  var x = (pos.x - this.center.x) / this.scale + this.w / 2;
+	  var y = (pos.y - this.center.y) / this.scale + this.h / 2;
+	  ctx.lineWidth = 0.05;
+	  RenderHelper.drawPoint(ctx, new Point(x, y), null, "#ffffff", Math.sqrt(this.toolSize / Math.PI));
 	  
 	  ctx.restore();
+	  
+	  RenderHelper.drawText(ctx, "" + this.particles.length, "top", "left", 36, new Point(10, 10), "#ffffff", null);
+	  RenderHelper.drawText(ctx, "" + kineticEnergy.toFixed(3) + " + " + potentialEnergy.toFixed(3) + " = " + (kineticEnergy + potentialEnergy).toFixed(3), "top", "left", 36, new Point(10, 50), "#ffffff", null);
   }
 }
 

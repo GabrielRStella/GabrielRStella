@@ -84,7 +84,7 @@ var f = DAT_GUI.addFolder("World");
 
 f.add(OPTIONS, "Width", 10, 100, 1);
 f.add(OPTIONS, "Height", 10, 100, 1);
-f.add(OPTIONS, "Gravity", 0, 1, 0.001);
+f.add(OPTIONS, "Gravity", -1, 1, 0.001);
 f.add(OPTIONS, "Restitution", 0, 1, 0.001);
 f.add(OPTIONS, "Speed", 0, 1, 0.001);
 f.add(OPTIONS, "Collisions");
