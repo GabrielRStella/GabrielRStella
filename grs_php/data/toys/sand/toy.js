@@ -93,7 +93,7 @@ var OPTIONS = {
 	Width: 80,
 	Height: 80,
 	Starticles: 100, //get it? starting particles? :^D
-	Gravity: 0.1,
+	Gravity: 0.03,
 	Damping: 0.9, //collision damping coefficient
 	Restitution: 1, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
