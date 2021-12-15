@@ -74,7 +74,7 @@ var OPTIONS = {
 	Width: 20,
 	Height: 20,
 	Gravity: 0,
-	Restitution: 1,
+	Restitution: 0.9,
 	//
 	Speed: 1,
 	Collisions: true,
@@ -91,6 +91,79 @@ f.add(OPTIONS, "Collisions");
 
 //////
 
+var DIST = 1 / Math.cos(Math.PI / 6); //distance of circle from the origin when in a triangular equilateral arrangement
+//collection of three particles bound by attractive spring forces
+class Grain {
+	constructor(p, angle) {
+		this.active = true;
+		var c = color(Math.random(), Math.random(), Math.random(), 1);
+		
+		//
+		angle = angle || (Math.random() * 2 * Math.PI);
+		//
+		this.particles = []; //list of member particles (three Bodies)
+		var offset = new Point(0, DIST);
+		offset.rotate(angle);
+		//
+		var pos1 = p.copy();
+		pos1.add(offset);
+		var b1 = new Body();
+		b1.color = c;
+		b1.position = pos1;
+		b1.grain = this;
+		this.particles.push(b1);
+		//
+		offset.rotate(Math.PI * 2 / 3); //rotate 120 degrees
+		var pos2 = p.copy();
+		pos2.add(offset);
+		var b2 = new Body();
+		b2.color = c;
+		b2.position = pos2;
+		b2.grain = this;
+		this.particles.push(b2);
+		//
+		offset.rotate(Math.PI * 2 / 3); //another 120 degrees
+		var pos3 = p.copy();
+		pos3.add(offset);
+		var b3 = new Body();
+		b3.color = c;
+		b3.position = pos3;
+		b3.grain = this;
+		this.particles.push(b3);
+	}
+	
+	update(dt) {
+		//if any particle is inactive, set all inactive and self inactive
+		for(var i = 0; i < this.particles.length; i++) {
+			if(!this.particles[i].active) {
+				this.active = false;
+				break;
+			}
+		}
+		if(!this.active) {
+			for(var i = 0; i < this.particles.length; i++) {
+				this.particles[i].active = false;
+			}
+		}
+		//add inter-body spring forces
+		for(var i = 0; i < this.particles.length; i++) {
+			var b = this.particles[i];
+			for(var j = i + 1; j < this.particles.length; j++) {
+				var b2 = this.particles[j];
+				//
+				var delta = b2.position.copy();
+				delta.sub(b.position);
+				//
+				delta.magnitude = (delta.magnitude - 2) / 2; //pull particles to be 2 units away (r = 1)
+				//
+				b.applyForce(new Point(0, 0), delta);
+				delta.multiply(-1);
+				b2.applyForce(new Point(0, 0), delta);
+			}
+		}
+	}
+}
+
 class Body {
 	constructor() {
 		this.active = true;
@@ -101,6 +174,8 @@ class Body {
 		
 		this.forces = []; //list of pairs (position, force vector), re-calculated on each frame
 		this.netForce = new Point(0, 0);
+		
+		this.color = "#ffffff";
 	}
 
 	applyForce(offset, F) {
@@ -201,8 +276,7 @@ class Body {
 	}
 	
 	render(ctx) {
-		var color = "#ffffff";
-		RenderHelper.drawPoint(ctx, this.position, color, null, 1);
+		RenderHelper.drawPoint(ctx, this.position, this.color, null, 1);
 		//
 		return this.velocity.magnitudeSquared;
 	}
@@ -231,9 +305,10 @@ class ToolSpawner extends Tool {
 	}
 	
 	onClick(x, y) {
-		var b = new Body();
-		b.position = new Point(x, y);
-		this.game.particles.push(b);
+		
+		var g = new Grain(new Point(x, y));
+		this.game.grains.push(g);
+		for(let b of g.particles) this.game.particles.push(b);
 	}
 }
 
@@ -243,23 +318,28 @@ class ToolDragger extends Tool {
 	}
 	
 	onDragBegin(p) {
-		this.dragging = this.game.getClosestParticleTouching(p);
+		var b = this.game.getClosestParticleTouching(p);
+		if(b) this.dragging = b.grain;
 	}
 	
 	onDrag(pBegin, pEnd, dt) {
 		var dmax = 1;
+		var pDelta = pEnd.copy();
+		pDelta.sub(pBegin);
 		if(this.dragging) {
-			if(OPTIONS.Speed > 0) {
-				//drag particle towards pEnd, with upper bound on force magnitude
-				var delta = pEnd.copy();
-				delta.sub(this.dragging.position);
-				if(delta.magnitude > dmax) delta.magnitude = dmax;
-				delta.add(new Point(0, -OPTIONS.Gravity));
-				delta.multiply(1 / OPTIONS.Speed);
-				this.dragging.applyForce(new Point(0, 0), delta);
-			} else {
-				this.dragging.velocity = new Point(0, 0);
-				this.dragging.position = pEnd;
+			for(let b of this.dragging.particles) {
+				if(OPTIONS.Speed > 0) {
+					//drag particle towards pEnd, with upper bound on force magnitude
+					var delta = pEnd.copy();
+					delta.sub(b.position);
+					if(delta.magnitude > dmax) delta.magnitude = dmax;
+					delta.add(new Point(0, -OPTIONS.Gravity));
+					delta.multiply(1 / OPTIONS.Speed);
+					b.applyForce(new Point(0, 0), delta);
+				} else {
+					b.velocity = new Point(0, 0);
+					b.position.add(pDelta);
+				}
 			}
 		}
 	}
@@ -287,11 +367,12 @@ class BallGame extends Game {
 	this.w = OPTIONS.Width;
 	this.h = OPTIONS.Height;
 	
+	this.grains = [];
 	this.particles = [];
 	for(var i = 0; i < 10; i++) {
-		var b = new Body();
-		b.position = new Point(Math.random() * this.w, Math.random() * this.h);
-		this.particles.push(b);
+		var g = new Grain(new Point(1 + Math.random() * (this.w - 2), 1 + Math.random() * (this.h - 2)));
+		this.grains.push(g);
+		for(let b of g.particles) this.particles.push(b);
 	}
 	
 	//create tools and gui
@@ -423,6 +504,17 @@ class BallGame extends Game {
 			}
 			//if gravity enabled, add downwards force
 			if(OPTIONS.Gravity != 0) b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity / steps));
+		}
+		
+		//update grains
+		for(var i = 0; i < this.grains.length; i++) {
+			var g = this.grains[i];
+			if(g.active)
+				g.update(tickPart / steps);
+			else {
+				this.grains.splice(i, 1);
+				i--;
+			}
 		}
 		
 		//update velocities and positions
