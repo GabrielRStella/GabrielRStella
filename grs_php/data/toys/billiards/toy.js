@@ -82,12 +82,154 @@ var OPTIONS = {
 
 var f = DAT_GUI.addFolder("World");
 
-f.add(OPTIONS, "Width", 10, 100, 1);
-f.add(OPTIONS, "Height", 10, 100, 1);
+f.add(OPTIONS, "Width", 10, 200, 1);
+f.add(OPTIONS, "Height", 10, 200, 1);
 f.add(OPTIONS, "Gravity", -1, 1, 0.001);
 f.add(OPTIONS, "Restitution", 0, 1, 0.001);
 f.add(OPTIONS, "Speed", 0, 1, 0.001);
 f.add(OPTIONS, "Collisions");
+
+//////
+//for voxelization of space
+var VOXEL_SIZE = 2;
+
+class Grid {
+	constructor(sz) {
+		this.sz = sz;
+		this.grid = {};
+	}
+	
+	pos2index(p) {
+		var x = Math.floor(p.x / this.sz);
+		var y = Math.floor(p.y / this.sz);
+		return {x: x, y: y};
+	}
+	
+	at(index) {
+		//index = this.pos2index(index);
+		index = "" + index.x + "," + index.y;
+		if(!(index in this.grid)) {
+			this.grid[index] = new Set();
+		}
+		return this.grid[index];
+	}
+	
+	clear() {
+		this.grid = {};
+	}
+	
+	//helper functions
+	
+	closest(p, particles) {
+		if(!particles || particles.size == 0) return null;
+		var particle = null;
+		var d = -1;
+		
+		for(let b of particles) {
+			var dist = p.distance(b.position);
+			if(d < 0 || dist < d) {
+				particle = b;
+				d = dist;
+			}
+		}
+		return particle ? {particle: particle, dist: d} : null;
+	}
+	
+	//looks in grid cells +=d in both x and y
+	helperGetClosestParticle(p, d) {
+		var particle = null;
+		var pdist = ((d + 1) * this.sz) * ((d + 1) * this.sz); //upper bound on distance
+		//
+		var i = this.pos2index(p);
+		//try corners
+		var closest1 = this.closest(p, this.at({x: i.x - d, y: i.y - d}));
+		if(closest1 != null && closest1.dist < pdist) {
+			particle = closest1.particle;
+			pdist = closest1.dist;
+		}
+		if(d > 0) {
+			var closest2 = this.closest(p, this.at({x: i.x + d, y: i.y - d}));
+			if(closest2 != null && closest2.dist < pdist) {
+				particle = closest2.particle;
+				pdist = closest2.dist;
+			}
+			var closest3 = this.closest(p, this.at({x: i.x - d, y: i.y + d}));
+			if(closest3 != null && closest3.dist < pdist) {
+				particle = closest3.particle;
+				pdist = closest3.dist;
+			}
+			var closest4 = this.closest(p, this.at({x: i.x + d, y: i.y + d}));
+			if(closest4 != null && closest4.dist < pdist) {
+				particle = closest4.particle;
+				pdist = closest4.dist;
+			}
+		}
+		//try edges
+		for(var j = -d + 1; j < d; j++) {
+			var closest1 = this.closest(p, this.at({x: i.x - d, y: i.y + j}));
+			if(closest1 != null && closest1.dist < pdist) {
+				particle = closest1.particle;
+				pdist = closest1.dist;
+			}
+			var closest2 = this.closest(p, this.at({x: i.x + d, y: i.y + j}));
+			if(closest2 != null && closest2.dist < pdist) {
+				particle = closest2.particle;
+				pdist = closest2.dist;
+			}
+			var closest3 = this.closest(p, this.at({x: i.x + j, y: i.y - d}));
+			if(closest3 != null && closest3.dist < pdist) {
+				particle = closest3.particle;
+				pdist = closest3.dist;
+			}
+			var closest4 = this.closest(p, this.at({x: i.x + j, y: i.y + d}));
+			if(closest4 != null && closest4.dist < pdist) {
+				particle = closest4.particle;
+				pdist = closest4.dist;
+			}
+		}
+		return particle;
+	}
+	
+	//returns the particle whose center is closest to the given point
+	getClosestParticle(p, dmax) {
+		dmax = dmax || 1;
+		var d = 0;
+		var particle = null;
+		var pdist = -1;
+		while(d <= dmax) {
+			var particle2 = this.helperGetClosestParticle(p, d);
+			if(particle2) {
+				var dist = p.distance(particle2.position);
+				if(pdist < 0 || dist < pdist) {
+					particle = particle2;
+					pdist = dist;
+				}
+			}
+			d++;
+		}
+		return particle;
+	}
+	
+	//returns all particles whose centers are contained within a circle centered at p with radius r (add MAX_RADIUS to r to get all particles touching the circle)
+	getParticlesWithin(p, r) {
+		var ps = new Set();
+		var i = this.pos2index(p);
+		var ir = Math.ceil(r);
+		for(var dx = -ir; dx <= ir; dx++) {
+			for(var dy = -ir; dy <= ir; dy++) {
+				var index = {x: i.x + dx, y: i.y + dy};
+				var particles = this.at(index);
+				for(let b of particles) {
+					//possible overlap
+					if(b.kinematic && b.position.distance(p) < r) {
+						ps.add(b);
+					}
+				}
+			}
+		}
+		return ps;
+	}
+}
 
 //////
 
@@ -226,14 +368,21 @@ class Tool {
 }
 
 class ToolSpawner extends Tool {
-	constructor(game) {
+	constructor(game, f) {
 		super(game);
+		this.N = 1;
+		f.add(this, "N", 1, 100);
 	}
 	
 	onClick(x, y) {
-		var b = new Body();
-		b.position = new Point(x, y);
-		this.game.particles.push(b);
+		for(var i = 0; i < this.N; i++) {
+			var b = new Body();
+			b.position = new Point(x, y);
+			this.game.particles.push(b);
+			
+			b.prevIndex = this.game.grid.pos2index(b.position);
+			this.game.grid.at(b.prevIndex).add(b);
+		}
 	}
 }
 
@@ -294,6 +443,8 @@ class BallGame extends Game {
 		this.particles.push(b);
 	}
 	
+	this.grid = new Grid(VOXEL_SIZE);
+	
 	//create tools and gui
 
 	var f = DAT_GUI.addFolder("Tool");
@@ -302,7 +453,7 @@ class BallGame extends Game {
 	this.Drag = function(){this.tool = this.toolDragger}.bind(this);
 	f.add(this, "Drag");
 	
-	this.toolSpawner = new ToolSpawner(this);
+	this.toolSpawner = new ToolSpawner(this, f);
 	this.Create = function(){this.tool = this.toolSpawner}.bind(this);
 	f.add(this, "Create");
 	
@@ -364,9 +515,9 @@ class BallGame extends Game {
   }
   
   getClosestParticleTouching(p) {
-	  var b = this.getClosestParticle(p);
+	  var b = this.grid.getClosestParticle(p, 1);
 	  if(b == null) return null;
-	  return b.position.distance(p) < 1 ? b : null;
+	  return (b.position.distance(p) < 1) ? b : null;
   }
   
   getClosestParticle(p) {
@@ -413,11 +564,18 @@ class BallGame extends Game {
 			b.forces = [];
 			b.netForce = new Point(0, 0);
 			if(OPTIONS.Collisions) {
-				for(var j = i + 1; j < this.particles.length; j++) {
-					var b2 = this.particles[j];
-					//possible collision
-					if(b.position.distance(b2.position) < 2) {
-						b.collide(b2.position, b2);
+				var index = this.grid.pos2index(b.position);
+				for(var dx = -1; dx <= 1; dx++) {
+					for(var dy = -1; dy <= 1; dy++) {
+						var index2 = {x: index.x + dx, y: index.y + dy};
+						var neighbors = this.grid.at(index2);
+						for(let b2 of neighbors) {
+							if(b2 == b) continue;
+							//possible collision
+							if(b.position.distance(b2.position) < 2) {
+								b.collide(b2.position, b2);
+							}
+						}
 					}
 				}
 			}
@@ -455,11 +613,19 @@ class BallGame extends Game {
 			}
 			if(!b.active) {
 				//ded
+				if(index) this.grid.at(index).delete(b);
 				this.particles.splice(i, 1);
 				i--;
 			} else {
 				//update
 				b.update(tickPart / steps);
+				//
+				var index2 = this.grid.pos2index(b.position);
+				if(!index || index2.x != index.x || index2.y != index.y) {
+					if(index) this.grid.at(index).delete(b);
+					this.grid.at(index2).add(b);
+					b.prevIndex = index2;
+				}
 			}
 		}
 	}
