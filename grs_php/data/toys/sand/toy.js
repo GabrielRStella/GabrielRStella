@@ -904,7 +904,7 @@ class SandGame extends Game {
 					}
 				}
 			}
-			b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity / OPTIONS.Steps));
+			b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity));
 		}
 		
 		//clear grid for updating

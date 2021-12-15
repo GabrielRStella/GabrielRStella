@@ -647,7 +647,7 @@ class BallGame extends Game {
 				}
 			}
 			//if gravity enabled, add downwards force
-			if(OPTIONS.Gravity != 0) b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity / steps));
+			if(OPTIONS.Gravity != 0) b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity));
 		}
 		
 		//update grains
