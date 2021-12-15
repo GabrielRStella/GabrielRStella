@@ -905,7 +905,11 @@ class SandGame extends Game {
 					}
 				}
 			}
-			b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity));
+			for(var offset of b.particles) {
+				var offset2 = offset.copy();
+				offset2.rotate(b.angle);
+				b.applyForce(offset2, new Point(0, OPTIONS.Gravity));
+			}
 		}
 		
 		//clear grid for updating
