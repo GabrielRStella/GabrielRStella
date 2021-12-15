@@ -93,7 +93,7 @@ var OPTIONS = {
 	Width: 80,
 	Height: 80,
 	Starticles: 100, //get it? starting particles? :^D
-	Gravity: 1,
+	Gravity: 0.1,
 	Damping: 0.9, //collision damping coefficient
 	Restitution: 0.85, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
@@ -126,7 +126,7 @@ f.add(OPTIONS, "Height", 1, 400, 1);
 
 f = DAT_GUI.addFolder("Physics");
 
-f.add(OPTIONS, "Gravity", -1, 1, 0.001);
+f.add(OPTIONS, "Gravity", -0.1, 0.1, 0.001);
 f.add(OPTIONS, "Damping", -1, 1);
 f.add(OPTIONS, "Restitution", -1, 1);
 f.add(OPTIONS, "alpha", 0, 3);
@@ -362,6 +362,7 @@ class Body {
 	//apply force (and torque) at offset
 	//F is a Point (i.e. vector)
 	applyForce(offset, F) {
+		//F.multiply(1/3); //technically should account for increased mass of 3-body.. but i like it better without this :))
 		this.accel.add(F); //ignore mass multiplication lol
 		var torque = offset.magnitude * F.magnitude * Math.sin(offset.angleBetween(F));
 		this.angularaccel += torque / I;
@@ -624,7 +625,7 @@ class ToolDragger extends Tool {
 					if(delta.magnitude > 2) delta.magnitude = 2;
 					delta.multiply(1 / OPTIONS.Speed);
 					//account for gravity
-					delta.add(new Point(0, -OPTIONS.Gravity));
+					delta.add(new Point(0, -OPTIONS.Gravity * OPTIONS.Steps));
 					//do some damping so they don't go crazy
 					particle.velocity.multiply(0.99);
 					//

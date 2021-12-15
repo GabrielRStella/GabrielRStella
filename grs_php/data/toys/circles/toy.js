@@ -90,6 +90,7 @@ var OPTIONS = {
 	Speed: 1,
 	Width: 100,
 	Height: 100,
+	Gravity: 0.1,
 	kd: 0.9, //collision damping coefficient
 	kr: 0.85, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
@@ -120,6 +121,7 @@ f.add(OPTIONS, "Height", 1, 400, 1);
 
 f = DAT_GUI.addFolder("Physics");
 
+f.add(OPTIONS, "Gravity", -0.1, 0.1, 0.001);
 f.add(OPTIONS, "kd", -1, 2);
 f.add(OPTIONS, "kr", -1, 2);
 f.add(OPTIONS, "alpha", 0, 3);
@@ -563,15 +565,22 @@ class ToolDragger extends Tool {
 				//target location
 				var target = offset.copy();
 				target.add(pEnd);
-				//movement
-				var delta = target.copy();
-				delta.sub(particle.position);
-				delta.multiply(this.Strength);
-				//
-				//do some damping so they don't go crazy
-				particle.velocity.multiply(0.9 / (this.Strength + 1));
-				//
-				particle.applyForce(new Point(0, 0), delta);
+				if(OPTIONS.Speed && OPTIONS.Playing) {
+					//movement
+					var delta = target.copy();
+					delta.sub(particle.position);
+					delta.multiply(this.Strength);
+					//
+					//account for gravity
+					delta.add(new Point(0, -OPTIONS.Gravity * OPTIONS.Steps));
+					//do some damping so they don't go crazy
+					particle.velocity.multiply(0.95);
+					//
+					particle.applyForce(new Point(0, 0), delta);
+				} else {
+					particle.velocity = new Point(0, 0);
+					particle.position = target;
+				}
 			}
 		}
 	}
@@ -837,7 +846,7 @@ class SandGame extends Game {
 					}
 				}
 			}
-			b.accel.y += 0.1; //TMP gravity value
+			b.applyForce(new Point(0, 0), new Point(0, OPTIONS.Gravity));
 		}
 		
 		//clear grid for updating
