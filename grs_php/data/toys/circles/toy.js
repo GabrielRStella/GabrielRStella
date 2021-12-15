@@ -385,7 +385,7 @@ class Body {
 			//tangent force (shear friction)
 			var Ft = Vt.copy();
 			if(!Ft.zero) {
-				Ft.magnitude = OPTIONS.u * fn;
+				Ft.magnitude = Math.max(-Ft.magnitude, OPTIONS.u * fn);
 				this.applyForce(off, Ft);
 			}
 		}
