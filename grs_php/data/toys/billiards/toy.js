@@ -14,7 +14,7 @@ RenderHelper.drawPoint = function(ctx, p, fill, stroke, radius) {
   if(fill) ctx.fillStyle = fill;
   if(stroke) ctx.strokeStyle = stroke;
   ctx.beginPath();
-  ctx.arc(p.x, p.y, radius || 2, 0, Math.TAU);
+  ctx.arc(p.x, p.y, radius, 0, Math.TAU);
   ctx.closePath();
   if(fill) ctx.fill();
   if(stroke) ctx.stroke();
@@ -221,7 +221,7 @@ class Grid {
 				var particles = this.at(index);
 				for(let b of particles) {
 					//possible overlap
-					if(b.kinematic && b.position.distance(p) < r) {
+					if(b.position.distance(p) < r) {
 						ps.add(b);
 					}
 				}
@@ -365,6 +365,9 @@ class Tool {
 	}
 	onDragEnd(p) {
 	}
+	
+	render(ctx, p) {
+	}
 }
 
 class ToolSpawner extends Tool {
@@ -420,11 +423,25 @@ class ToolDragger extends Tool {
 class ToolDelete extends Tool {
 	constructor(game, f) {
 		super(game);
+		this.Radius = 0;
+		f.add(this, "Radius", 0, 5, 0.001);
 	}
 	
 	onDrag(pBegin, pEnd, dt) {
-		var b = this.game.getClosestParticleTouching(pEnd);
-		if(b != null) b.active = false;
+		if(this.Radius == 0) {
+			var b = this.game.getClosestParticleTouching(pEnd);
+			if(b != null) b.active = false;
+		} else {
+			var particles = this.game.grid.getParticlesWithin(pEnd, this.Radius);
+			for(let b of particles) {
+				b.active = false;
+			}
+		}
+	}
+	
+	render(ctx, p) {
+	  ctx.lineWidth = 0.1;
+	  RenderHelper.drawPoint(ctx, p, null, "#ff0000", this.Radius);
 	}
 }
 
@@ -655,6 +672,11 @@ class BallGame extends Game {
 		kineticEnergy += b.render(ctx);
 		potentialEnergy += OPTIONS.Gravity * ((this.h - 1) - b.position.y) / 10 * 2; // /10 to account for number of steps; *2 to account for my slightly incorrect energy formula :^)
 	  }
+	  
+      var pos = this.mouse.mouse;
+	  var x = (pos.x - this.center.x) / this.scale + this.w / 2;
+	  var y = (pos.y - this.center.y) / this.scale + this.h / 2;
+	  this.tool.render(ctx, new Point(x, y));
 	  
 	  ctx.restore();
 	  

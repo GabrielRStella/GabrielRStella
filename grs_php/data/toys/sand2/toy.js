@@ -78,6 +78,7 @@ var OPTIONS = {
 	//
 	Speed: 1,
 	Collisions: true,
+	SelfCollide: true
 };
 
 var f = DAT_GUI.addFolder("World");
@@ -88,6 +89,7 @@ f.add(OPTIONS, "Gravity", -1, 1, 0.001);
 f.add(OPTIONS, "Restitution", 0, 1, 0.001);
 f.add(OPTIONS, "Speed", 0, 1, 0.001);
 f.add(OPTIONS, "Collisions");
+f.add(OPTIONS, "SelfCollide");
 
 //////
 
@@ -637,7 +639,7 @@ class BallGame extends Game {
 						for(let b2 of neighbors) {
 							if(b2 == b) continue;
 							//possible collision
-							if(b.position.distance(b2.position) < 2) {
+							if((OPTIONS.SelfCollide || b.grain != b2.grain) && b.position.distance(b2.position) < 2) {
 								b.collide(b2.position, b2);
 							}
 						}
