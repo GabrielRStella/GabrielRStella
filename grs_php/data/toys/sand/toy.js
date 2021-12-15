@@ -95,7 +95,7 @@ var OPTIONS = {
 	Starticles: 100, //get it? starting particles? :^D
 	Gravity: 0.1,
 	Damping: 0.9, //collision damping coefficient
-	Restitution: 0.85, //restitution/rigidity coefficient
+	Restitution: 1, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
 	beta: 1.5, //normal force modulator (rigidity)
 	Friction: 0.9 //shear friction coefficient
@@ -128,7 +128,7 @@ f = DAT_GUI.addFolder("Physics");
 
 f.add(OPTIONS, "Gravity", -0.1, 0.1, 0.001);
 f.add(OPTIONS, "Damping", -1, 1);
-f.add(OPTIONS, "Restitution", -1, 1);
+f.add(OPTIONS, "Restitution", 0, 10);
 f.add(OPTIONS, "alpha", 0, 3);
 f.add(OPTIONS, "beta", 0, 3);
 f.add(OPTIONS, "Friction", -1, 1); //negative = rolly bois (very dangerous)

@@ -92,7 +92,7 @@ var OPTIONS = {
 	Height: 100,
 	Gravity: 0.1,
 	kd: 0.9, //collision damping coefficient
-	kr: 0.85, //restitution/rigidity coefficient
+	kr: 1, //restitution/rigidity coefficient
 	alpha: 0.5, //normal force modulator (energy dissipation)
 	beta: 1.5, //normal force modulator (rigidity)
 	u: 0.5 //shear friction coefficient
@@ -123,7 +123,7 @@ f = DAT_GUI.addFolder("Physics");
 
 f.add(OPTIONS, "Gravity", -0.1, 0.1, 0.001);
 f.add(OPTIONS, "kd", -1, 2);
-f.add(OPTIONS, "kr", -1, 2);
+f.add(OPTIONS, "kr", 0, 10);
 f.add(OPTIONS, "alpha", 0, 3);
 f.add(OPTIONS, "beta", 0, 3);
 f.add(OPTIONS, "u", -1, 1); //negative = rolly bois (very dangerous)
