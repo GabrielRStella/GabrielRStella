@@ -50,8 +50,8 @@ make_nav();
 		<div class="col s12 m12 l12">
 		  <div class="card">
 			<div class="card-content">
-			  <a href="#"><span class="card-title">Final Update</span></a>
-			  <p>TODO (Dec 7)</p>
+			  <a href="/CSCE645/finalreport.pdf"><span class="card-title">Final Report</span></a>
+			  <p>This is the final report for the project.</p>
 			</div>
 		  </div>
 		</div>
