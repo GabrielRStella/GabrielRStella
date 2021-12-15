@@ -572,7 +572,8 @@ class BallGame extends Game {
 						for(let b2 of neighbors) {
 							if(b2 == b) continue;
 							//possible collision
-							if(b.position.distance(b2.position) < 2) {
+							var d = b.position.distance(b2.position);
+							if(d > 0 && d < 2) {
 								b.collide(b2.position, b2);
 							}
 						}
