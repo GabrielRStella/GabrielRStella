@@ -55,6 +55,14 @@ make_nav();
 			</div>
 		  </div>
 		</div>
+		<div class="col s12 m12 l12">
+		  <div class="card">
+			<div class="card-content">
+			  <a href="/CSCE645/slides.pdf"><span class="card-title">Presentation Slides</span></a>
+			  <p>Short set of slides used for the final presentation</p>
+			</div>
+		  </div>
+		</div>
 	</div>
   </div>
 </div>
