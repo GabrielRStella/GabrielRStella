@@ -23,6 +23,36 @@ make_nav();
       </div>
     </div>
 	<div class="row">
+		<div class="col s12 m6 l3">
+		  <div class="card">
+			<div class="card-content">
+			  <a href="/toy.php?toy=circles"><span class="card-title">MD Circles</span></a>
+			</div>
+		  </div>
+		</div>
+		<div class="col s12 m6 l3">
+		  <div class="card">
+			<div class="card-content">
+			  <a href="/toy.php?toy=billiards"><span class="card-title">Rigid Circles</span></a>
+			</div>
+		  </div>
+		</div>
+		<div class="col s12 m6 l3">
+		  <div class="card">
+			<div class="card-content">
+			  <a href="/toy.php?toy=sand"><span class="card-title">MD Polycircles</span></a>
+			</div>
+		  </div>
+		</div>
+		<div class="col s12 m6 l3">
+		  <div class="card">
+			<div class="card-content">
+			  <a href="/toy.php?toy=sand2"><span class="card-title">Rigid Polycircles</span></a>
+			</div>
+		  </div>
+		</div>
+	</div>
+	<div class="row">
 		<div class="col s12 m12 l12">
 		  <div class="card">
 			<div class="card-content">
