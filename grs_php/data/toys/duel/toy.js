@@ -124,9 +124,10 @@ class Player {
 			ctx.lineWidth = 0.1;
 			RenderHelper.drawLine(ctx, this.position, this.target, this.color);
 			RenderHelper.drawPoint(ctx, this.target, this.color, null, 0.2);
+			
+			RenderHelper.drawPoint(ctx, this.position, "#000000", null, 1.1);
 		}
 		//
-		if(!this.winner) RenderHelper.drawPoint(ctx, this.position, "#000000", null, 1.1);
 		RenderHelper.drawPoint(ctx, this.position, this.color, null, 1);
 		//
 		var composite = ctx.globalCompositeOperation;
@@ -178,7 +179,7 @@ class Bullet {
 		var overlap = Math.max(0, 2 - dist); //length of overlap
 		//velocities
 		var v1 = this.velocity.copy(); //technically may want to use getVelocityAtPoint(mp) here, if rotation is allowed
-		var v2 = b.velocity.copy();
+		var v2 =  (b != null) ? b.velocity.copy() : new Point(0, 0);
 		//relative velocity
 		var V = v1.copy(); //relative velocity at point of contact
 		V.sub(v2);
@@ -195,19 +196,21 @@ class Bullet {
 			tmp = this.velocity.copy();
 			tmp.multiply(-overlaptime);
 			this.position.add(tmp);
-			tmp = b.velocity.copy();
-			tmp.multiply(-overlaptime);
-			b.position.add(tmp);
+			if(b != null) {
+				tmp = b.velocity.copy();
+				tmp.multiply(-overlaptime);
+				p.add(tmp);
+			}
 		}
 		//if they are still overlapping, have to manually move them - in this case, just move evenly apart
-		overlap = 2 - b.position.distance(this.position);
+		overlap = 2 - p.distance(this.position);
 		if(overlap > 0) {
 			var delta = this.position.copy();
-			delta.sub(b.position);
+			delta.sub(p);
 			delta.magnitude = overlap;
 			delta.multiply(0.5);
 			this.position.add(delta);
-			b.position.sub(delta);
+			p.sub(delta);
 		}
 		//swap velocities
 		var Cr = 1; //coefficient of restitution
@@ -220,19 +223,22 @@ class Bullet {
 		var vt2 = N.reject(v2);
 		//
 		var v1p = vt1;
-		v1p.add(vn2);
+		if(b != null) v1p.add(vn2);
+		else v1p.sub(vn1);
 		this.velocity = v1p;
 		var v2p = vt2;
 		v2p.add(vn1);
-		b.velocity = v2p;
+		if(b != null) b.velocity = v2p;
 		//move forward by however much we went back
 		if(Vn > 0.1) {
 			tmp = this.velocity.copy();
 			tmp.multiply(overlaptime);
 			this.position.add(tmp);
-			tmp = b.velocity.copy();
-			tmp.multiply(overlaptime);
-			b.position.add(tmp);
+			if(b != null) {
+				tmp = b.velocity.copy();
+				tmp.multiply(overlaptime);
+				p.add(tmp);
+			}
 		}
 	}
 	
@@ -318,7 +324,6 @@ class DuelGame extends Game {
 	for(let p of this.players) {
 		if(!p.alive) continue;
 		this.winner = p;
-		p.winner = true;
 	}
   }
 
@@ -453,6 +458,7 @@ class DuelGame extends Game {
 						b.velocity.y = - b.velocity.y;
 					}
 				}
+				b.velocity.magnitude = 1;
 				if(!b.active) {
 					//ded
 					this.bullets.splice(i, 1);
@@ -466,14 +472,19 @@ class DuelGame extends Game {
 			//check for players hit
 			var playersAlive = 0;
 			for(let p of this.players) {
-				if(!p.alive) continue;
 				
 				for(let b of this.bullets) {
 					if(b.position.distance(p.position) < 2) {
-						p.alive = false;
-						b.active = false;
+						if(p.alive) {
+							p.alive = false;
+							b.active = false;
+						} else {
+							b.collide(p.position);
+						}
 					}
 				}
+				if(!p.alive) continue;
+				
 				if(p.alive) playersAlive++;
 			}
 			
@@ -534,10 +545,12 @@ class DuelGame extends Game {
 	  ctx.restore();
 	  
 	  if(this.state == 0) {
-		  RenderHelper.drawText(ctx, "Click here for next player", "top", "right", 36, new Point(width - 10, 10), this.getPlayerColor(this.players.length));
-		  RenderHelper.drawText(ctx, "Click here to start", "top", "left", 36, new Point(10, 10), "#ffffff");
+		  RenderHelper.drawText(ctx, "Click here for next player", "top", "right", 36, new Point(width - 10, 10), this.getPlayerColor(this.players.length), "#000000");
+		  RenderHelper.drawText(ctx, "Click in the box to aim", "top", "right", 36, new Point(width - 10, 50), this.getPlayerColor(this.players.length), "#000000");
+		  RenderHelper.drawText(ctx, "Drag on the player to move", "top", "right", 36, new Point(width - 10, 90), this.getPlayerColor(this.players.length), "#000000");
+		  RenderHelper.drawText(ctx, "Click here to start", "top", "left", 36, new Point(10, 10), "#ffffff", "#000000");
 	  } else if(this.state == 2 && this.winner != null) {
-		  RenderHelper.drawText(ctx, "Click here to restart", "top", "right", 36, new Point(width - 10, 10), this.winner.color);
+		  RenderHelper.drawText(ctx, "Click here to restart", "top", "right", 36, new Point(width - 10, 10), this.winner.color, "#000000");
 	  }
 	  
 	}
