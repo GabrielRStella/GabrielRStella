@@ -441,18 +441,18 @@ class ImageStore {
   }
 
   getImage(name) {
-    if(imgCache[name]) {
-      return imgCache[name];
+    if(this.imgCache[name]) {
+      return this.imgCache[name];
     } else {
-      loadImage(name);
-      return imgCache[name];
+      this.loadImage(name);
+      return this.imgCache[name];
     }
   }
 
   loadImage(name) {
     var img = new Image();
     img.src = this.path + name + ".png";
-    imgCache[name] = img;
+    this.imgCache[name] = img;
 //todo - make sure it's loaded before returning (and have async version)
   }
 
