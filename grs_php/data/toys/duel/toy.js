@@ -487,7 +487,7 @@ class DuelGame extends Game {
 						if(d > 0 && d < 2) {
 							var impactInfo = b.collide(b2.position, b2);
 							var radius = 4;
-							var life = 10;
+							var life = 7;
 							var impact = new Impact(b.color, b2.color, radius, impactInfo.pos, impactInfo.angle, life);
 							this.impacts.push(impact);
 						}
@@ -555,7 +555,7 @@ class DuelGame extends Game {
 						}
 						var impactInfo = b.collide(p.position);
 						var radius = 4;
-						var life = 10;
+						var life = 7;
 						var impact = new Impact(b.color, p.color, radius, impactInfo.pos, impactInfo.angle, life);
 						this.impacts.push(impact);
 					}
