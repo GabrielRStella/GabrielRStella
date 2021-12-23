@@ -212,6 +212,10 @@ class Bullet {
 			this.position.add(delta);
 			p.sub(delta);
 		}
+		var impactAngle = this.position.angleTo(p); //angle of delta
+		var impactPosition = this.position.copy();
+		impactPosition.add(p);
+		impactPosition.multiply(1/2);
 		//swap velocities
 		var Cr = 1; //coefficient of restitution
 		//
@@ -240,6 +244,8 @@ class Bullet {
 				p.add(tmp);
 			}
 		}
+		//for impact
+		return {angle: impactAngle, pos: impactPosition};
 	}
 	
 	//update pos + angle and clear accels
@@ -262,6 +268,46 @@ class Bullet {
 	}
 }
 
+class Impact {
+	constructor(color1, color2, r, pos, angle, life) {
+		this.color1 = color1;
+		this.color2 = color2;
+		this.r = r;
+		this.pos = pos;
+		this.angle = angle;
+		this.timer = 0;
+		this.life = life;
+	}
+	
+	get active() {
+		return this.timer < this.life;
+	}
+	
+	update(dt) {
+		this.timer += dt;
+	}
+	
+	render(ctx) {
+		ctx.save();
+		var t = (this.timer / this.life);
+		ctx.lineWidth = (1 - t) * this.r;
+		//
+		  ctx.strokeStyle = this.color2;
+		  ctx.beginPath();
+		  ctx.arc(this.pos.x, this.pos.y, this.r * t, this.angle - Math.PI / 2, this.angle + Math.PI / 2);
+		  ctx.closePath();
+		  ctx.stroke();
+		//
+		  ctx.strokeStyle = this.color1;
+		  ctx.beginPath();
+		  ctx.arc(this.pos.x, this.pos.y, this.r * t, this.angle + Math.PI / 2, this.angle + 3 * Math.PI / 2);
+		  ctx.closePath();
+		  ctx.stroke();
+		//
+		ctx.restore();
+	}
+}
+
 var STATE_PLACEPLAYER = 0;
 var STATE_SIMULATING = 1;
 var STATE_GAMEOVER = 2;
@@ -277,7 +323,8 @@ class DuelGame extends Game {
 	this.players = [];
 	this.bullets = [];
 	this.state = 0; //false: setup; true: simulation
-	
+	//
+	this.impacts = []; //impact animations :^)
 	//
 	this.dragging = false;
 	this.drag = null; //null = aim, Point = drag player with offset
@@ -289,6 +336,7 @@ class DuelGame extends Game {
 	this.state = 0;
 	this.players = [];
 	this.bullets = [];
+	this.impacts = [];
 	this.newPlayer();
   }
   
@@ -429,7 +477,11 @@ class DuelGame extends Game {
 					if(b != b2) {
 						var d = b.position.distance(b2.position);
 						if(d > 0 && d < 2) {
-							b.collide(b2.position, b2);
+							var impactInfo = b.collide(b2.position, b2);
+							var radius = 4;
+							var life = 10;
+							var impact = new Impact(b.color, b2.color, radius, impactInfo.pos, impactInfo.angle, life);
+							this.impacts.push(impact);
 						}
 					}
 				}
@@ -472,18 +524,32 @@ class DuelGame extends Game {
 				}
 			}
 			
+			for(var i = 0; i < this.impacts.length; i++) {
+				var impact = this.impacts[i];
+				impact.update(tickPart / steps);
+				if(!impact.active) {
+					//ded
+					this.impacts.splice(i, 1);
+					i--;
+				}
+			}
+			
 			//check for players hit
 			var playersAlive = 0;
 			for(let p of this.players) {
 				
 				for(let b of this.bullets) {
+					if(!b.active) continue;
 					if(b.position.distance(p.position) < 2) {
 						if(p.alive) {
 							p.alive = false;
 							b.active = false;
-						} else {
-							b.collide(p.position);
 						}
+						var impactInfo = b.collide(p.position);
+						var radius = 4;
+						var life = 10;
+						var impact = new Impact(b.color, p.color, radius, impactInfo.pos, impactInfo.angle, life);
+						this.impacts.push(impact);
 					}
 				}
 				if(!p.alive) continue;
@@ -496,6 +562,21 @@ class DuelGame extends Game {
 		}
 	} else if(this.state == 2) {
 		this.gameEndTimer += tickPart;
+		
+		var steps = 10;
+		for(var step = 0; step < steps; step++) {
+			
+			for(var i = 0; i < this.impacts.length; i++) {
+				var impact = this.impacts[i];
+				impact.update(tickPart / steps);
+				if(!impact.active) {
+					//ded
+					this.impacts.splice(i, 1);
+					i--;
+				}
+			}
+			
+		}
 	}
   }
 
@@ -534,6 +615,10 @@ class DuelGame extends Game {
 		  this.players[this.players.length - 1].render(ctx, this.gameManager.images, true);
 		  
 	  } else {
+			for(let i of this.impacts) {
+				i.render(ctx);
+			}
+			
 		  for(var i = 0; i < this.bullets.length; i++) {
 			var b = this.bullets[i];
 			b.render(ctx);
