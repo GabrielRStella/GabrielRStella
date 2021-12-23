@@ -290,18 +290,26 @@ class Impact {
 	render(ctx) {
 		ctx.save();
 		var t = (this.timer / this.life);
+		var r = this.r * t;
 		ctx.lineWidth = (1 - t) * this.r;
+		//
+		var offset = new Point(r, 0);
+		offset.rotate(this.angle - Math.PI / 2);
+		var endp1 = this.pos.copy();
+		endp1.add(offset);
+		var endp2 = this.pos.copy();
+		endp2.sub(offset);
 		//
 		  ctx.strokeStyle = this.color2;
 		  ctx.beginPath();
-		  ctx.arc(this.pos.x, this.pos.y, this.r * t, this.angle - Math.PI / 2, this.angle + Math.PI / 2);
-		  ctx.closePath();
+		  //ctx.moveTo(endp1);
+		  ctx.arc(this.pos.x, this.pos.y, r, this.angle - Math.PI / 2, this.angle + Math.PI / 2);
+		  //ctx.moveTo(endp2);
 		  ctx.stroke();
 		//
 		  ctx.strokeStyle = this.color1;
 		  ctx.beginPath();
-		  ctx.arc(this.pos.x, this.pos.y, this.r * t, this.angle + Math.PI / 2, this.angle + 3 * Math.PI / 2);
-		  ctx.closePath();
+		  ctx.arc(this.pos.x, this.pos.y, r, this.angle + Math.PI / 2, this.angle + 3 * Math.PI / 2);
 		  ctx.stroke();
 		//
 		ctx.restore();
