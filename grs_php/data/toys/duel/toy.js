@@ -56,6 +56,37 @@ function color(r, g, b, a) {
   return "rgba(" + Math.floor(r * 255) + "," + Math.floor(g * 255) + "," + Math.floor(b * 255) + "," + a + ")";
 }
 
+//https://stackoverflow.com/a/17243070
+/* accepts parameters
+ * h  Object = {h:x, s:y, v:z}
+ * OR 
+ * h, s, v
+*/
+function HSVtoRGB(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (arguments.length === 1) {
+        s = h.s, v = h.v, h = h.h;
+    }
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return {
+        r: r,
+        g: g,
+        b: b
+    };
+}
+
 //https://stackoverflow.com/a/5624139
 function hexToRgb(hex) {
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -71,6 +102,7 @@ function hexToRgb(hex) {
 class Player {
 	constructor() {
 		this.alive = true;
+		this.winner = false;
 		
 		this.color = "#ffffff";
 		this.position = new Point(0, 0);
@@ -80,19 +112,21 @@ class Player {
 	getBullet() {
 		var bullet = new Bullet();
 		bullet.color = this.color;
-		bullet.position = this.posiiton;
+		bullet.position = this.position.copy();
 		bullet.velocity = this.target.copy();
 		bullet.velocity.sub(this.position);
 		bullet.velocity.magnitude = 1;
 		return bullet;
 	}
 	
-	render(ctx, imgs) {
-		ctx.lineWidth = 0.1;
-		RenderHelper.drawLine(ctx, this.position, this.target, this.color);
-		RenderHelper.drawPoint(ctx, this.target, this.color, null, 0.2);
+	render(ctx, imgs, renderAim) {
+		if(renderAim) {
+			ctx.lineWidth = 0.1;
+			RenderHelper.drawLine(ctx, this.position, this.target, this.color);
+			RenderHelper.drawPoint(ctx, this.target, this.color, null, 0.2);
+		}
 		//
-		RenderHelper.drawPoint(ctx, this.position, "#000000", null, 1.1);
+		if(!this.winner) RenderHelper.drawPoint(ctx, this.position, "#000000", null, 1.1);
 		RenderHelper.drawPoint(ctx, this.position, this.color, null, 1);
 		//
 		var composite = ctx.globalCompositeOperation;
@@ -176,7 +210,7 @@ class Bullet {
 			b.position.sub(delta);
 		}
 		//swap velocities
-		var Cr = OPTIONS.Restitution; //coefficient of restitution
+		var Cr = 1; //coefficient of restitution
 		//
 		var vn1 = N.project(v1);
 		vn1.multiply(Cr);
@@ -222,6 +256,10 @@ class Bullet {
 	}
 }
 
+var STATE_PLACEPLAYER = 0;
+var STATE_SIMULATING = 1;
+var STATE_GAMEOVER = 2;
+
 class DuelGame extends Game {
   constructor() {
     super("duel");
@@ -243,11 +281,45 @@ class DuelGame extends Game {
   
   resetGame() {
 	this.state = 0;
+	this.players = [];
+	this.bullets = [];
+	this.newPlayer();
+  }
+  
+  getPlayerColor(i) {
+	  var hue = ((i / 3) + (i < 3 ? 0 : i) * Math.sqrt(5)) % 1;
+	  var saturation = 1 / (Math.floor(i / 3) + 1);
+	  var rgb = HSVtoRGB(hue, saturation, 1);
+	  //
+	  return color(rgb.r, rgb.g, rgb.b, 1); //TODO
+  }
+  
+  newPlayer() {
 	var player = new Player();
-	player.color = "#ff0000";
+	player.color = this.getPlayerColor(this.players.length);
 	player.position = new Point(Math.random() * this.w, Math.random() * this.h);
 	player.target = player.position.copy();
 	this.players.push(player);
+  }
+  
+  startGame() {
+	  this.state = 1;
+	  for(let p of this.players) {
+		  var b = p.getBullet();
+		  b.update(2);
+		  this.bullets.push(b);
+	  }
+  }
+  
+  endGame() {
+	  this.state = 2;
+	  this.gameEndTimer = 0;
+	  this.winner = null;
+	for(let p of this.players) {
+		if(!p.alive) continue;
+		this.winner = p;
+		p.winner = true;
+	}
   }
 
   register(keys, mouse) {
@@ -275,16 +347,27 @@ class DuelGame extends Game {
 	var pos = this.transformLocal(this.mouse.getMousePos(evt));
 	//
 	if(this.state == 0) {
-		//move player/aim
-		var player = this.players[this.players.length - 1];
-		if(pos.distance(player.position) <= 1)  {
-			var delta = player.position.copy();
-			delta.sub(pos);
-			this.drag = delta;
-		} else {
-			this.drag = null;
+		if(pos.x < 0) {
+			//pressed off left of bounds
+			//finished placing
+			this.startGame();
 		}
-		this.dragging = true;
+		if(pos.x > this.w) {
+			//pressed off right of bounds
+			//next player
+			this.newPlayer();
+		} else {
+			//move player/aim
+			var player = this.players[this.players.length - 1];
+			if(pos.distance(player.position) <= 1)  {
+				var delta = player.position.copy();
+				delta.sub(pos);
+				this.drag = delta;
+			} else {
+				this.drag = null;
+			}
+			this.dragging = true;
+		}
 	} else if(this.state == 2) {
 		//game ended, reset
 		this.resetGame();
@@ -292,14 +375,13 @@ class DuelGame extends Game {
   }
   
   onMouseUp(evt) {
-	if(this.dragging) {
-		var pos = this.transformLocal(this.mouse.getMousePos(evt));
-		//
-	}
 	this.dragging = false;
   }
 
   update(tickPart) {
+	
+	
+    if(tickPart > 1) tickPart = 1;
 	
 	  if(this.dragging) {
 		var dragdst = this.transformLocal(this.mouse.mouse);
@@ -315,61 +397,91 @@ class DuelGame extends Game {
 		//
 		this.dragsrc = dragdst;
 	  }
+	  
+	  if(this.state == 0) {
+		  
+		var player = this.players[this.players.length - 1];
+		if(player.position.x < 1) player.position.x = 1;
+		else if(player.position.x > this.w - 1) player.position.x = this.w - 1;
+		if(player.position.y < 1) player.position.y = 1;
+		else if(player.position.y > this.h - 1) player.position.y = this.h - 1
+		
+		return;
+	  }
 	
+	if(this.state == 1) {
 	
-    if(tickPart > 1) tickPart = 1;
-	
-	var steps = 10;
-	for(var step = 0; step < steps; step++) {
-		//update forces, apply gravity / wall repulsion
-		for(let b of this.bullets) {
-			b.forces = [];
-			b.netForce = new Point(0, 0);
-			for(let b2 of this.bullets) {
-				if(b != b2) {
-					var d = b.position.distance(b2.position);
-					if(d > 0 && d < 2) {
-						b.collide(b2.position, b2);
+		var steps = 10;
+		for(var step = 0; step < steps; step++) {
+			//update forces, apply gravity / wall repulsion
+			for(let b of this.bullets) {
+				b.forces = [];
+				b.netForce = new Point(0, 0);
+				for(let b2 of this.bullets) {
+					if(b != b2) {
+						var d = b.position.distance(b2.position);
+						if(d > 0 && d < 2) {
+							b.collide(b2.position, b2);
+						}
 					}
 				}
 			}
-		}
-		
-		//update velocities and positions
-		for(var i = 0; i < this.bullets.length; i++) {
-			var b = this.particles[i];
-			//bounds
-			var b1 = (b.position.x < 1);
-			var b2 = (b.position.x > this.w - 1);
-			var b3 = (b.position.y < 1);
-			var b4 = (b.position.y > this.h - 1);
-			if(b1 || b2 || b3 || b4) {
-				if(b1) {
-					b.position.x = 2 - b.position.x;
-					b.velocity.x = - b.velocity.x;
+			
+			//update velocities and positions
+			for(var i = 0; i < this.bullets.length; i++) {
+				var b = this.bullets[i];
+				//bounds
+				var b1 = (b.position.x < 1);
+				var b2 = (b.position.x > this.w - 1);
+				var b3 = (b.position.y < 1);
+				var b4 = (b.position.y > this.h - 1);
+				if(b1 || b2 || b3 || b4) {
+					if(b1) {
+						b.position.x = 2 - b.position.x;
+						b.velocity.x = - b.velocity.x;
+					}
+					else if(b2) {
+						b.position.x = (this.w - 1) * 2 - b.position.x;
+						b.velocity.x = - b.velocity.x;
+					}
+					if(b3) {
+						b.position.y = 2 - b.position.y;
+						b.velocity.y = - b.velocity.y;
+					}
+					else if(b4) {
+						b.position.y = (this.h - 1) * 2 - b.position.y;
+						b.velocity.y = - b.velocity.y;
+					}
 				}
-				else if(b2) {
-					b.position.x = (this.w - 1) * 2 - b.position.x;
-					b.velocity.x = - b.velocity.x;
-				}
-				if(b3) {
-					b.position.y = 2 - b.position.y;
-					b.velocity.y = - b.velocity.y;
-				}
-				else if(b4) {
-					b.position.y = (this.h - 1) * 2 - b.position.y;
-					b.velocity.y = - b.velocity.y;
+				if(!b.active) {
+					//ded
+					this.bullets.splice(i, 1);
+					i--;
+				} else {
+					//update
+					b.update(tickPart / steps);
 				}
 			}
-			if(!b.active) {
-				//ded
-				this.particles.splice(i, 1);
-				i--;
-			} else {
-				//update
-				b.update(tickPart / steps);
+			
+			//check for players hit
+			var playersAlive = 0;
+			for(let p of this.players) {
+				if(!p.alive) continue;
+				
+				for(let b of this.bullets) {
+					if(b.position.distance(p.position) < 2) {
+						p.alive = false;
+						b.active = false;
+					}
+				}
+				if(p.alive) playersAlive++;
 			}
+			
+			if(playersAlive <= 1) this.endGame();
+			
 		}
+	} else if(this.state == 2) {
+		this.gameEndTimer += tickPart;
 	}
   }
 
@@ -389,14 +501,30 @@ class DuelGame extends Game {
 	  ctx.lineWidth = 0.1;
 	  RenderHelper.drawRect(ctx, new Rectangle(0, 0, this.w, this.h), "#000000", "#ffffff");
 	  
-	  for(var i = 0; i < this.bullets.length; i++) {
-		var b = this.bullets[i];
-		b.render(ctx);
+	  if(this.state == 2 && this.winner != null) {
+		  ctx.save();
+		  //
+		  ctx.beginPath();
+		  ctx.rect(0, 0, this.w, this.h);
+		  ctx.clip();
+		  //
+		  RenderHelper.drawPoint(ctx, this.winner.position, this.winner.color, null, this.gameEndTimer);
+		  //
+		  ctx.restore();
 	  }
 	  
-	  for(var i = 0; i < this.players.length; i++) {
-		var b = this.players[i];
-		b.render(ctx, this.gameManager.images);
+	  if(this.state == 0) {
+		  this.players[this.players.length - 1].render(ctx, this.gameManager.images, true);
+	  } else {
+		  for(var i = 0; i < this.bullets.length; i++) {
+			var b = this.bullets[i];
+			b.render(ctx);
+		  }
+		  
+		  for(var i = 0; i < this.players.length; i++) {
+			var b = this.players[i];
+			b.render(ctx, this.gameManager.images, false);
+		  }
 	  }
 	  
 	  ctx.restore();
