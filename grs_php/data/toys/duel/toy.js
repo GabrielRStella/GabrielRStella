@@ -490,6 +490,8 @@ class DuelGame extends Game {
 	  //rescale to window size
 	  this.scale = Math.min(width / this.w, height / this.h);
 	  this.center = new Point(width / 2, height / 2);
+	  
+	  //RenderHelper.drawRect(ctx, new Rectangle(0, 0, width, height), "#000000", "#ffffff");
 	
 	  ctx.save();
 	  
@@ -511,10 +513,12 @@ class DuelGame extends Game {
 		  RenderHelper.drawPoint(ctx, this.winner.position, this.winner.color, null, this.gameEndTimer);
 		  //
 		  ctx.restore();
+		  //
 	  }
 	  
 	  if(this.state == 0) {
 		  this.players[this.players.length - 1].render(ctx, this.gameManager.images, true);
+		  
 	  } else {
 		  for(var i = 0; i < this.bullets.length; i++) {
 			var b = this.bullets[i];
@@ -528,6 +532,13 @@ class DuelGame extends Game {
 	  }
 	  
 	  ctx.restore();
+	  
+	  if(this.state == 0) {
+		  RenderHelper.drawText(ctx, "Click here for next player", "top", "right", 36, new Point(width - 10, 10), this.getPlayerColor(this.players.length));
+		  RenderHelper.drawText(ctx, "Click here to start", "top", "left", 36, new Point(10, 10), "#ffffff");
+	  } else if(this.state == 2 && this.winner != null) {
+		  RenderHelper.drawText(ctx, "Click here to restart", "top", "right", 36, new Point(width - 10, 10), this.winner.color);
+	  }
 	  
 	}
 }
