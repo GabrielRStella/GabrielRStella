@@ -74,14 +74,25 @@ class Player {
 		
 		this.color = "#ffffff";
 		this.position = new Point(0, 0);
-		this.facing = new Point(0, 0);
+		this.target = new Point(0, 0);
 	}
 	
 	getBullet() {
-		
+		var bullet = new Bullet();
+		bullet.color = this.color;
+		bullet.position = this.posiiton;
+		bullet.velocity = this.target.copy();
+		bullet.velocity.sub(this.position);
+		bullet.velocity.magnitude = 1;
+		return bullet;
 	}
 	
 	render(ctx, imgs) {
+		ctx.lineWidth = 0.1;
+		RenderHelper.drawLine(ctx, this.position, this.target, this.color);
+		RenderHelper.drawPoint(ctx, this.target, this.color, null, 0.2);
+		//
+		RenderHelper.drawPoint(ctx, this.position, "#000000", null, 1.1);
 		RenderHelper.drawPoint(ctx, this.position, this.color, null, 1);
 		//
 		var composite = ctx.globalCompositeOperation;
@@ -89,7 +100,7 @@ class Player {
 		var r = new Rectangle(0, 0, 2, 2);
 		r.center = this.position;
 		ctx.globalCompositeOperation = "darken";
-		imgs.drawImage("face", ctx, r, false);
+		imgs.drawImage(this.alive ? "face" : "face2", ctx, r, false);
 		//
 		ctx.globalCompositeOperation = composite;
 	}
@@ -221,16 +232,21 @@ class DuelGame extends Game {
 	
 	this.players = [];
 	this.bullets = [];
-	this.state = false; //false: setup; true: simulation
+	this.state = 0; //false: setup; true: simulation
+	
+	//
+	this.dragging = false;
+	this.drag = null; //null = aim, Point = drag player with offset
 	
 	this.resetGame();
   }
   
   resetGame() {
-	this.state = false;
+	this.state = 0;
 	var player = new Player();
 	player.color = "#ff0000";
 	player.position = new Point(Math.random() * this.w, Math.random() * this.h);
+	player.target = player.position.copy();
 	this.players.push(player);
   }
 
@@ -252,9 +268,27 @@ class DuelGame extends Game {
   }
   
   onMouseDown(evt) {
-	this.dragging = true;
+	if(this.state == 1) {
+		//game on, do nothing
+		return;
+	}
 	var pos = this.transformLocal(this.mouse.getMousePos(evt));
 	//
+	if(this.state == 0) {
+		//move player/aim
+		var player = this.players[this.players.length - 1];
+		if(pos.distance(player.position) <= 1)  {
+			var delta = player.position.copy();
+			delta.sub(pos);
+			this.drag = delta;
+		} else {
+			this.drag = null;
+		}
+		this.dragging = true;
+	} else if(this.state == 2) {
+		//game ended, reset
+		this.resetGame();
+	}
   }
   
   onMouseUp(evt) {
@@ -269,8 +303,15 @@ class DuelGame extends Game {
 	
 	  if(this.dragging) {
 		var dragdst = this.transformLocal(this.mouse.mouse);
+		var player = this.players[this.players.length - 1];
 		//
-		
+		if(this.drag) {
+			var newpos = this.drag.copy();
+			newpos.add(dragdst);
+			player.position = newpos;
+		} else {
+			player.target = dragdst;
+		}
 		//
 		this.dragsrc = dragdst;
 	  }
