@@ -305,6 +305,9 @@ class DuelGame extends Game {
 	player.color = this.getPlayerColor(this.players.length);
 	player.position = new Point(Math.random() * this.w, Math.random() * this.h);
 	player.target = player.position.copy();
+	var offset = new Point(2, 0);
+	offset.rotate(Math.random() * 2 * Math.PI);
+	player.target.add(offset);
 	this.players.push(player);
   }
   
