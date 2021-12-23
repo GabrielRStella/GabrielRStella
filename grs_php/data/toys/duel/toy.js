@@ -645,8 +645,8 @@ class DuelGame extends Game {
 		  RenderHelper.drawText(ctx, "Click in the box to aim", "top", "right", 36, new Point(width - 10, 50), this.getPlayerColor(this.players.length), "#000000");
 		  RenderHelper.drawText(ctx, "Drag on the player to move", "top", "right", 36, new Point(width - 10, 90), this.getPlayerColor(this.players.length), "#000000");
 		  RenderHelper.drawText(ctx, "Click here to start", "top", "left", 36, new Point(10, 10), "#ffffff", "#000000");
-	  } else if(this.state == 2 && this.winner != null) {
-		  RenderHelper.drawText(ctx, "Click here to restart", "top", "right", 36, new Point(width - 10, 10), this.winner.color, "#000000");
+	  } else if(this.state == 2) {
+		  RenderHelper.drawText(ctx, "Click here to restart", "top", "right", 36, new Point(width - 10, 10), this.winner != null  ? this.winner.color : "#ffffff", "#000000");
 	  }
 	  
 	}
