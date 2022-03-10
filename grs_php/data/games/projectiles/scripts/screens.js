@@ -36,12 +36,11 @@ class ScreenMain extends Screen {
 class ScreenGame extends Screen {
   constructor() {
     super();
-    this.game = game;
+    this.game = new Game();
   }
   
   enter(gui, window, parent) {
     this.gui = gui;
-    this.game.begin(gui, window, window.center);
   }
   
   resize(windowRect) {
@@ -52,13 +51,13 @@ class ScreenGame extends Screen {
     this.game.mouseDown(pt);
   } //mouse btn down at a point
 
-  update(tickPart, windowRect, cursor) {
-    this.game.update(tickPart, windowRect, cursor);
+  update(windowRect, cursor) {
+    this.game.update(windowRect, cursor);
   }
   
   render(ctx, windowRect) {
     ctx.save();
-    this.game.render(ctx, windowRect);
+    this.game.render(ctx, windowRect, this); //pass this for render helper functions
     ctx.restore();
   }
 }

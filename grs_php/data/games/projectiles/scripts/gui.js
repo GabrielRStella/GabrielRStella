@@ -4,19 +4,38 @@
 
 class Gui {
   constructor() {
+    this.canvas = document.getElementById("gameCanvas");
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
+    this.window = new Rectangle(this.width, this.height);
+
+    this.ctx = this.canvas.getContext("2d");
+    
+    
+    //screen management
     this.screens = [];
     this.screen = null;
 
+    //input-related things to make Screen stuff easier
+    this.keys = new Keys();
+    this.mouse = new MouseListener(this.canvas, 0);
+    
     this.input = false;
 
-    this.window = new Rectangle(0, 0, 0, 0);
-
-    //input-related things to make Screen stuff easier
     this.cursor = new Point();
     this.mouse_down = false;
     this.mouse_down_start = null;
     this.mouse_prev = null;
+    
+    //running/timing
+    this.ticksPerSec = 60;
+    this.msPerTick = 1000 / this.ticksPerSec;
+
+    this.update = this.update.bind(this);
+    this.running = false;
   }
+  
+  //screen management
 
   push(screen) {
     if(this.screen) {
@@ -60,31 +79,8 @@ class Gui {
     this.popTo(gui);
     this.pop();
   }
-
-  register(keys, mouse) {
-    if(this.screen) {
-      if(this.input) {
-        this.screen.unregister(this.keys, this.mouse);
-      } 
-      this.screen.register(keys, mouse);
-    }
-    this.input = true;
-    this.keys = keys;
-    this.mouse = mouse;
-
-    this.LISTENER_MOUSE_DOWN = mouse.addListener("mousedown", this.onMouseDown.bind(this));
-    this.LISTENER_MOUSE_UP = mouse.addListener("mouseup", this.onMouseUp.bind(this));
-  }
-
-  unregister(keys, mouse) {
-    if(this.input && this.screen) {
-      this.screen.unregister(this.keys, this.mouse);
-    }
-    this.input = false;
-
-    mouse.removeListener(this.LISTENER_MOUSE_DOWN);
-    mouse.removeListener(this.LISTENER_MOUSE_UP);
-  }
+  
+  //events
 
   onMouseDown(evt) {
     var pos = this.mouse.getMousePos(evt);
@@ -123,6 +119,78 @@ class Gui {
       this.screens[i].resize(windowRect);
     }
     this.window = windowRect;
+  }
+  
+  //lifecycle
+  
+  start() {
+    this.keys.register();
+    this.mouse.register();
+    this.LISTENER_MOUSE_DOWN = this.mouse.addListener("mousedown", this.onMouseDown.bind(this));
+    this.LISTENER_MOUSE_UP = this.mouse.addListener("mouseup", this.onMouseUp.bind(this));
+    
+    if(this.screen) {
+      if(this.input) {
+        this.screen.unregister(this.keys, this.mouse);
+      } 
+      this.screen.register(this.keys, this.mouse);
+    }
+    this.input = true;
+
+    this.prevTickMs = new Date().getTime();
+    this.running = true;
+
+    requestAnimationFrame(this.update);
+  }
+
+  update() {
+    if(!this.running) return;
+
+    var ms = new Date().getTime();
+    var part = (ms - this.prevTickMs) / this.msPerTick;
+
+    //resize
+    if(this.prevWindowWidth != window.innerWidth || this.prevWindowHeight != window.innerHeight) {
+      this.prevWindowWidth = window.innerWidth;
+      this.prevWindowHeight = window.innerHeight;
+
+      //reset canvas
+      var canvas = this.canvas;
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight - 1; //is the -1 necessary? I think it is, to make borders render properly
+      this.width = canvas.width;
+      this.height = canvas.height;
+
+      this.window = new Rectangle(0, 0, this.width, this.height);
+      this.resize(this.window);
+    }
+
+    //prepare for next screen
+    var ctx = this.ctx;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.updateAndRender(part, ctx, this.window);
+
+    this.prevTickMs = ms;
+
+    requestAnimationFrame(this.update);
+  }
+
+  stop() {
+    if(this.input && this.screen) {
+      this.screen.unregister(this.keys, this.mouse);
+    }
+    this.input = false;
+
+    this.mouse.removeListener(this.LISTENER_MOUSE_DOWN);
+    this.mouse.removeListener(this.LISTENER_MOUSE_UP);
+    
+    this.keys.unregister();
+    this.mouse.unregister();
+
+    this.running = false;
   }
 
   updateAndRender(tickPart, ctx, windowRect) {
