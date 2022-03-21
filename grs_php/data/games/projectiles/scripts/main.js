@@ -1,5 +1,5 @@
 //starter code
-var gui = new Gui();
-gui.push(new ScreenMain());
-gui.start();
+var screenManager = new ScreenManager();
+screenManager.push(new ScreenMain());
+screenManager.start();
 
