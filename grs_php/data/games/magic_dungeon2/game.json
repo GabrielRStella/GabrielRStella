@@ -1,0 +1,30 @@
+{
+  "order": "6",
+  "title": "Magic Dungeon Redux",
+  "caption": "Made some slight improvements",
+  "thumbnail": "thumb.png",
+  "background": "#000000",
+  "text": "black-text",
+  "dateString": "Fri Apr 01 2022 15:35:24 GMT-0500 (Central Daylight Time)",
+  "scriptDir": "scripts/",
+  "scripts": [
+    "utilities.js",
+    "images.js",
+    "keys.js",
+    "io.js",
+    "gui.js",
+    "screens.js",
+    "class_element.js",
+    "spells.js",
+    "class_trait.js",
+    "ai.js",
+    "class_monster.js",
+    "class_player.js",
+    "class_state.js",
+    "class_style.js",
+    "class_room.js",
+    "class_world.js",
+    "class_game.js",
+    "game.js"
+    ]
+}
