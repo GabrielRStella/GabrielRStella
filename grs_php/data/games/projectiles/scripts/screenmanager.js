@@ -10,6 +10,7 @@ class ScreenManager {
     this.window = new Rectangle(this.width, this.height);
 
     this.ctx = this.canvas.getContext("2d");
+    this.renderer = new RenderHelper(this.ctx, this.width, this.height);
     
     
     //screen management
@@ -236,10 +237,20 @@ class Screen {
 
   update(tickPart, windowRect, cursor) {}
   render(ctx, windowRect) {}
+}
+
+class RenderHelper {
+  constructor(ctx, w, h) {
+    this.ctx = ctx;
+    this.w = w;
+    this.h = h;
+  }
 
   //rendering helper functions
 
-  renderTitle(ctx, text) {
+  renderTitle(text) {
+    var ctx = this.ctx;
+    //
     ctx.font = '64px sans-serif';
     ctx.textBaseline = 'top';
     ctx.textAlign = 'start';
@@ -249,7 +260,9 @@ class Screen {
     ctx.strokeText(text, 10, 10);
   }
 
-  drawRect(ctx, r, fill, stroke) {
+  drawRect(r, fill, stroke) {
+    var ctx = this.ctx;
+    //
     if(fill) ctx.fillStyle = fill;
     if(stroke) ctx.strokeStyle = stroke;
     ctx.beginPath();
@@ -259,7 +272,9 @@ class Screen {
     if(stroke) ctx.stroke();
   }
 
-  drawPoint(ctx, p, fill, stroke, radius) {
+  drawPoint(p, fill, stroke, radius) {
+    var ctx = this.ctx;
+    //
     if(fill) ctx.fillStyle = fill;
     if(stroke) ctx.strokeStyle = stroke;
     ctx.beginPath();
@@ -269,7 +284,9 @@ class Screen {
     if(stroke) ctx.stroke();
   }
 
-  drawLine(ctx, a, b, color) {
+  drawLine(a, b, color) {
+    var ctx = this.ctx;
+    //
     if(color) ctx.strokeStyle = color;
     ctx.save();
     ctx.beginPath();
@@ -280,7 +297,9 @@ class Screen {
     ctx.restore();
   }
   
-  drawText(ctx, text, baseline, align, size, p, fill, stroke) {
+  drawText(text, baseline, align, size, p, fill, stroke) {
+    var ctx = this.ctx;
+    //
     if(fill) ctx.fillStyle = fill;
     if(stroke) ctx.strokeStyle = stroke;
     ctx.font = size + 'px sans-serif';
@@ -290,7 +309,9 @@ class Screen {
     if(stroke) ctx.strokeText(text, p.x, p.y);
   }
   
-  drawTextCentered(ctx, text, size, p, fill, stroke) {
+  drawTextCentered(text, size, p, fill, stroke) {
+    var ctx = this.ctx;
+    //
     if(fill) ctx.fillStyle = fill;
     if(stroke) ctx.strokeStyle = stroke;
     ctx.font = size + 'px sans-serif';
