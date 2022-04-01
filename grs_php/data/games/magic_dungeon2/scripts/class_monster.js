@@ -38,7 +38,7 @@ class Monster {
     this.spellCooldown -= tickPart;
 
     var mov = this.ai.move(tickPart);
-    mov.magnitude = this.moveSpeed;
+    mov.magnitude = this.moveSpeed * tickPart;
     this.bounds.point.add(mov);
 
     if((this.spellCooldown <= 0) && (Math.random() < this.randomBulletChance)) {

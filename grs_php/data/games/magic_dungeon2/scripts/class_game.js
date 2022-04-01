@@ -26,20 +26,13 @@ class Game {
 
   saveScore() {
     if(this.score > this.highScore) {
-      var date = new Date();
-      date.setFullYear(date.getFullYear() + 1); //won't expire for a while :)
-      document.cookie = "maxScore_magic_dungeon=" + this.score + ";expires=" + date;
       this.highScore = this.score;
+	    window.localStorage.setItem("magic_dungeon_score", this.highScore);
     }
   }
 
   loadHighScore() {
-    var cookie = document.cookie;
-    var index = cookie.search("maxScore_magic_dungeon=");
-    if(index >= 0) {
-      index += 23; //beginning of the number
-      this.highScore = parseInt(cookie.substring(index));
-    } else this.highScore = 0;
+    this.highScore = parseInt(window.localStorage.getItem("magic_dungeon_score") ?? "0");
     return this.highScore;
   }
 

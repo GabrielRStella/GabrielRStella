@@ -47,7 +47,7 @@ class World {
     //IO (movement)
     var io = this.game.io;
     var playerMove = io.playerMove;
-    playerMove.multiply(0.1);
+    playerMove.multiply(0.07 * tickPart);
     var bounds = player.bounds;
     bounds.point.add(playerMove);
 

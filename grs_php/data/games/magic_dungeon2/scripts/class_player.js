@@ -32,8 +32,8 @@ class Player {
 
   update(tickPart) {
     this.spellCooldown -= tickPart;
-	this.iframes -= tickPart;
-	if(this.iframes < 0) this.iframes = 0;
+    this.iframes -= tickPart;
+    if(this.iframes < 0) this.iframes = 0;
   }
 
   draw(canvas) {

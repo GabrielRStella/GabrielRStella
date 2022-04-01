@@ -368,11 +368,11 @@ class ScreenMap extends Screen {
         littleCircle(point, isDist);
       } else if(room2.countOpen() > 0) {
 		  canvas.save();
-		  canvas.fillStyle = "#ffffff";
-		  canvas.textAlign = "center";
-		  canvas.textBaseline = "middle";
-		  canvas.font = '16px sans-serif';
-		  canvas.fillText("?", point.x + 10, point.y - 24);
+      canvas.beginPath();
+      canvas.moveTo(point.x - 20, point.y + 20);
+      canvas.lineTo(point.x + 20, point.y + 20);
+      canvas.stroke();
+      canvas.closePath();
 		  canvas.restore();
 	  }
 
