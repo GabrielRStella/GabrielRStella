@@ -366,17 +366,10 @@ class ScreenMap extends Screen {
       if(isDist) roomDst = this.roomDst = room2; //for later
       if(isCurrent || isDist) {
         littleCircle(point, isDist);
-      } else if(room2.countOpen() > 0) {
-		  canvas.save();
-      canvas.beginPath();
-      canvas.moveTo(point.x - 20, point.y + 20);
-      canvas.lineTo(point.x + 20, point.y + 20);
-      canvas.stroke();
-      canvas.closePath();
-		  canvas.restore();
-	  }
+      }
 
       canvas.fillStyle = "#ffffff";
+      if(room2.countOpen() > 0) canvas.fillStyle = "#ffff00";
       canvas.save();
       canvas.textAlign = "center";
       canvas.textBaseline = "middle";
