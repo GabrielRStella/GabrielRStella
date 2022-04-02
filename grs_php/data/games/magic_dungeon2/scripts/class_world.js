@@ -197,6 +197,40 @@ class World {
 
     //le drawing
     room.draw(canvas);
+    
+    
+    //testing if the path finder works
+    //(it does)
+    bounds = bounds_;
+    var tilepos = new Point((THE_MOUSE.x - bounds.minX) * room.width / bounds.width, (1 + (-1 * (THE_MOUSE.y - bounds.minY) / bounds.height)) * room.height);
+    tilepos.x = Math.floor(tilepos.x);
+    tilepos.y = Math.floor(tilepos.y);
+    if(tilepos.x >= 0 && tilepos.x < room.width && tilepos.y >= 0 && tilepos.y < room.width) {
+      /*
+      canvas.save();
+      canvas.fillStyle = "#00000040";
+      canvas.beginPath();
+      canvas.rect(tilepos.x, tilepos.y, 1, 1);
+      canvas.fill();
+      canvas.closePath();
+      canvas.restore();
+      */
+      var path = room.findPath(this.player.bounds.center, new Point(tilepos.x + 0.5, tilepos.y + 0.5), 1);
+      for(var i = 0; i < path.length - 1; i++) {
+        canvas.save();
+        canvas.strokeStyle = "#00000040";
+        canvas.lineWidth = 0.1;
+        canvas.beginPath();
+        var pprev = path[i];
+        var pnext = path[i + 1];
+        canvas.moveTo(pprev.x, pprev.y);
+        canvas.lineTo(pnext.x, pnext.y);
+        canvas.stroke();
+        canvas.restore();
+      }
+    }
+    
+    
     this.player.draw(canvas);
     
     //draw a little shadow on unexplored doorways
@@ -223,35 +257,6 @@ class World {
         canvas.restore();
       }
     }
-    
-    //testing if the path finder worked
-    //(it does)
-    /*
-    bounds = bounds_;
-    var tilepos = new Point((THE_MOUSE.x - bounds.minX) * room.width / bounds.width, (1 + (-1 * (THE_MOUSE.y - bounds.minY) / bounds.height)) * room.height);
-    tilepos.x = Math.floor(tilepos.x);
-    tilepos.y = Math.floor(tilepos.y);
-    canvas.save();
-    canvas.fillStyle = "#ff0000";
-    canvas.beginPath();
-    canvas.rect(tilepos.x, tilepos.y, 1, 1);
-    canvas.fill();
-    canvas.closePath();
-    canvas.restore();
-    var path = room.findPath(this.player.bounds.center, new Point(tilepos.x + 0.5, tilepos.y + 0.5), 1);
-    for(var i = 0; i < path.length - 1; i++) {
-      canvas.save();
-      canvas.strokeStyle = "#00ff00";
-      canvas.lineWidth = 0.1;
-      canvas.beginPath();
-      var pprev = path[i];
-      var pnext = path[i + 1];
-      canvas.moveTo(pprev.x, pprev.y);
-      canvas.lineTo(pnext.x, pnext.y);
-      canvas.stroke();
-      canvas.restore();
-    }
-    */
 
     canvas.restore();
   }

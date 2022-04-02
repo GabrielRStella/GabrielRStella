@@ -149,7 +149,7 @@ class Room {
   }
 
   generateObstacles() {
-    if(Math.random() < 0.9) { //TMP was 0.13
+    if(Math.random() < 0.15) {
       this.generateMaze();
       this.canHaveBoss = false;
     } else if(Math.random() < 0.2) {
@@ -256,6 +256,9 @@ class Room {
       var y = p.y;
       //if breaking this wall would lead to a diagonal disconnect, then we can't delete it; leave it a wall and remove from frontier
       //if any of this wall's neighbors are walls, then the diagonals in that direction must also be walls
+      //this is just for aesthetic reasons, and actually this alg isn't entirely correct;
+      //but is ok
+      //need to explicitly check for each pair of directions (e.g. check that if left+up are walls, then left+up diagonal must also be a wall)
       var canBreak = true;
       for(var i = 0; i < DIRS.length; i++) {
         var dir = DIRS[i];
@@ -278,20 +281,29 @@ class Room {
       
       //can't break a wall that would connect a region to itself
       //to test: if the wall has two or more neighbors in the same region, it can't be broken
-      //(doesn't seem to be necessary with current rules; may add it back later)
-      /*
+      //also, helps to see whether we are connecting a region
       var lRegion = regions[x-1][y];
       var rRegion = regions[x+1][y];
       var dRegion = regions[x][y-1];
       var uRegion = regions[x][y+1];
-      var neighborRegions = new Set();
-      if(lRegion >= 0) neighborRegions.add(lRegion);
-      if(neighborRegions.has(rRegion)) continue;
-      if(rRegion >= 0) neighborRegions.add(rRegion);
-      if(neighborRegions.has(dRegion)) continue;
-      if(dRegion >= 0) neighborRegions.add(dRegion);
-      if(neighborRegions.has(uRegion)) continue;
-      */
+      var neighborRegions = [lRegion, rRegion, dRegion, uRegion];
+      neighborRegions.sort();
+      var neighborRegionsSet = new Set(neighborRegions)
+      neighborRegionsSet.delete(-1); //just in case; we don't care about this one
+      var numDistinctRegions = neighborRegionsSet.size; //the number of distinct regions that show up
+      var numHighestRegionCount = 1; //the max number of times a single region shows up
+      var maxRegion = neighborRegions[neighborRegions.length - 1]; //highest-index region in the neighbor set
+      if(numDistinctRegions < 4) {
+        neighborRegionsSet.forEach(function(value) {
+          var count = 0;
+          for(var i = 0; i < neighborRegions.length; i++) {
+            if(neighborRegions[i] == value) count++;
+          }
+          numHighestRegionCount = Math.max(numHighestRegionCount, count);
+        });
+      }
+      if(numHighestRegionCount > 1) continue;
+      if(maxRegion < 0) continue; //not sure why this happens... but it does sometimes...
       
       //count neighbors and add them to frontier,
       //if they aren't in the "seen" set
@@ -317,10 +329,29 @@ class Room {
       //if this block is surrounded on three sides, let's just delete it
       if(neighborWalls == 3) {
         this.states[x][y] = STATE_EMPTY;
+        regions[x][y] = maxRegion;
+        regionList.get(maxRegion).add(this.convertPos(x, y));
         addNeighbors = true;
       }
       
-      
+      //if breaking this would connect two regions, let's delete it and convert both regions to the max index
+      if(numDistinctRegions > 1) {
+        this.states[x][y] = STATE_EMPTY;
+        //
+        var maxRegionMembers = regionList.get(maxRegion);
+        //go through each region
+        neighborRegionsSet.forEach(function(region) {
+          if(region == maxRegion) return;
+          //change all of its members to be in the maxRegion
+          var regionMembers = regionList.get(region);
+          regionMembers.forEach(function(idx) {
+            var mp = this.convertInt(idx);
+            regions[mp.x][mp.y] = maxRegion;
+            maxRegionMembers.add(idx);
+          }, this);
+          regionList.delete(region);
+        }, this);
+      }
       
       for(var i = 0; i < neighborsToAdd.length; i++) {
         var nidx = neighborsToAdd[i];
