@@ -238,7 +238,7 @@ class World {
       }
     }
 	var chance = 1 - (1.0 / totalDoors); //more likely as there are more rooms available
-	if(totalDoors < 3) chance = 0;
+	if(totalDoors < 5) chance = 0;
 	if(rooms.length > 0 && Math.random() < chance) {
 		//connect to one of the existing rooms
 		//keep going until we find a matching one

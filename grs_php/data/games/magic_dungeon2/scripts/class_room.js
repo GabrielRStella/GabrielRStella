@@ -144,7 +144,7 @@ class Room {
   }
 
   generateObstacles() {
-    if(Math.random() < 0.13) {
+    if(Math.random() < 0.9) { //TMP was 0.13
       this.generateMaze();
       this.canHaveBoss = false;
     } else if(Math.random() < 0.2) {
