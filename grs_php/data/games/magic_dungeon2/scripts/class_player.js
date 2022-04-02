@@ -75,9 +75,9 @@ class Player {
 
   onHit(spellPart) {
     if(this.iframes <= 0) {
-		this.health -= spellPart.damage;
-		this.iframes = 10; //60 is a full second, iirc
-	}
+		  this.health -= spellPart.damage;
+		  this.iframes = 20; //100 is a full second
+	  }
   }
 
   onDeath(spellPart, monster) {
