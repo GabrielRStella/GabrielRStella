@@ -25,6 +25,10 @@ function randomRangeFloor(min, max) {
   return Math.floor(randomRange(min, max));
 }
 
+function randomIndex(arr) {
+  return Math.floor(Math.random()*arr.length);
+}
+
 function choosePoint() {
   var p = new Point(1, 0);
   p.rotate(Math.random() * Math.PI * 2);

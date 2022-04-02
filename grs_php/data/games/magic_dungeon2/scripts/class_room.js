@@ -92,17 +92,22 @@ class Room {
   }
 
   getState(x, y) {
-    if((x < 0) || (x >= this.width) || (x < 0) || (x >= this.height)) {
+    if((x < 0) || (x >= this.width) || (y < 0) || (y >= this.height)) {
       return STATE_EMPTY;
     }
     return this.states[x][y];
   }
 
   setState(x, y, state) {
-    if((x < 0) || (x >= this.width) || (x < 0) || (x >= this.height)) {
+    if((x < 0) || (x >= this.width) || (y < 0) || (y >= this.height)) {
       return;
     }
     this.states[x][y] = state;
+  }
+  
+  checkBounds(x, y, off) {
+    off = off || 0;
+    return !((x < off) || (x >= this.width - off) || (y < off) || (y >= this.height - off));
   }
 
   //---generators
@@ -184,89 +189,30 @@ class Room {
   }
 
   generateMaze() {
-    var minX = 0;
-    var minY = 0;
-    var maxX = this.width;
-    var maxY = this.height;
-
     //make it a maze
-    //using a "randomized kruskal's algorithm" from wikipedia
-    //https://en.wikipedia.org/wiki/Maze_generation_algorithm
-    //woo...
-    var walls = [];
-    var points = []
-    for(var x = minX; x < maxX; x++) {
-      for(var y = minY; y < maxY; y++) {
-        if(x % 2 == 0 && y % 2 == 0) {
-          points.push(new Set([this.convertPoint(new Point(x, y))]));
-        } else if((x % 2 == 0 || y % 2 == 0)) {
-          walls.push(this.convertPoint(new Point(x, y)));
-        }
+    //using a custom algorithm :))) hope it works well
+    //set operations: add, delete, clear, has, forEach
+   
+    var regions = [];
+    var regionList = new Map(); //maps from region number to set of block positions (as integers)
+    for(var i = 0; i < this.width; i++) {
+      var arr = [];
+      for(var j = 0; j < this.height; j++) {
+        arr.push(-1); //no region
       }
+      regions.push(arr);
     }
-    shuffle(walls);
-    walls = new Set(walls);
-    walls.forEach(function(wall) {
-      wall = this.convertInt(wall);
-      var p1;
-      var p2;
-      if(wall.x % 2 == 0) {
-        //join vertically
-        p1 = new Point(wall.x, wall.y - 1);
-        p2 = new Point(wall.x, wall.y + 1);
-      } else {
-        //join horizontally
-        p1 = new Point(wall.x - 1, wall.y);
-        p2 = new Point(wall.x + 1, wall.y);
-      }
-      p1 = this.convertPoint(p1);
-      p2 = this.convertPoint(p2);
-      var s1;
-      var s2;
-      var i2;
-      for(var i = 0; i < points.length; i++) {
-        var s = points[i];
-        //console.log(s);
-        if(s.has(p1)) {
-          s1 = s;
-        }
-        if(s.has(p2)) {
-          s2 = s;
-          i2 = i;
-        }
-      }
-      if(s1 && s2 && (s1 != s2)) {
-        s1.add(this.convertPoint(wall));
-        var iter = s2.values();
-        do {
-          var n = iter.next();
-          if(n.done) break;
-          s1.add(n.value);
-        } while(true);
-
-        points.splice(i2, 1);
-      }
-    }, this);
-
-    if(points.length != 1) {
-      console.log("what happened? something went wrong while generating a maze.");
-    }
-    points = points[0];
-
-    var broken = 1 - (Math.random() * Math.random());
-    minX = 1;
-    minY = 1;
-    maxX = this.width - 1;
-    maxY = this.height - 1;
-    for(var x = minX; x < maxX; x++) {
-      for(var y = minY; y < maxY; y++) {
-        if((Math.random() < broken) && !points.has(this.convertPoint(new Point(x, y)))) {
-          this.states[x][y] = STATE_WALL;
-        }
+    var frontier = [];
+    var seen = new Set(); //blocks that can't be added to frontier anymore
+    
+    //set all blocks to stone
+    for(var x = 1; x < this.width - 1; x++) {
+      for(var y = 1; y < this.height - 1; y++) {
+        this.states[x][y] = STATE_WALL;
       }
     }
 
-    //dig tunnels from the gates
+    //dig tunnels from the gates and add the corresponding regions
     for(var i = 0; i < DIRS.length; i++) {
       if(this.open[DIRS[i]]) {
         var dir = DIRS[i].opposite; //if it's the bottom gate, we're going up, etc
@@ -278,10 +224,113 @@ class Room {
         src.y += dir.delta.y;
         this.states[src.x][src.y] = STATE_EMPTY;
         this.states[src.x + dx][src.y + dy] = STATE_EMPTY;
+        //initialize the region
+        regions[src.x][src.y] = i;
+        regions[src.x + dx][src.y + dy] = i;
+        var idx1 = this.convertPos(src.x, src.y);
+        var idx2 = this.convertPos(src.x + dx, src.y + dy);
+        regionList.set(i, new Set([idx1, idx2]));
       }
     }
-
-    //TODO: correctly ensure all gates are reachable using a search
+    
+    for(var x = 1; x < this.width - 1; x++) {
+      for(var y = 1; y < this.height - 1; y++) {
+        if(this.states[x][y] == STATE_WALL) {
+          //if it's a wall, and it's next to an empty block, add it to the frontier
+          if(this.getState(x - 1, y) == STATE_EMPTY || this.getState(x + 1, y) == STATE_EMPTY || this.getState(x, y - 1) == STATE_EMPTY || this.getState(x, y + 1) == STATE_EMPTY) {
+            frontier.push(x + y * this.width); //index number of that block
+          }
+        }
+      }
+    }
+    
+    //randomly carve out spots in the frontier
+    while(frontier.length > 0) {
+      //get random from frontier and remove it
+      var idx = randomIndex(frontier);
+      var curr = frontier[idx];
+      frontier.splice(idx, 1);
+      //
+      var p = this.convertInt(curr);
+      var x = p.x;
+      var y = p.y;
+      //if breaking this wall would lead to a diagonal disconnect, then we can't delete it; leave it a wall and remove from frontier
+      //if any of this wall's neighbors are walls, then the diagonals in that direction must also be walls
+      var canBreak = true;
+      for(var i = 0; i < DIRS.length; i++) {
+        var dir = DIRS[i];
+        //neighbor pos
+        var nx = x + dir.delta.x;
+        var ny = y + dir.delta.y;
+        if(this.states[nx][ny] == STATE_WALL) {
+          //two diagonals; one must be a wall, or we can't break the current block
+          var d1 = dir.next;
+          var d1x = nx + d1.delta.x, d1y = ny + d1.delta.y;
+          var d2 = dir.prev;
+          var d2x = nx + d2.delta.x, d2y = ny + d2.delta.y;
+          if(this.states[d1x][d1y] == STATE_EMPTY && this.states[d2x][d2y] == STATE_EMPTY) {
+            canBreak = false;
+            break;
+          }
+        }
+      }
+      if(!canBreak) continue;
+      
+      //can't break a wall that would connect a region to itself
+      //to test: if the wall has two or more neighbors in the same region, it can't be broken
+      //(doesn't seem to be necessary with current rules; may add it back later)
+      /*
+      var lRegion = regions[x-1][y];
+      var rRegion = regions[x+1][y];
+      var dRegion = regions[x][y-1];
+      var uRegion = regions[x][y+1];
+      var neighborRegions = new Set();
+      if(lRegion >= 0) neighborRegions.add(lRegion);
+      if(neighborRegions.has(rRegion)) continue;
+      if(rRegion >= 0) neighborRegions.add(rRegion);
+      if(neighborRegions.has(dRegion)) continue;
+      if(dRegion >= 0) neighborRegions.add(dRegion);
+      if(neighborRegions.has(uRegion)) continue;
+      */
+      
+      //count neighbors and add them to frontier,
+      //if they aren't in the "seen" set
+      var neighborWalls = 0;
+      var neighborsToAdd = [];
+      var addNeighbors = false;
+      for(var i = 0; i < DIRS.length; i++) {
+        var dir = DIRS[i];
+        //neighbor pos
+        var nx = x + dir.delta.x;
+        var ny = y + dir.delta.y;
+        if(!this.checkBounds(nx, ny, 1)) {
+          neighborWalls++;
+          continue;
+        }
+        if(this.states[nx][ny] == STATE_WALL) {
+          neighborWalls++;
+          var nidx = this.convertPos(nx, ny);
+          neighborsToAdd.push(nidx);
+        }
+      }
+      
+      //if this block is surrounded on three sides, let's just delete it
+      if(neighborWalls == 3) {
+        this.states[x][y] = STATE_EMPTY;
+        addNeighbors = true;
+      }
+      
+      
+      
+      for(var i = 0; i < neighborsToAdd.length; i++) {
+        var nidx = neighborsToAdd[i];
+        if(!seen.has(nidx)) {
+          seen.add(nidx);
+          frontier.push(nidx);
+        }
+      }
+    }
+    
   }
 
   generateMonsters(difficulty) {
@@ -379,6 +428,10 @@ class Room {
 
   convertPoint(p) {
     return p.x + p.y * this.width;
+  }
+
+  convertPos(x, y) {
+    return x + y * this.width;
   }
 
   convertInt(x) {
