@@ -434,6 +434,8 @@ class Room {
     var endp = end;
     start = this.convertPoint(start);
     end = this.convertPoint(end);
+    
+    if(start == end) return [];
 
     var checked = [start];
     var frontier = new PriorityQueue();
@@ -447,7 +449,7 @@ class Room {
     }
 
     var last = null;
-
+      
     while(frontier.size) {
       var curr = frontier.pop();
       checked.push(curr);
