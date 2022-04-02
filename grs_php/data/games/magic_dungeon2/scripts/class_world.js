@@ -197,6 +197,31 @@ class World {
     //le drawing
     room.draw(canvas);
     this.player.draw(canvas);
+    
+    //draw a little shadow on unexplored doorways
+    for(var d in room.open) {
+      if(room.open[d] && !room.connections[d]) {
+        var dir = DIRS[d];
+        var dx = (dir.delta.x == 0) ? 0 : 1;
+        var dy = (dir.delta.y == 0) ? 0 : 1;
+        var src;
+        if(dx == 0) {
+          //vertical direction
+          src = new Point(room.width / 2 - 1, (room.height) * (dir.delta.y + 1) / 2 - .5);
+        } else {
+          //horizontal direction
+          src = new Point((room.width) * (dir.delta.x + 1) / 2 - .5, room.height / 2 - 1);
+        }
+        var bounds = new Rectangle(src, 2 - dx, 2 - dy);
+        canvas.save();
+        canvas.fillStyle = "#00000040";
+        canvas.beginPath();
+        canvas.rect(bounds.point.x, bounds.point.y, bounds.width, bounds.height);
+        canvas.fill();
+        canvas.closePath();
+        canvas.restore();
+      }
+    }
 
     canvas.restore();
   }
