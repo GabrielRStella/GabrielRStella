@@ -205,8 +205,8 @@ class World {
     var tilepos = new Point((THE_MOUSE.x - bounds.minX) * room.width / bounds.width, (1 + (-1 * (THE_MOUSE.y - bounds.minY) / bounds.height)) * room.height);
     tilepos.x = Math.floor(tilepos.x);
     tilepos.y = Math.floor(tilepos.y);
-    if(tilepos.x >= 0 && tilepos.x < room.width && tilepos.y >= 0 && tilepos.y < room.width) {
-      /*
+    if(tilepos.x >= 0 && tilepos.x < room.width && tilepos.y >= 0 && tilepos.y < room.height) {
+      ///*
       canvas.save();
       canvas.fillStyle = "#00000040";
       canvas.beginPath();
@@ -214,7 +214,6 @@ class World {
       canvas.fill();
       canvas.closePath();
       canvas.restore();
-      */
       var path = room.findPath(this.player.bounds.center, new Point(tilepos.x + 0.5, tilepos.y + 0.5), 1);
       for(var i = 0; i < path.length - 1; i++) {
         canvas.save();
