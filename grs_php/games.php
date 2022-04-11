@@ -41,9 +41,9 @@ function cmp($a, $b)
 $basedir = 'data/games/';
 $games = array();
 foreach(listFilesAndDirs($basedir) as $dir) {
-  $datafile = $basedir . $dir . '/' . $gamedir . 'game.json';
+  $datafile = $basedir . $dir . '/' . 'game.json';
   $gamedata = json_decode(file_get_contents($datafile), true); //info: script/scripts/scriptDir, title, caption, background (color), thumbnail, text (color), dateString
-  if($gamedata['hidden']) {
+  if(property_exists($gamedata, 'hidden') and $gamedata['hidden']) {
     continue;
   }
   $gamedata['dir'] = $dir;

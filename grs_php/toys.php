@@ -42,9 +42,9 @@ foreach(listFilesAndDirs($basedir) as $dir) {
   if(strpos($dir, '.') !== false) {
     continue;
   }
-  $datafile = $basedir . $dir . '/' . $gamedir . 'toy.json';
+  $datafile = $basedir . $dir . '/' . 'toy.json';
   $gamedata = json_decode(file_get_contents($datafile), true); //info: title, description, foreground, background, dateString
-  if($gamedata['hidden']) {
+  if(property_exists($gamedata, 'hidden') and $gamedata['hidden']) {
     continue;
   }
   $gamedata['dir'] = $dir;
