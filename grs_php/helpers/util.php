@@ -63,7 +63,7 @@ function make_footer() {
       <div class=\"center container\">
         This site is a work in progress.
         <br/>
-        &copy; 2020 Gabriel Stella
+        &copy; 2017-2022 Gabriel Stella
       </div>
     </footer>";
 }
