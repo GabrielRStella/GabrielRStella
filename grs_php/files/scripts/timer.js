@@ -25,6 +25,7 @@ class Message extends React.Component {
   }
 }
 
+//TODO fix this for mobile (use two rows; I think valign-wrapper breaks it)
 class Options extends React.Component {
   render() {
     return React.createElement('div', {className: "row valign-wrapper"},
