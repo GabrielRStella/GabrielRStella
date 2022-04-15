@@ -27,7 +27,7 @@ $projects = array(
   array(
     "to"=>"/timer.php",
     "title"=>"Timer",
-    "description"=>"An simple timer."
+    "description"=>"A simple timer."
   ),
   array(
     "to"=>"/CSCE645",
