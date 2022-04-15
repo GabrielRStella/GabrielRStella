@@ -25,16 +25,6 @@ class Message extends React.Component {
   }
 }
 
-class Body extends React.Component {
-  render() {
-    return React.createElement('div', {style: {border: "solid 1px black", fontSize: "72px"}},
-      React.createElement('p', {}, this.props.message,
-        React.createElement('br', {})
-      )
-    );
-  }
-}
-
 class Options extends React.Component {
   render() {
     return React.createElement('div', {className: "row valign-wrapper"},
