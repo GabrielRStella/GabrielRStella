@@ -28,14 +28,22 @@ class Message extends React.Component {
 class Options extends React.Component {
   render() {
     return React.createElement('div', {className: "row valign-wrapper"},
-      React.createElement('div', {className: "input-field col m6 s12"},
+      React.createElement('div', {className: "input-field col m4 s12"},
         React.createElement('input', {type: "time", id: "field_begin", value: this.props.timeBegin, onChange: this.props.onTimeBeginChange}),
         React.createElement('label', {"for": "field_begin"}, "Begin")
       ),
-      React.createElement('div', {className: "input-field col m6 s12"},
+      React.createElement('div', {className: "input-field col m4 s12"},
         React.createElement('input', {type: "time", id: "field_end", value: this.props.timeEnd, onChange: this.props.onTimeEndChange}),
         React.createElement('label', {"for": "field_end"}, "End")
-      )
+      ),
+      React.createElement('div', {className: "input-field col m2 s6"},
+        React.createElement('input', {type: "number", step:"1", id: "field_fontsize", value: this.props.fontSize, onChange: this.props.onFontSizeChange}),
+        React.createElement('label', {"for": "field_fontsize"}, "Font size")
+      ),
+        React.createElement('label', {className: "input-field col m2 s6"},
+			React.createElement('input', {type: "checkbox", className: "filled-in", id: "field_showpercent", checked: this.props.showPercent, onChange: this.props.onShowPercentChange}),
+			React.createElement('span', {}, "Show Percentage")
+		)
     );
   }
 }
@@ -50,19 +58,23 @@ class Page extends React.Component {
       //https://stackoverflow.com/a/30245911
       timeBegin: timeToString(currentDate),
       timeEnd: timeToString(nextDate),
-      timeCurrent: timeToString(currentDate) //is actually just a placeholder to let us setState on tick
+      timeCurrent: timeToString(currentDate), //is actually just a placeholder to let us setState on tick
+	  //
+	  fontSize: 72,
+	  showPercent: false
     };
     //
     this.onTimeBeginChange = this.onTimeBeginChange.bind(this); //when user updates start time
     this.onTimeEndChange = this.onTimeEndChange.bind(this); //when user updates end time
     this.onTimeChange = this.onTimeChange.bind(this); //when the clock ticks
+    this.onFontSizeChange = this.onFontSizeChange.bind(this); //when the clock ticks
+    this.onShowPercentChange = this.onShowPercentChange.bind(this); //when the clock ticks
     
     setInterval(this.onTimeChange, 500);
   }
   
   //options callbacks
   onTimeBeginChange(event) {
-    console.log(event.target.value);
 	  this.setState({timeBegin: event.target.value});
   }
   onTimeEndChange(event) {
@@ -71,17 +83,19 @@ class Page extends React.Component {
   onTimeChange() {
 	  this.setState({timeCurrent: timeToString(new Date())});
   }
-  //entries callbacks
-  onEntryClick(key, value) {
-	  this.setState({
-		  key: key, value: value
-	  });
+  onFontSizeChange(event) {
+	  this.setState({fontSize: event.target.value});
+  }
+  onShowPercentChange(event) {
+	  this.setState({showPercent: !this.state.showPercent});
   }
 
   render() {
 	  var options = React.createElement(Options, {
 			onTimeBeginChange: this.onTimeBeginChange, onTimeEndChange: this.onTimeEndChange,
-      timeBegin: this.state.timeBegin, timeEnd: this.state.timeEnd
+			timeBegin: this.state.timeBegin, timeEnd: this.state.timeEnd,
+			onFontSizeChange: this.onFontSizeChange, onShowPercentChange: this.onShowPercentChange,
+			fontSize: this.state.fontSize, showPercent: this.state.showPercent
 		});
     
     var tBegin = this.state.timeBegin;
@@ -95,25 +109,38 @@ class Page extends React.Component {
     var sElapsed = Math.round((dCurrent - dBegin) / 1000);
     var sRemaining = Math.round((dEnd - dCurrent) / 1000);
     
-	  var body = React.createElement(Message, {message: "..."});
+	var msg = "...";
     
     if(sTotal < 0) {
-      var body = React.createElement(Message, {message: "Invalid interval"});
+      msg = "Invalid interval";
     } else if(sElapsed < 0) {
-      var body = React.createElement(Message, {message: "Waiting to start"});
+      msg = "Waiting to start";
     } else if(sRemaining <= 0) {
-      var body = React.createElement(Message, {message: "Time is over"});
+      msg = "Time is over";
     } else {
       //counting down a valid interval
       var sRemaining_ = sRemaining % 60;
       var mRemaining = Math.floor(sRemaining / 60);
       var mRemaining_ = mRemaining % 60;
       var hRemaining = Math.floor(mRemaining / 60);
-      var msg = (hRemaining > 0 ? (hRemaining.toString() + ":") : "") + partsToString(mRemaining_, sRemaining_) + " Remaining";
-      var body = React.createElement(Message, {message: msg});
-      console.log("hi");
+	  var timeString = "";
+	  if(hRemaining > 0) {
+		  //h:mm:ss
+		  timeString = hRemaining.toString() + ":" + partsToString(mRemaining_, sRemaining_);
+	  } else if(mRemaining_ > 0) {
+		  //m:ss
+		  timeString = mRemaining_.toString() + ":" + sRemaining_.toString().padStart(2, '0');
+	  } else {
+		  //s
+		  timeString = sRemaining_.toString() + "s";
+	  }
+	  msg = timeString + " Remaining";
+	  if(this.state.showPercent) {
+		  var percentElapsed = Math.floor(100 * sElapsed / sTotal);
+		  msg += " (" + percentElapsed + "%)";
+	  }
     }
-    
+	var body = React.createElement(Message, {message: msg, fontSize: this.state.fontSize});
     
     return React.createElement('div', {className: "container"},
       React.createElement('div', {style: {height: '10px'}}),
