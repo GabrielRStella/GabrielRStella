@@ -25,6 +25,11 @@ make_nav();
 
 $projects = array(
   array(
+    "to"=>"/timer.php",
+    "title"=>"Timer",
+    "description"=>"An simple timer."
+  ),
+  array(
     "to"=>"/CSCE645",
     "title"=>"CSCE 645 Project",
     "description"=>"My research project for CSCE 645: Geometric Modeling."
