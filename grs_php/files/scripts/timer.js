@@ -1,5 +1,9 @@
 function timeToString(d) {
-  return d.getHours().toString().padStart(2, '0') + ":" + d.getMinutes().toString().padStart(2, '0');
+  return partsToString(d.getHours(), d.getMinutes());
+}
+
+function partsToString(h, m) {
+  return h.toString().padStart(2, '0') + ":" + m.toString().padStart(2, '0');
 }
 
 function stringToDate(hhmm) {
@@ -11,9 +15,19 @@ function stringToDate(hhmm) {
   return d;
 }
 
+class Message extends React.Component {
+  render() {
+    return React.createElement('div', {style: {border: "solid 1px black", fontSize: (this.props.fontSize || 72) + "px"}},
+      React.createElement('p', {}, this.props.message,
+        React.createElement('br', {})
+      )
+    );
+  }
+}
+
 class Body extends React.Component {
   render() {
-    return React.createElement('div', {style: {border: "solid 1px black"}},
+    return React.createElement('div', {style: {border: "solid 1px black", fontSize: "72px"}},
       React.createElement('p', {}, this.props.message,
         React.createElement('br', {})
       )
@@ -91,18 +105,22 @@ class Page extends React.Component {
     var sElapsed = Math.round((dCurrent - dBegin) / 1000);
     var sRemaining = Math.round((dEnd - dCurrent) / 1000);
     
-	  var body = React.createElement(Body, {message: "..."});
+	  var body = React.createElement(Message, {message: "..."});
     
     if(sTotal < 0) {
-      var body = React.createElement(Body, {message: "Invalid interval"});
+      var body = React.createElement(Message, {message: "Invalid interval"});
     } else if(sElapsed < 0) {
-      var body = React.createElement(Body, {message: "Waiting to start"});
+      var body = React.createElement(Message, {message: "Waiting to start"});
     } else if(sRemaining < 0) {
-      var body = React.createElement(Body, {message: "Time is over"});
+      var body = React.createElement(Message, {message: "Time is over"});
     } else {
       //counting down a valid interval
-      var msg = "Elapsed: " + sElapsed + ", Remaining: " + sRemaining;
-      var body = React.createElement(Body, {message: msg});
+      var sRemaining_ = sRemaining % 60;
+      var mRemaining = Math.floor(sRemaining / 60);
+      var mRemaining_ = mRemaining % 60;
+      var hRemaining = Math.floor(mRemaining / 60);
+      var msg = (hRemaining > 0 ? (hRemaining.toString() + ":") : "") + partsToString(mRemaining_, sRemaining_) + " Remaining";
+      var body = React.createElement(Message, {message: msg});
       console.log("hi");
     }
     
