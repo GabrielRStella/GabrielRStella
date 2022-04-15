@@ -101,7 +101,7 @@ class Page extends React.Component {
       var body = React.createElement(Message, {message: "Invalid interval"});
     } else if(sElapsed < 0) {
       var body = React.createElement(Message, {message: "Waiting to start"});
-    } else if(sRemaining < 0) {
+    } else if(sRemaining <= 0) {
       var body = React.createElement(Message, {message: "Time is over"});
     } else {
       //counting down a valid interval
