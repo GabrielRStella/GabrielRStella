@@ -25,7 +25,6 @@ class Message extends React.Component {
   }
 }
 
-//TODO fix this for mobile (use two rows; I think valign-wrapper breaks it)
 class Options extends React.Component {
   createContent(args) {
   }
@@ -83,6 +82,9 @@ class Options extends React.Component {
   }
 }
 
+//TODO: could have it parse default time values from the URL query stringToDate
+//https://www.sitepoint.com/get-url-parameters-with-javascript/
+//https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
 class Page extends React.Component {
   constructor(props) {
     super(props);
