@@ -146,12 +146,23 @@ class Page extends React.Component {
     var sElapsed = Math.round((dCurrent - dBegin) / 1000);
     var sRemaining = Math.round((dEnd - dCurrent) / 1000);
     
-	var msg = "...";
+	  var msg = "...";
     
     if(sTotal < 0) {
       msg = "Invalid interval";
     } else if(sElapsed < 0) {
-      msg = "Waiting to start";
+      var sToStart = -sElapsed;
+      var mToStart = Math.floor(sToStart / 60);
+      var hToStart = Math.floor(mToStart / 60);
+      var tString = "";
+      if(hToStart > 0) {
+        tString = hToStart.toString() + "h";
+      } else if(mToStart > 0) {
+        tString = mToStart.toString() + "m";
+      } else {
+        tString = sToStart.toString() + "s";
+      }
+      msg = "Waiting to start (" + tString + ")";
     } else if(sRemaining <= 0) {
       msg = "Time is over";
     } else {
@@ -160,22 +171,22 @@ class Page extends React.Component {
       var mRemaining = Math.floor(sRemaining / 60);
       var mRemaining_ = mRemaining % 60;
       var hRemaining = Math.floor(mRemaining / 60);
-	  var timeString = "";
-	  if(hRemaining > 0) {
-		  //h:mm:ss
-		  timeString = hRemaining.toString() + ":" + partsToString(mRemaining_, sRemaining_);
-	  } else if(mRemaining_ > 0) {
-		  //m:ss
-		  timeString = mRemaining_.toString() + ":" + sRemaining_.toString().padStart(2, '0');
-	  } else {
-		  //s
-		  timeString = sRemaining_.toString() + "s";
-	  }
-	  msg = timeString + " Remaining";
-	  if(this.state.showPercent) {
-		  var percentElapsed = Math.floor(100 * sElapsed / sTotal);
-		  msg += " (" + percentElapsed + "%)";
-	  }
+      var timeString = "";
+      if(hRemaining > 0) {
+        //h:mm:ss
+        timeString = hRemaining.toString() + ":" + partsToString(mRemaining_, sRemaining_);
+      } else if(mRemaining_ > 0) {
+        //m:ss
+        timeString = mRemaining_.toString() + ":" + sRemaining_.toString().padStart(2, '0');
+      } else {
+        //s
+        timeString = sRemaining_.toString() + "s";
+      }
+      msg = timeString + " Remaining";
+      if(this.state.showPercent) {
+        var percentElapsed = Math.floor(100 * sElapsed / sTotal);
+        msg += " (" + percentElapsed + "%)";
+      }
     }
 	var body = React.createElement(Message, {message: msg, fontSize: this.state.fontSize});
     
