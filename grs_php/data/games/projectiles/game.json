@@ -1,4 +1,5 @@
 {
+  "hidden": "true",
   "order": "7",
   "title": "Projectiles",
   "caption": "A SHMUP with programmable projectiles",
