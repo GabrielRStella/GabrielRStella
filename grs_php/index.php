@@ -26,8 +26,9 @@ make_nav();
         <p>
           Hi!
           I'm a computer science PhD student at Texas A&M University.
-          I am currently developing theory and algorithms for high-performance Big Data systems.
-          I'm interested in external-memory algorithms, distributed computing and artificial intelligence.
+          I'm currently researching new methods for reinforcement learning.
+          Previously I worked on theory and algorithms for high-performance Big Data systems.
+          I also do game development in my free time.
           Thanks for checking out my website!
         </p>
       </div>
