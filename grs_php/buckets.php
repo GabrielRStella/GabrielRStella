@@ -22,6 +22,10 @@ make_nav();
       </div>
     </div>
     <div style="height: 1px;"></div>
+    <p>
+      This is a simulation of the <i>bucket game</i> introduced in our paper <a href="http://irl.cs.tamu.edu/people/gabriel/bigdata2022.pdf">On High-Latency Bowtie Data Streaming</a>, published in the proceedings of IEEE BigData 2022.
+      It demonstrates the distribute-from-file case, or <i>D<sub>1</sub></i> in the paper's notation.
+    </p>
   </div>
   <script src="files/scripts/buckets-canvas.js"></script>
   <script src="files/scripts/buckets-react.js"></script>
