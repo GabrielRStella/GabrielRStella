@@ -7,6 +7,8 @@ class BucketSim {
     this.m = 9; //number of output buckets
     this.c = 3; //size of bucket groups
     this.M = 10000; //number of blocks in memory
+    this.ordered = true; //whether to empty in order of index (true) or max bucket (false)
+    this.speed = 10; //number of buffers to distribute per step
     this.free = this.M;
     this.buckets = new Array(this.m);
     for(var i = 0; i < this.m; i++) {
@@ -15,8 +17,8 @@ class BucketSim {
     this.current = 0; //current bucket being written, if writing
     this.writes_remaining = 0; //number of buckets left to write, if writing
     this.next = 0; //next bucket when doing fixed order
-    this.ordered = true;
-    this.speed = 10; //number of buffers to distribute per step
+    
+    //TODO also track L
     
     this.playing = false;
     this.do_play = this.do_play.bind(this);
@@ -34,6 +36,9 @@ class BucketSim {
     for(var i = 0; i < this.m; i++) {
       this.buckets[i] = 0;
     }
+    this.current = 0;
+    this.writes_remaining = 0;
+    this.next = 0;
   }
   
   get_largest() {
@@ -153,4 +158,4 @@ class BucketSim {
   }
 }
 
-var sim = new BucketSim(document.getElementById("bucket-canvas"));
+var SIM = new BucketSim(document.getElementById("bucket-canvas"));
