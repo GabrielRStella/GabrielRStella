@@ -95,6 +95,10 @@ class BucketSim {
   }
   
   render() {
+    //set canvas size from parent
+    this.canvas.width = this.canvas.parentElement.clientWidth;
+    this.canvas.height = this.canvas.width * 0.5;
+    //
     var w = this.canvas.width;
     var h = this.canvas.height;
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -104,7 +108,7 @@ class BucketSim {
     
     //calculate width of buckets
     var bucket_width = w / (this.m + 2); //leave space for free stack + gaps
-    var bucket_gap = bucket_width / this.m; //size = gap size / # of gaps, which is m+2 (m gaps between m+1 stacks, plus 1 on either end)
+    var bucket_gap = bucket_width / (this.m + 2); //size = gap size / # of gaps, which is m+2 (m gaps between m+1 stacks, plus 1 on either end)
     var block_height = h / this.M;
     //
     var x = bucket_gap;

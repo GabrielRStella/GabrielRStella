@@ -11,10 +11,20 @@ include 'helpers/files.php';
 make_nav();
 ?>
 <div style="display: block; background: #ffffff">
-  <div id="react-app"></div>
-  <canvas id="bucket-canvas"></canvas>
+  <div class="container">
+    <div style="height: 10px;"></div>
+    <h4 style="display: inline;">Buckets</h4>
+    <div style="height: 10px;"></div>
+    <!-- options go here --> <div id="react-app"></div>
+    <div style="align-content: center; text-align: center; height: 10px;">
+      <div style="border: solid 1px black;">
+        <canvas id="bucket-canvas"></canvas>
+      </div>
+    </div>
+    <div style="height: 1px;"></div>
+  </div>
   <script src="files/scripts/buckets-canvas.js"></script>
-  <script src="files/scripts/buckets-react.js"></script>
+  <!-- <script src="files/scripts/buckets-react.js"></script> -->
 </div>
 <?php
 make_footer();
