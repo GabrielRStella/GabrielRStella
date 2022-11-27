@@ -35,6 +35,12 @@ class Options extends React.Component {
     this.setState({ordered: !this.state.ordered});
   }
   
+  onChange_show_free(event) {
+    var sim = this.props.simulator;
+    sim.show_free = !sim.show_free;
+    this.setState({}); //trigger rebuild
+  }
+  
   onRestart() {
     //sync changes to simulator
     var sim = this.props.simulator;
@@ -79,6 +85,10 @@ class Options extends React.Component {
         React.createElement('label', {className: "input-field col l2 s8"},
           React.createElement('input', {type: "checkbox", className: "filled-in", id: "field_ordered", checked: this.state.ordered, onChange: this.onChange_ordered.bind(this)}),
           React.createElement('span', {}, "Ordered")
+        ),
+        React.createElement('label', {className: "input-field col l2 s8"},
+          React.createElement('input', {type: "checkbox", className: "filled-in", id: "field_show_free", checked: sim.show_free, onChange: this.onChange_show_free.bind(this)}),
+          React.createElement('span', {}, "Show Free")
         ),
         React.createElement('div', {className: "col s1"}),
         React.createElement('div', {className: "btn col s1", onClick: this.onRestart.bind(this)},

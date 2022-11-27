@@ -22,7 +22,9 @@ class BucketSim {
     this.total_IO = 0; //both read and write
     this.total_seeks = 1;
     
-    this.playing = false;
+    this.show_free = true; //render the bar of free memory?
+    
+    this.playing = false; //TODO I forgot to actually support stopping + stepping lol
     this.do_play = this.do_play.bind(this);
     
     //start rendering
@@ -165,19 +167,37 @@ class BucketSim {
     
     //draw some buckets (and a free stack)
     
-    //calculate width of buckets
-    var bucket_width = w / (this.m + 2); //leave space for free stack + gaps
-    var bucket_gap = bucket_width / (this.m + 2); //size = gap size / # of gaps, which is m+2 (m gaps between m+1 stacks, plus 1 on either end)
-    var block_height = h / this.M;
-    //
-    var x = bucket_gap;
-    //draw the free stack
-    this.drawRect(this.ctx, x, 0, bucket_width, block_height * this.free, "#a0a0a0", "#000000");
-    x += bucket_width + bucket_gap;
-    //draw the other stacks
-    for(var i = 0; i < this.m; i++) {
-      this.drawRect(this.ctx, x, 0, bucket_width, block_height * this.buckets[i], "#ffffff", "#000000");
+    if(this.show_free) {
+      //calculate width of buckets
+      var bucket_width = w / (this.m + 2); //leave space for free stack + gaps
+      var bucket_gap = bucket_width / (this.m + 2); //size = gap size / # of gaps, which is m+2 (m gaps between m+1 stacks, plus 1 on either end)
+      var block_height = h / this.M;
+      //
+      var x = bucket_gap;
+      //draw the free stack
+      this.drawRect(this.ctx, x, 0, bucket_width, block_height * this.free, "#a0a0a0", "#000000");
       x += bucket_width + bucket_gap;
+      //draw the other stacks
+      for(var i = 0; i < this.m; i++) {
+        this.drawRect(this.ctx, x, 0, bucket_width, block_height * this.buckets[i], "#ffffff", "#000000");
+        x += bucket_width + bucket_gap;
+      }
+    } else {
+      //calculate width of buckets
+      var bucket_width = w / (this.m + 1); //leave space for gaps without free stack
+      var bucket_gap = bucket_width / (this.m + 1); //size = gap size / # of gaps, which is m+1 (m-1 gaps between m stacks, plus 1 on either end)
+      var max_bucket = this.M * 3 / this.m; //rescale to ~max ever bucket occupancy (stationary max is around 2M/m, but initial values can be higher)
+      var block_height = h / max_bucket;
+      //
+      var x = bucket_gap;
+      //draw the other stacks
+      for(var i = 0; i < this.m; i++) {
+        this.drawRect(this.ctx, x, 0, bucket_width, block_height * this.buckets[i], "#ffffff", "#000000");
+        x += bucket_width + bucket_gap;
+      }
+      //write amt free
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.drawText(this.ctx, "Free: " + (this.free / this.M).toFixed(2) + "M", "top", "left", 60, 10, 80, "#000000");
     }
     
     //L estimate
@@ -185,6 +205,9 @@ class BucketSim {
     var L_blocks = (this.total_seeks > 0 ? (this.total_IO / this.total_seeks) : 0);
     var L = L_blocks / this.M;
     this.drawText(this.ctx, "L ~ " + L.toFixed(2) + "M", "top", "right", 60, w - 10, 10, "#000000");
+    //reading or writing?
+    var writing = this.free == 0 || this.writes_remaining > 0;
+    this.drawText(this.ctx, writing ? "Writing" : "Reading", "top", "left", 60, 10, 10, "#000000");
     
     requestAnimationFrame(this.render);
   }

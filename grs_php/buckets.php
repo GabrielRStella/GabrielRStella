@@ -13,7 +13,7 @@ make_nav();
 <div style="display: block; background: #ffffff">
   <div class="container">
     <div style="height: 10px;"></div>
-    <h4 style="display: inline;">Buckets</h4>
+    <h4 style="display: inline;">Bucket Game D1</h4>
     <div style="height: 10px;"></div>
     <!-- options go here --> <div id="react-app"></div>
     <div style="align-content: center; text-align: center;">

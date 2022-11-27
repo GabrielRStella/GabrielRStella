@@ -26,7 +26,7 @@ make_nav();
 $projects = array(
   array(
     "to"=>"/buckets.php",
-    "title"=>"Buckets",
+    "title"=>"Bucket Game D1",
     "description"=>"A bucket-game simulator."
   ),
   array(
