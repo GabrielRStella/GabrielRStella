@@ -18,7 +18,9 @@ class BucketSim {
     this.writes_remaining = 0; //number of buckets left to write, if writing
     this.next = 0; //next bucket when doing fixed order
     
-    //TODO also track L
+    //also track L
+    this.total_IO = 0; //both read and write
+    this.total_seeks = 1;
     
     this.playing = false;
     this.do_play = this.do_play.bind(this);
@@ -39,6 +41,9 @@ class BucketSim {
     this.current = 0;
     this.writes_remaining = 0;
     this.next = 0;
+    //reset L estimate
+    this.total_IO = 0;
+    this.total_seeks = 1;
   }
   
   get_largest() {
@@ -66,16 +71,24 @@ class BucketSim {
         //assign first
         this.current = this.get_next();
         this.writes_remaining = this.c;
+        this.total_seeks++;
       }
       //drain current
       for(var i = 0; i < this.speed && this.buckets[this.current] > 0; i++) {
         this.buckets[this.current]--;
         this.free++;
+        this.total_IO++; //one block written
       }
       //possibly move forward or end writing
       if(this.buckets[this.current] == 0) {
         this.writes_remaining--;
-        if(this.writes_remaining > 0) this.current = this.get_next();
+        if(this.writes_remaining > 0) {
+          this.current = this.get_next();
+          this.total_seeks++;
+        } else {
+          //back to reading...
+          this.total_seeks++;
+        }
       }
       
       //empty largest c buckets
@@ -93,6 +106,7 @@ class BucketSim {
         var index = Math.floor(Math.random()*this.m);
         this.buckets[index]++;
         this.free--;
+        this.total_IO++; //one block read
       }
     }
   }
@@ -127,6 +141,16 @@ class BucketSim {
     ctx.stroke();
   }
   
+  drawText(ctx, text, baseline, align, size, x, y, fill, stroke) {
+    if(fill) ctx.fillStyle = fill;
+    if(stroke) ctx.strokeStyle = stroke;
+    ctx.font = size + 'px sans-serif';
+    ctx.textBaseline = baseline;
+    ctx.textAlign = align;
+    if(fill) ctx.fillText(text, x, y);
+    if(stroke) ctx.strokeText(text, x, y);
+  }
+  
   render() {
     //set canvas size from parent
     this.canvas.width = this.canvas.parentElement.clientWidth;
@@ -134,11 +158,12 @@ class BucketSim {
     //
     var w = this.canvas.width;
     var h = this.canvas.height;
+    //
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    this.ctx.setTransform(1, 0, 0, -1, 0, this.canvas.height);
     this.ctx.clearRect(0, 0, w, h);
-    // this.drawRect(this.ctx, 10, 10, w - 20, h - 20, "#ff0000", "#00ff00");
-    //TODO: draw some buckets (and a free stack)
+    this.ctx.setTransform(1, 0, 0, -1, 0, this.canvas.height);
+    
+    //draw some buckets (and a free stack)
     
     //calculate width of buckets
     var bucket_width = w / (this.m + 2); //leave space for free stack + gaps
@@ -154,6 +179,12 @@ class BucketSim {
       this.drawRect(this.ctx, x, 0, bucket_width, block_height * this.buckets[i], "#ffffff", "#000000");
       x += bucket_width + bucket_gap;
     }
+    
+    //L estimate
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    var L_blocks = (this.total_seeks > 0 ? (this.total_IO / this.total_seeks) : 0);
+    var L = L_blocks / this.M;
+    this.drawText(this.ctx, "L ~ " + L.toFixed(2) + "M", "top", "right", 60, w - 10, 10, "#000000");
     
     requestAnimationFrame(this.render);
   }
