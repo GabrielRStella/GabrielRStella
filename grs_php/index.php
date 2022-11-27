@@ -55,7 +55,7 @@ $options = array(
     */
     array(
       "title"=>"IRL@TAMU",
-      "to"=>"http://irl.cs.tamu.edu/",
+      "to"=>"http://irl.cs.tamu.edu/people/gabriel/",
       "icon"=>"fas fa-network-wired"
     ),
     array(
