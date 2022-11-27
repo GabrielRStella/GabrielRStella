@@ -35,6 +35,11 @@ class BucketSim {
   }
   
   restart() {
+    //check parameters
+    this.m = Math.max(this.m, 1);
+    this.c = Math.min(this.m, Math.max(1, this.c));
+    this.M = Math.max(this.M, 1);
+    //
     this.free = this.M;
     this.buckets = new Array(this.m);
     for(var i = 0; i < this.m; i++) {

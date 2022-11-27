@@ -49,6 +49,13 @@ class Options extends React.Component {
     sim.M = parseInt(this.state.M);
     sim.ordered = this.state.ordered;
     sim.restart();
+    //if simulator did parameter checking, update our copy
+    this.setState({
+      m: sim.m,
+      c: sim.c,
+      M: sim.M,
+      ordered: sim.ordered
+    });
   }
   
   render() {
