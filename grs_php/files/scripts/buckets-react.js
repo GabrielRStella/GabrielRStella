@@ -27,7 +27,7 @@ class Options extends React.Component {
   
   onChange_speed(event) {
     var sim = this.props.simulator;
-    sim.speed = parseInt(event.target.value);
+    sim.speed = Math.max(1, parseInt(event.target.value));
     this.setState({}); //trigger rebuild :^) hax
   }
   
