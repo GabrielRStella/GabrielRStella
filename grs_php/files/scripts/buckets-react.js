@@ -76,12 +76,13 @@ class Options extends React.Component {
           React.createElement('input', {type: "number", step:"1", id: "field_speed", value: sim.speed, onChange: this.onChange_speed.bind(this)}),
           React.createElement('label', {"for": "field_speed"}, "Speed")
         ),
-        React.createElement('label', {className: "input-field col l4 s8"},
+        React.createElement('label', {className: "input-field col l2 s8"},
           React.createElement('input', {type: "checkbox", className: "filled-in", id: "field_ordered", checked: this.state.ordered, onChange: this.onChange_ordered.bind(this)}),
           React.createElement('span', {}, "Ordered")
         ),
-        React.createElement('div', {className: "btn col s1 black", onClick: this.onRestart.bind(this)},
-          React.createElement('i', {className: "material-icons"}, "play_circle_outlined")
+        React.createElement('div', {className: "col s1"}),
+        React.createElement('div', {className: "btn col s1", onClick: this.onRestart.bind(this)},
+          React.createElement('i', {className: "material-icons"}, "refresh")
         )
       );
     }
@@ -89,11 +90,3 @@ class Options extends React.Component {
 }
 
 ReactDOM.render(React.createElement(Options, {simulator: SIM}), document.getElementById('react-app'))
-
-
-
-    // var icons = ["input", "list", "play_arrow", "file_download"]; //"play_circle_outlined", 
-    // var icon = icons[Math.floor(Math.random() * icons.length)];
-      // React.createElement('div', {className: "btn col s1 black", onClick: this.onSearch},
-        // React.createElement('i', {className: "material-icons"}, icon)
-      // )
