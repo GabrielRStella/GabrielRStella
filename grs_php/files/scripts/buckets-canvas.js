@@ -12,8 +12,9 @@ class BucketSim {
     for(var i = 0; i < this.m; i++) {
       this.buckets[i] = 0;
     }
+    this.current = 0; //current bucket being written, if writing
+    this.writes_remaining = 0; //number of buckets left to write, if writing
     this.next = 0; //next bucket when doing fixed order
-    this.writes_remaining = 0;
     this.ordered = true;
     this.speed = 10; //number of buffers to distribute per step
     
@@ -48,19 +49,39 @@ class BucketSim {
     return index;
   }
   
+  get_next() {
+    return this.ordered ? (this.next++ % this.m) : this.get_largest();
+  }
+  
   //move one block (or, if M is full, empty c buckets)
   //return true iff it was an emptying step
   step() {
-    if(this.free == 0) {
+    if(this.free == 0 || this.writes_remaining > 0) {
+      if(this.free == 0) {
+        //assign first
+        this.current = this.get_next();
+        this.writes_remaining = this.c;
+      }
+      //drain current
+      for(var i = 0; i < this.speed && this.buckets[this.current] > 0; i++) {
+        this.buckets[this.current]--;
+        this.free++;
+      }
+      //possibly move forward or end writing
+      if(this.buckets[this.current] == 0) {
+        this.writes_remaining--;
+        if(this.writes_remaining > 0) this.current = this.get_next();
+      }
+      
       //empty largest c buckets
       //TODO or empty in order for demonstration
-      for(var i = 0; i < this.c; i++) {
-        //find largest bucket
-        var index = this.ordered ? (this.next++ % this.m) : this.get_largest();
-        //empty it
-        this.free += this.buckets[index];
-        this.buckets[index] = 0;
-      }
+      // for(var i = 0; i < this.c; i++) {
+        // //find largest bucket
+        // var index = ;
+        // //empty it
+        // this.free += this.buckets[index];
+        // this.buckets[index] = 0;
+      // }
     } else {
       //move <speed> buffers
       for(var i = 0; i < this.speed && this.free > 0; i++) {
