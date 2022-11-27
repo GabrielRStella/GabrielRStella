@@ -4,14 +4,19 @@ class BucketSim {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     
-    this.m = 4; //number of output buckets
-    this.c = 2; //size of bucket groups
-    this.M = 500; //number of blocks in memory
+    this.m = 9; //number of output buckets
+    this.c = 3; //size of bucket groups
+    this.M = 10000; //number of blocks in memory
     this.free = this.M;
     this.buckets = new Array(this.m);
     for(var i = 0; i < this.m; i++) {
       this.buckets[i] = 0;
     }
+    this.next = 0; //next bucket when doing fixed order
+    this.writes_remaining = 0;
+    this.ordered = true;
+    this.speed = 10; //number of buffers to distribute per step
+    
     this.playing = false;
     this.do_play = this.do_play.bind(this);
     
@@ -51,16 +56,18 @@ class BucketSim {
       //TODO or empty in order for demonstration
       for(var i = 0; i < this.c; i++) {
         //find largest bucket
-        var index = this.get_largest();
+        var index = this.ordered ? (this.next++ % this.m) : this.get_largest();
         //empty it
         this.free += this.buckets[index];
         this.buckets[index] = 0;
       }
     } else {
-      //move one buffer
-      var index = Math.floor(Math.random()*this.m);
-      this.buckets[index]++;
-      this.free--;
+      //move <speed> buffers
+      for(var i = 0; i < this.speed && this.free > 0; i++) {
+        var index = Math.floor(Math.random()*this.m);
+        this.buckets[index]++;
+        this.free--;
+      }
     }
   }
   
@@ -101,9 +108,9 @@ class BucketSim {
     //
     var w = this.canvas.width;
     var h = this.canvas.height;
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.setTransform(1, 0, 0, -1, 0, this.canvas.height);
     this.ctx.clearRect(0, 0, w, h);
-    this.drawRect(this.ctx, 10, 10, w - 20, h - 20, "#ff0000", "#00ff00");
+    // this.drawRect(this.ctx, 10, 10, w - 20, h - 20, "#ff0000", "#00ff00");
     //TODO: draw some buckets (and a free stack)
     
     //calculate width of buckets
