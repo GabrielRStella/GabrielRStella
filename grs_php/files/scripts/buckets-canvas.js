@@ -134,6 +134,7 @@ class BucketSim {
     //
     var w = this.canvas.width;
     var h = this.canvas.height;
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     this.ctx.setTransform(1, 0, 0, -1, 0, this.canvas.height);
     this.ctx.clearRect(0, 0, w, h);
     // this.drawRect(this.ctx, 10, 10, w - 20, h - 20, "#ff0000", "#00ff00");

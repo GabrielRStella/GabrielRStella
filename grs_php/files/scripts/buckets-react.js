@@ -27,7 +27,7 @@ class Options extends React.Component {
   
   onChange_speed(event) {
     var sim = this.props.simulator;
-    sim.speed = event.target.value;
+    sim.speed = parseInt(event.target.value);
     this.setState({}); //trigger rebuild :^) hax
   }
   
@@ -38,9 +38,9 @@ class Options extends React.Component {
   onRestart() {
     //sync changes to simulator
     var sim = this.props.simulator;
-    sim.m = this.state.m;
-    sim.c = this.state.c;
-    sim.M = this.state.M;
+    sim.m = parseInt(this.state.m);
+    sim.c = parseInt(this.state.c);
+    sim.M = parseInt(this.state.M);
     sim.ordered = this.state.ordered;
     sim.restart();
   }
