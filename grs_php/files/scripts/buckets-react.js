@@ -1,8 +1,54 @@
 class Options extends React.Component {
   
+  constructor(props) {
+    super(props);
+    
+    var sim = props.simulator;
+    this.state = {
+      m: sim.m,
+      c: sim.c,
+      M: sim.M,
+      ordered: sim.ordered
+      //speed can be set any time
+    };
+  }
+  
+  onChange_m(event) {
+    this.setState({m: event.target.value});
+  }
+  
+  onChange_c(event) {
+    this.setState({c: event.target.value});
+  }
+  
+  onChange_M(event) {
+    this.setState({M: event.target.value});
+  }
+  
+  onChange_speed(event) {
+    var sim = this.props.simulator;
+    sim.speed = event.target.value;
+    this.setState({}); //trigger rebuild :^) hax
+  }
+  
+  onChange_ordered(event) {
+    this.setState({ordered: !this.state.ordered});
+  }
+  
+  onRestart() {
+    //sync changes to simulator
+    var sim = this.props.simulator;
+    sim.m = this.state.m;
+    sim.c = this.state.c;
+    sim.M = this.state.M;
+    sim.ordered = this.state.ordered;
+    sim.restart();
+  }
+  
   render() {
     //parameters:
     //m, c, M, ordered, speed
+    var sim = this.props.simulator;
     
     //materializecss uses the following width calculations to determine screen size category:
     //large: >= 993px
@@ -10,25 +56,32 @@ class Options extends React.Component {
     if(window.innerWidth <= 600) {
       //small
     
-      return React.createElement('p', {}, "uhh...");
+      return React.createElement('p', {}, "uhh... mobile not yet supported :^) cya soon!");
     } else {
       //medium or large
       return React.createElement('div', {className: "row valign-wrapper"},
-        React.createElement('div', {className: "input-field col l3 s6"},
-          React.createElement('input', {type: "time", id: "field_begin", value: this.props.timeBegin, onChange: this.props.onTimeBeginChange}),
-          React.createElement('label', {"for": "field_begin"}, "Begin")
-        ),
-        React.createElement('div', {className: "input-field col l3 s6"},
-          React.createElement('input', {type: "time", id: "field_end", value: this.props.timeEnd, onChange: this.props.onTimeEndChange}),
-          React.createElement('label', {"for": "field_end"}, "End")
+        React.createElement('div', {className: "input-field col l2 s4"},
+          React.createElement('input', {type: "number", step:"1", id: "field_m", value: this.state.m, onChange: this.onChange_m.bind(this)}),
+          React.createElement('label', {"for": "field_m"}, "Buckets")
         ),
         React.createElement('div', {className: "input-field col l2 s4"},
-          React.createElement('input', {type: "number", step:"1", id: "field_fontsize", value: this.props.fontSize, onChange: this.props.onFontSizeChange}),
-          React.createElement('label', {"for": "field_fontsize"}, "Font size")
+          React.createElement('input', {type: "number", step:"1", id: "field_c", value: this.state.c, onChange: this.onChange_c.bind(this)}),
+          React.createElement('label', {"for": "field_c"}, "Group Size")
+        ),
+        React.createElement('div', {className: "input-field col l2 s4"},
+          React.createElement('input', {type: "number", step:"1", id: "field_M", value: this.state.M, onChange: this.onChange_M.bind(this)}),
+          React.createElement('label', {"for": "field_M"}, "Memory")
+        ),
+        React.createElement('div', {className: "input-field col l2 s4"},
+          React.createElement('input', {type: "number", step:"1", id: "field_speed", value: sim.speed, onChange: this.onChange_speed.bind(this)}),
+          React.createElement('label', {"for": "field_speed"}, "Speed")
         ),
         React.createElement('label', {className: "input-field col l4 s8"},
-          React.createElement('input', {type: "checkbox", className: "filled-in", id: "field_showpercent", checked: this.props.showPercent, onChange: this.props.onShowPercentChange}),
-          React.createElement('span', {}, "Show Percentage")
+          React.createElement('input', {type: "checkbox", className: "filled-in", id: "field_ordered", checked: this.state.ordered, onChange: this.onChange_ordered.bind(this)}),
+          React.createElement('span', {}, "Ordered")
+        ),
+        React.createElement('div', {className: "btn col s1 black", onClick: this.onRestart.bind(this)},
+          React.createElement('i', {className: "material-icons"}, "play_circle_outlined")
         )
       );
     }
@@ -36,3 +89,11 @@ class Options extends React.Component {
 }
 
 ReactDOM.render(React.createElement(Options, {simulator: SIM}), document.getElementById('react-app'))
+
+
+
+    // var icons = ["input", "list", "play_arrow", "file_download"]; //"play_circle_outlined", 
+    // var icon = icons[Math.floor(Math.random() * icons.length)];
+      // React.createElement('div', {className: "btn col s1 black", onClick: this.onSearch},
+        // React.createElement('i', {className: "material-icons"}, icon)
+      // )
