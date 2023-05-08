@@ -25,7 +25,7 @@ make_nav();
 
 $projects = array(
   array(
-    "to"=>"/CSCE641",
+    "to"=>"/CSCE641/index.php",
     "title"=>"CSCE 641 Project",
     "description"=>"My course project for CSCE 641: Computer Graphics."
   ),
@@ -40,12 +40,12 @@ $projects = array(
     "description"=>"A simple timer."
   ),
   array(
-    "to"=>"/CSCE645",
+    "to"=>"/CSCE645/index.php",
     "title"=>"CSCE 645 Project",
     "description"=>"My research project for CSCE 645: Geometric Modeling."
   ),
   array(
-    "to"=>"/CSCE452",
+    "to"=>"/CSCE452/index.php",
     "title"=>"CSCE 452 Robots",
     "description"=>"A set of projects done for CSCE 452: Robotics and Spatial Intelligence."
   ),
