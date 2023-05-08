@@ -48,18 +48,41 @@ make_nav();
 		<div class="col s12 m12 l12">
 		  <div class="card">
 			<div class="card-content center-align">
-				TODO put presentation video here
 			  <!-- https://stackoverflow.com/a/23673392 ty aspect ratio -->
-			  <iframe style="aspect-ratio: 560/315;" width="100%" src="https://www.youtube.com/embed/EYtFH2bFCfg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+			  <iframe style="aspect-ratio: 560/315;" width="100%" src="https://www.youtube.com/embed/rwHK44klv6o" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 			</div>
 		  </div>
 		</div>
 		<div class="col s12 m12 l12">
 		  <div class="card">
 			<div class="card-content center-align">
-				TODO put demo video here
 			  <!-- https://stackoverflow.com/a/23673392 ty aspect ratio -->
-			  <iframe style="aspect-ratio: 560/315;" width="100%" src="https://www.youtube.com/embed/EYtFH2bFCfg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+			  <iframe style="aspect-ratio: 560/315;" width="100%" src="https://www.youtube.com/embed/siqBnVs9H-w" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+			</div>
+		  </div>
+		</div>
+		<div class="col s12 m12 l12">
+		  <div class="card">
+			<div class="card-content">
+			  <span class="card-title">Implementation</span>
+				<p style="text-indent: 36px;">
+					MVDES has three modes of operation. The <i>interactive sandbox</i> generates random scenes using models loaded from a user directory and allows the user to move the camera and adjust render settings.
+					For development, the user can watch the depth estimation algorithms work in real-time based on the current view; for benchmarking, the current view can be saved as a "snapshot" for later evaluation.
+					The <i>snapshot viewer</i> allows the user to load and view their saved snapshots.
+					The <i>evaluator</i> is a batch-mode tool that evaluates a set of estimation algorithms against a set of saved snapshots and reports average error scores over time.
+					The data flow of the interactive sandbox is shown below:
+				</p>
+				<br/>
+				<img src="CSCE641/data_flow.png" alt="Dataflow diagram of the interactive sandbox." title="Sandbox Dataflow" class="responsive-img"/>
+				<br/>
+				<br/>
+				<p style="text-indent: 36px;">
+					The viewer and evaluator both implement approximately a subset of the above behavior.
+					The below images are screenshots taken from the sandbox program; the first shows the ground-truth view, while the second shows estimated depth using PatchMatch-Multi.
+			  	</p>
+				<br/>
+				<img src="CSCE641/screenshot.png" alt="Screenshot of MVDES, containing ground truth images for the measurement views" title="MVDES Screenshot 1" class="responsive-img"/>
+				<img src="CSCE641/screenshot2.png" alt="Screenshot of MVDES, containing a view of the estimated depth using PatchMatch-Multi" title="MVDES Screenshot 2" class="responsive-img"/>
 			</div>
 		  </div>
 		</div>
@@ -67,10 +90,82 @@ make_nav();
 		  <div class="card">
 			<div class="card-content">
 			  <span class="card-title">Results</span>
-			  <p>TODO recreate the presentation results here with figures and stuff</p>
+				<p style="text-indent: 36px;">
+					Performance was measured using average relative error (percentage error of each estimated depth value, normalized over the image size).
+					Four algorithms were tested: 7x7 stereo PatchMatch, 7x7 n-view PatchMatch, 256-value logarithmic Cost Volume, and 2500-segment randomized Mieloch's algorithm. 
+					Several parameters were varied to observe their effect on the estimation runtime and accuracy.
+					First, enabling surface textures improves performance, since it makes the correspondence problem much easier:
+				</p>
+				<div class="row">
+					<div class="col s12 m6">
+						<img src="CSCE641/result_textures_0.png" alt="Result image 1.1: textured vs. textureless surfaces, 320x180 untextured" title="Estimation performance on textured vs. textureless surfaces, 320x180 untextured" class="responsive-img"/>
+					</div>
+					<div class="col s12 m6">
+						<img src="CSCE641/result_textures_1.png" alt="Result image 1.2: textured vs. textureless surfaces, 320x180 textured" title="Estimation performance on textured vs. textureless surfaces, 320x180 textured" class="responsive-img"/>
+					</div>
+					<div class="col s12 m6">
+						<img src="CSCE641/result_textures_2.png" alt="Result image 1.3: textured vs. textureless surfaces, 960x540 untextured" title="Estimation performance on textured vs. textureless surfaces, 960x540 untextured" class="responsive-img"/>
+					</div>
+					<div class="col s12 m6">
+						<img src="CSCE641/result_textures_3.png" alt="Result image 1.4: textured vs. textureless surfaces, 960x540 textured" title="Estimation performance on textured vs. textureless surfaces, 960x540 textured" class="responsive-img"/>
+					</div>
+				</div>
+				<p>
+					Increasing resolution improves performance, though most algorithms have runtime linear in the number of pixels:
+				</p>
+				<div class="row">
+					<div class="col s12 m6">
+						<img src="CSCE641/result_resolution_0.png" alt="Result image 2.1: PatchMatch multi-res" title="Estimation performance on varying resolution, PatchMatch" class="responsive-img"/>
+					</div>
+					<div class="col s12 m6">
+						<img src="CSCE641/result_resolution_1.png" alt="Result image 2.2: PatchMatch-Multi multi-res" title="Estimation performance on varying resolution, PatchMatch-Multi" class="responsive-img"/>
+					</div>
+					<div class="col s12 m6">
+						<img src="CSCE641/result_resolution_2.png" alt="Result image 2.3: Cost Volume multi-res" title="Estimation performance on varying resolution, Cost Volume" class="responsive-img"/>
+					</div>
+					<div class="col s12 m6">
+						<img src="CSCE641/result_resolution_3.png" alt="Result image 2.4: Mieloch multi-res" title="Estimation performance on varying resolution, Mieloch" class="responsive-img"/>
+					</div>
+				</div>
+				<p>
+					Finally, for algorithms that can process more than one measurement image, increasing the number of secondary views increases accuracy at a small runtime cost:
+				</p>
+				<div class="row">
+					<div class="col s12 m6">
+						<img src="CSCE641/result_nviews_0.png" alt="Result image 3.1: Stereo" title="Estimation performance on 1080p stereo" class="responsive-img"/>
+					</div>
+					<div class="col s12 m6">
+						<img src="CSCE641/result_nviews_1.png" alt="Result image 3.2: 4-view" title="Estimation performance on 1080p 4-view" class="responsive-img"/>
+					</div>
+				</div>
+				<p style="text-indent: 36px;">
+					There are a couple quick takeaways from these figures:
+					first, PatchMatch is a highly effective algorithm, yielding the lowest error and often the fastest convergence;
+					second, Mieloch et al.'s algorithm can be interpreted as an segment-based approximation of the cost volume approach.
+					Though its runtime is technically linear in the number of pixels (due to the pixel clustering step), the constants are very low, so its speed remains high even on large images.
+				</p>
+				<p style="text-indent: 36px;">
+					Even with these highly-effective algorithms, the final error rates were usually greater than 10%. Qualitatively, the error seems to come from three sources.
+					Object boundaries (and occlusions) were the primary cause of this error, which none of the tested algorithms could properly resolve.
+					Fortunately, the error resulting from this usually decreases proportionally as image resolution increases.
+					Another issue was the fact that PatchMatch, as described in the original paper, cannot handle sub-pixel disparity;
+					thus, it necessarily has some error, which generally shows up as wavy patterns throughout the image (as disparity goes from e.g. 1 to 2 pixels, the error is greatest where the value should be 1.5).
+					Finally, textureless regions always cause issues, since these algorithms only use <i>local</i> information to assign depth/disparity values.
+					When a surface has uniform color, a wide range of depth/disparity values will result in the same cost and the algorithm cannot determine the correct value.
+				</p>
 			</div>
 		  </div>
 		</div>
+		<!-- <div class="col s12 m12 l12">
+		  <div class="card">
+			<div class="card-content">
+			  <span class="card-title">Resources</span>
+				<p style="text-indent: 36px;">
+					TODO code/slides ig
+				</p>
+			</div>
+		  </div>
+		</div> -->
 	</div>
   </div>
 </div>
