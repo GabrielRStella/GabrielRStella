@@ -25,6 +25,11 @@ make_nav();
 
 $projects = array(
   array(
+    "to"=>"/CSCE641",
+    "title"=>"CSCE 641 Project",
+    "description"=>"My course project for CSCE 641: Computer Graphics."
+  ),
+  array(
     "to"=>"/buckets.php",
     "title"=>"Bucket Game D<sub>1</sub>",
     "description"=>"A bucket-game simulator."
@@ -61,9 +66,6 @@ $projects = array(
   )
 );
 
-//load game data
-$basedir = 'data/toys/';
-//TODO: sort toys by date
 foreach($projects as $proj) {
   $to = $proj['to'];
   $title = $proj['title'];
@@ -72,7 +74,7 @@ foreach($projects as $proj) {
     continue;
   }
   echo "
-    <div class=\"col s12 m6 l4\">
+    <div class=\"col s12 m6\">
       <div class=\"card\">
         <div class=\"card-content\">
           <a href=\"$to\"><span class=\"card-title\">$title</span></a>
