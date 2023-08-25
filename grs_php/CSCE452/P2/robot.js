@@ -180,9 +180,9 @@ class Robot {
       PaintColor: "#ffffff",
       PaintRadius: 5,
       Painting: false,
-      Tracking: false,
+      Tracking: true,
       DrawBound: false,
-      DrawReach: false,
+      DrawReach: true,
       Dot: function() {
         drawDot(robot.getEndPoint());
       },
