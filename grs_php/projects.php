@@ -39,11 +39,11 @@ $projects = array(
     "title"=>"Timer",
     "description"=>"A simple timer."
   ),
-  array(
-    "to"=>"/CSCE645/index.php",
-    "title"=>"CSCE 645 Project",
-    "description"=>"My research project for CSCE 645: Geometric Modeling."
-  ),
+  // array(
+  //   "to"=>"/CSCE645/index.php",
+  //   "title"=>"CSCE 645 Project",
+  //   "description"=>"My research project for CSCE 645: Geometric Modeling."
+  // ),
   array(
     "to"=>"/CSCE452/index.php",
     "title"=>"CSCE 452 Robots",
