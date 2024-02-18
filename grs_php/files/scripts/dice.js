@@ -77,9 +77,10 @@ class OneDie extends React.Component {
       React.createElement('div', {className: "row valign-wrapper"},
         React.createElement('div', {className: "container"},
         this.props.info.faces.map((face, index) => {
-          return React.createElement('div', {className: "btn col l2 s6 " + (index == this.state.active ? "black" : "red"), onClick: this.onClickFace.bind(this, index)},
+          return [' ', React.createElement('div', {className: "btn col l2 s6 " + (index == this.state.active ? "black" : "red"), onClick: this.onClickFace.bind(this, index)},
             face
-          )})
+            )]
+          })
         )
       )
     );
@@ -142,7 +143,7 @@ class Dice extends React.Component {
           "Clear Dice"
         )
       ),
-      this.state.dice.map((one_die, idx) => {return [React.createElement(OneDie, {info: one_die, index: idx, callback: this.onDieChanged}), React.createElement('br', {})];})
+      this.state.dice.map((one_die, idx) => {return [' ', React.createElement(OneDie, {info: one_die, index: idx, callback: this.onDieChanged}), React.createElement('br', {})];})
     );
   }
 }

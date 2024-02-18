@@ -17,7 +17,9 @@ make_nav();
   <div class="section">
     <div class="row">
       <div class="col s12 m4 push-m8">
-        <img src="files/img/avatars/<?php echo selectRandomFile('files/img/avatars/'); ?>" alt="A collection of colliding circles." title="Circles" class="responsive-img"></img>
+        <!-- <img src="files/img/avatars/<?php echo selectRandomFile('files/img/avatars/'); ?>" alt="A collection of colliding circles." title="Circles" class="responsive-img"></img> -->
+        <canvas id="circles" style="width: 100%; aspect-ratio: 1 / 1;"/>
+        <script src="files/scripts/circles.js"></script>
       </div>
       <div class="col s12 m8 pull-m4">
         <div class="center-align">
