@@ -123,6 +123,8 @@ function create_color_func() {
 }
 
 //generate a random color generator
+//TODO: palettes to generate more consistently pleasing color sets
+//i.e., generate set [background, background border, initial border color, final border color, initial fill color, final fill color] all together in preset patterns (e.g., white bg, ...)
 function create_color_generator() {
     var gen_base = new ColorGeneratorSimple(create_color_func(), create_color_func());
     //white bg
