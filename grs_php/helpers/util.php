@@ -16,16 +16,24 @@ function make_nav() {
       "title"=>"Home"
     ),
     array(
-      "to"=>"/games.php",
-      "title"=>"Games"
+      "to"=>"/research",
+      "title"=>"Research"
     ),
     array(
-      "to"=>"/projects.php",
-      "title"=>"Projects"
+      "to"=>"/teaching",
+      "title"=>"Teaching"
     ),
     array(
-      "to"=>"/toys.php",
-      "title"=>"Toys"
+      "to"=>"/games_toys",
+      "title"=>"Games+Toys"
+    ),
+    array(
+      "to"=>"/utilities",
+      "title"=>"Utilities"
+    ),
+    array(
+      "to"=>"/misc",
+      "title"=>"Misc"
     )
   );
   //{navLinks.map((x, i) => (<li key={i}><a href={x.to}>{x.title}</a></li>))}
@@ -63,7 +71,7 @@ function make_footer() {
       <div class=\"center container\">
         This site is a work in progress.
         <br/>
-        &copy; 2017-2023 Gabriel Stella
+        &copy; 2017-2024 Gabriel Stella
       </div>
     </footer>";
 }

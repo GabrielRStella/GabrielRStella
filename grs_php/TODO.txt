@@ -1,0 +1,25 @@
+reorganization:
+-home
+--bio
+--cv
+--some links
+-research
+--brief research interest statement
+--projects [list and links to individual pages]
+---em streaming
+---model-based reinforcement learning
+--publications []
+---bowtie
+---qora
+-old games and toys
+--itch.io link
+--games
+--toys [put more info for each?]
+-utilities
+--timer
+--dice
+--github tracker
+--web storage interface
+-misc
+--452 robots
+--641 project
