@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <?php
+$title = 'Research';
 include '../helpers/util.php';
 include '../helpers/header.php';
 include '../helpers/files.php';

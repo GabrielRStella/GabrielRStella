@@ -1,6 +1,6 @@
 <?php
 $dir = $_GET['toy'];
-$basedir = 'data/toys/';
+$basedir = 'toys/';
 $gamedir = $basedir . $dir . '/';
 $game_exists = true;
 
@@ -30,7 +30,7 @@ if($game_exists) {
   <head>
     <meta charset=\"utf-8\" />
     <title>GabrielRStella::$title</title>
-    <script type=\"text/javascript\" src=\"data/toys/dat.gui.min.js\"></script>
+    <script type=\"text/javascript\" src=\"toys/dat.gui.min.js\"></script>
   </head>
   <body>
   <div style=\"background: $game_background\">
@@ -45,7 +45,7 @@ if($game_exists) {
     echo "<script src=\"$gamedir$script\"></script>";
   }
   if(!$gamedata['no_lib']) {
-    echo "<script src=\"data/toys/toy_lib.js\"></script>";
+    echo "<script src=\"toys/toy_lib.js\"></script>";
   }
   echo
     "<script src=\"$game_script\"></script>

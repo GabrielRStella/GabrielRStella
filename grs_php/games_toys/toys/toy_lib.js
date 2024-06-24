@@ -435,7 +435,7 @@ class ImageStore {
     if(full) {
       this.path = name;
     } else {
-      this.path = "/data/toys/" + name + "/res/";
+      this.path = "/games_toys/toys/" + name + "/res/";
     }
     this.imgCache = {};
   }

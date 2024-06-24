@@ -13,7 +13,7 @@ class ImageStore {
     if(full) {
       this.path = name;
     } else {
-      this.path = "/data/games/" + name + "/res/";
+      this.path = "/games_toys/games/" + name + "/res/";
     }
     this.imgCache = {};
   }

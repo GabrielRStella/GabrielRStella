@@ -1,6 +1,6 @@
 <?php
 $dir = $_GET['game'];
-$basedir = 'data/games/';
+$basedir = 'games/';
 $gamedir = $basedir . $dir . '/';
 $game_exists = true;
 

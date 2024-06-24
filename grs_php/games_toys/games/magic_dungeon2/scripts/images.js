@@ -32,7 +32,7 @@ function drawImageFlipped(img, canvas, r) {
 function loadImage(name) {
 
   var img = new Image();
-  img.src = "/data/games/magic_dungeon/res/" + name + ".png";
+  img.src = "/games_toys/games/magic_dungeon/res/" + name + ".png";
   IMAGE_CACHE[name] = img;
 
 //this doesn't synchronize it - 'loaded' is never set in the calling scope
