@@ -32,6 +32,11 @@ make_nav();
           Previously I worked on theory and algorithms for high-performance Big Data systems.
           I also do game development in my free time.
           Thanks for checking out my website!
+
+          <!-- I'm currently working on writing a new bio. :) In the meantime, go ahead and explore the site! -->
+
+          <!-- My research seeks to shed light on the foundational principles of intelligence. -->
+
         </p>
       </div>
     </div>

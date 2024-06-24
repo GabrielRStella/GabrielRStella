@@ -1,8 +1,6 @@
 reorganization:
--home
---bio
 -research
---brief research interest statement
+--brief research statement
 --projects [list and links to individual pages]
 ---em streaming
 ---model-based reinforcement learning
@@ -10,4 +8,5 @@ reorganization:
 ---bowtie
 ---qora
 
+-new bio on home page
 -push to actual site and make sure all the relative links still work :)

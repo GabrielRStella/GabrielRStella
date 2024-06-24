@@ -1,0 +1,24 @@
+[
+    {
+        "ref": "qora",
+        "title": "QORA: Zero-Shot Transfer via Interpretable Object-Relational Model Learning",
+        "authors": "Gabriel Stella, Dmitri Loguinov",
+        "venue": "ICML, July 2024",
+        "links": {
+            "PDF": "#",
+            "Poster": "#",
+            "Project": "#"
+        }
+    },
+    {
+        "ref": "bowtie",
+        "title": "On High-Latency Bowtie Data Streaming",
+        "authors": "Gabriel Stella, Dmitri Loguinov",
+        "venue": "IEEE BigData, December 2022",
+        "links": {
+            "PDF": "#",
+            "Presentation": "#",
+            "Project": "#"
+        }
+    }
+]
