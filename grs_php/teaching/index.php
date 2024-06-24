@@ -15,22 +15,10 @@ make_nav();
 <div class="container">
   <div class="section">
     <div class="center-align">
-        <h1>Projects</h1>
+      <h1>Teaching</h1>
     </div>
-    <p>
-        Hi!
-        This is placeholder text, present while I work on reorganizing my site.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-    </p>
-  </div>
-  <div class="section">
-    <div class="center-align">
-        <h1>Publications</h1>
-    </div>
-    <p>
-        Hi!
-        This is placeholder text, present while I work on reorganizing my site.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+    <p class="center-align">
+      Hi! This page is in progress. In the future, I'll be adding information about courses I've assisted or taught.
     </p>
   </div>
 </div>

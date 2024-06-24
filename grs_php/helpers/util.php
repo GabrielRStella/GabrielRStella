@@ -19,10 +19,10 @@ function make_nav() {
       "to"=>"/research",
       "title"=>"Research"
     ),
-    array(
-      "to"=>"/teaching",
-      "title"=>"Teaching"
-    ),
+    // array(
+    //   "to"=>"/teaching",
+    //   "title"=>"Teaching"
+    // ),
     array(
       "to"=>"/games_toys",
       "title"=>"Games+Toys"
