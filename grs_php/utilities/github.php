@@ -12,7 +12,7 @@ make_nav();
 ?>
 <div style="display: block; background: #ffffff">
   <div id="react-app"></div>
-  <script src="/files/scripts/github.js"></script>
+  <script src="github.js"></script>
 </div>
 <?php
 make_footer();

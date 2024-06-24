@@ -17,7 +17,7 @@ make_nav();
     <div style="height: 10px;"></div>
   </div>
   <div id="react-app"></div>
-  <script src="/files/scripts/dice.js"></script>
+  <script src="dice.js"></script>
 </div>
 <?php
 make_footer();

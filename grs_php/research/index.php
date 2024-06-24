@@ -23,22 +23,51 @@ make_nav();
   </div>
   <div class="section">
     <div class="center-align">
-        <h1>Projects</h1>
+        <h2>Projects</h2>
     </div>
     <p>
         Hi!
         This is placeholder text, present while I work on reorganizing my site.
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
     </p>
+    <div class="row">
+
+      <?php
+      $projects = array(
+        array(
+          "title"=>"Object-Oriented Reinforcement Learning",
+          "name"=>"oorl",
+        ),
+        array(
+          "title"=>"External-Memory Streaming",
+          "name"=>"em",
+        ),
+      );
+      foreach($projects as $project) {
+        $ptitle = $project['title'];
+        $pname = $project['name'];
+        $plink = "research/".$pname.".php";
+        echo "
+          <div class=\"col s12 m6 l12\">
+            <div class=\"card-panel center-align\">
+              <a href=\"$plink\">$ptitle</a>
+            </div>
+          </div>";
+      }
+
+      ?>
+
+
+    </div>
   </div>
   <div class="section">
     <div class="center-align">
-        <h1>Publications</h1>
+        <h2>Publications</h2>
     </div>
     <div class="row">
     <?php
       
-      $pubs = json_decode(file_get_contents("pub.json"), true); //ref links
+      $pubs = json_decode(file_get_contents("pub.json"), true);
       foreach($pubs as $pub) {
         $ptitle = $pub['title'];
         $pauthors = $pub['authors'];

@@ -9,4 +9,7 @@ reorganization:
 ---qora
 
 -new bio on home page
+-research statement
+-research project pages? [oorl, em, others]
+--each page can just be an abstract, publication list, then more specific description/links as needed
 -push to actual site and make sure all the relative links still work :)
