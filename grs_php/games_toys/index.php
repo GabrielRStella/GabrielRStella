@@ -42,130 +42,135 @@ make_nav();
       </div>";
       ?>
     </div>
-
   </div>
 
+<?php
+function cmp($a, $b)
+{
+  $val = $a['order'] - $b['order'];
+  if($val == 0) {
+    return 0;
+  }
+  //invert order
+  return - (($val > 0) ? 1 : -1);
+}
 
+$all_objects = array();
+$all_games = array();
+$all_toys = array();
+//load game data
+$basedir_games = 'games/';
+$games = array();
+foreach(listFilesAndDirs($basedir_games) as $dir) {
+  $datafile = $basedir_games . $dir . '/' . 'game.json';
+  $gamedata = json_decode(file_get_contents($datafile), true); //info: script/scripts/scriptDir, title, caption, background (color), thumbnail, text (color), dateString
+  if(array_key_exists('hidden', $gamedata) and $gamedata['hidden']) {
+    continue;
+  }
+  $gamedata['dir'] = $dir;
+  $games[] = $gamedata;
+}
+//convert game data
+usort($games, "cmp");
+foreach($games as $gamedata) {
+  //
+  $game_img = 'games_toys/games/'.$gamedata['dir'].'/'.$gamedata['thumbnail'];
+  $game_text = $gamedata['text'];
+  $game_title = $gamedata['title'];
+  $game_link = '/games_toys/game.php?game='.$gamedata['dir'];
+  $game_caption = $gamedata['caption'];
+  //
+  $game_card_data = "
+    <div class=\"col s12\">
+      <div class=\"card\">
+        <div class=\"card-image\">
+          <img src=\"$game_img\"/>
+          <span class=\"card-title $game_text\">$game_title</span>
+          <a href=\"$game_link\" class=\"btn-floating halfway-fab waves-effect waves-light black\"><i class=\"material-icons\">play_arrow</i></a>
+        </div>
+        <div class=\"card-content\">
+          <p>$game_caption</p>
+        </div>
+      </div>
+    </div>";
+  //
+  $game_obj = array();
+  $game_obj['order'] = $gamedata['order'];
+  $game_obj['html'] = $game_card_data;
+  $all_objects[] = $game_obj;
+  $all_games[] = $game_obj;
+}
+
+//load toy data
+$basedir_toys = 'toys/';
+$toys = array();
+foreach(listFilesAndDirs($basedir_toys) as $dir) {
+  if(strpos($dir, '.') !== false) {
+    continue;
+  }
+  $datafile = $basedir_toys . $dir . '/' . 'toy.json';
+  $toydata = json_decode(file_get_contents($datafile), true); //info: title, description, foreground, background, dateString
+  if(array_key_exists('hidden', $toydata) and $toydata['hidden']) {
+    continue;
+  }
+  $toydata['dir'] = $dir;
+  $toys[] = $toydata;
+}
+//convert toy data
+usort($toys, "cmp");
+foreach($toys as $toydata) {
+  //extracted data
+  $game_title = $toydata['title'];
+  $game_link = '/games_toys/toy.php?toy='.$toydata['dir'];
+  $game_caption = $toydata['description'];
+  //
+  $toy_card_data = "
+    <div class=\"col s12\">
+      <div class=\"card\">
+        <div class=\"card-content\">
+          <a href=\"$game_link\"><span class=\"card-title\">$game_title</span></a>
+          <p>$game_caption</p>
+        </div>
+      </div>
+    </div>";
+  //
+  $toy_obj = array();
+  $toy_obj['order'] = $toydata['order'];
+  $toy_obj['html'] = $toy_card_data;
+  $all_objects[] = $toy_obj;
+  $all_toys[] = $toy_obj;
+}
+
+//sort and emit cards
+// usort($all_objects, "cmp");
+// foreach($all_objects as $obj) {
+//   echo $obj['html'];
+// }
+?>
 
 
   <div class="section">
     <div class="row">
-      <?php
-
-      function cmp($a, $b)
-      {
-        $val = $a['order'] - $b['order'];
-        if($val == 0) {
-          return 0;
-        }
-        //invert order
-        return - (($val > 0) ? 1 : -1);
-      }
-
-      //load game data
-      $basedir_games = 'games/';
-      $games = array();
-      foreach(listFilesAndDirs($basedir_games) as $dir) {
-        $datafile = $basedir_games . $dir . '/' . 'game.json';
-        $gamedata = json_decode(file_get_contents($datafile), true); //info: script/scripts/scriptDir, title, caption, background (color), thumbnail, text (color), dateString
-        if(array_key_exists('hidden', $gamedata) and $gamedata['hidden']) {
-          continue;
-        }
-        $gamedata['dir'] = $dir;
-        $games[] = $gamedata;
-      }
-      usort($games, "cmp");
-      foreach($games as $gamedata) {
-        //extracted data
-        $game_img = 'games_toys/games/'.$gamedata['dir'].'/'.$gamedata['thumbnail'];
-        $game_text = $gamedata['text'];
-        $game_title = $gamedata['title'];
-        $game_link = '/games_toys/game.php?game='.$gamedata['dir'];
-        $game_caption = $gamedata['caption'];
-        echo "
-          <div class=\"col s12\">
-            <div class=\"card\">
-              <div class=\"card-image\">
-                <img src=\"$game_img\"/>
-                <span class=\"card-title $game_text\">$game_title</span>
-                <a href=\"$game_link\" class=\"btn-floating halfway-fab waves-effect waves-light black\"><i class=\"material-icons\">play_arrow</i></a>
-              </div>
-              <div class=\"card-content\">
-                <p>$game_caption</p>
-              </div>
-            </div>
-          </div>";
-      }
-
-      ?>
+      <div class="col s12 l6">
+        <div class="row">
+          <?php
+            foreach($all_games as $obj) {
+              echo $obj['html'];
+            }
+          ?>
+        </div>
+      </div>
+      <div class="col s12 l6">
+        <div class="row">
+          <?php
+            foreach($all_toys as $obj) {
+              echo $obj['html'];
+            }
+          ?>
+        </div>
+      </div>
     </div>
   </div>
-
-
-
-
-
-
-
-
-
-  <div class="section">
-    <div class="row">
-      <?php
-
-      // function cmp($a, $b)
-      // {
-      //   $val = $a['order'] - $b['order'];
-      //   if($val == 0) {
-      //     return 0;
-      //   }
-      //   //invert order
-      //   return - (($val > 0) ? 1 : -1);
-      // }
-
-      //load game data
-      $basedir = 'toys/';
-      $toys = array();
-      //TODO: sort toys by date
-      foreach(listFilesAndDirs($basedir) as $dir) {
-        if(strpos($dir, '.') !== false) {
-          continue;
-        }
-        $datafile = $basedir . $dir . '/' . 'toy.json';
-        $gamedata = json_decode(file_get_contents($datafile), true); //info: title, description, foreground, background, dateString
-        if(array_key_exists('hidden', $gamedata) and $gamedata['hidden']) {
-          continue;
-        }
-        $gamedata['dir'] = $dir;
-        $toys[] = $gamedata;
-      }
-      usort($toys, "cmp");
-      foreach($toys as $gamedata) {
-        //extracted data
-        $game_title = $gamedata['title'];
-        $game_link = '/games_toys/toy.php?toy='.$gamedata['dir'];
-        $game_caption = $gamedata['description'];
-        echo "
-          <div class=\"col s12 m6 l4\">
-            <div class=\"card\">
-              <div class=\"card-content\">
-                <a href=\"$game_link\"><span class=\"card-title\">$game_title</span></a>
-                <p>$game_caption</p>
-              </div>
-            </div>
-          </div>";
-      }
-
-      ?>
-    </div>
-  </div>
-
-
-
-
-
-
-
 
 
 
