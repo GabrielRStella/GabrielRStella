@@ -11,10 +11,5 @@ reorganization:
 --publications []
 ---bowtie
 ---qora
--utilities
---timer
---dice
---github tracker
---web storage interface
 
 -push to actual site and make sure all the relative links still work :)

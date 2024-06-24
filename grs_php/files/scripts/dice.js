@@ -36,9 +36,11 @@ class OneDie extends React.Component {
   
   onClickRoll() {
     var n = this.props.info.faces.length;
+    if(n == 0) return;
     var new_active = this.state.active;
     while(new_active == this.state.active) {
       new_active = Math.floor(Math.random() * n);
+      if(n == 1) break;
     }
     this.setState({active: new_active});
   }
