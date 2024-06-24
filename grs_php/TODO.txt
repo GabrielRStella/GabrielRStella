@@ -1,8 +1,6 @@
 reorganization:
 -home
 --bio
---cv
---some links
 -research
 --brief research interest statement
 --projects [list and links to individual pages]

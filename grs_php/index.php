@@ -55,6 +55,12 @@ $options = array(
       "icon"=>"fas fa-file-alt"
     ),
     */
+    
+    array(
+      "title"=>"CV",
+      "to"=>"/files/resume.pdf",
+      "icon"=>"fas fa-file"
+    ),
     array(
       "title"=>"IRL@TAMU",
       "to"=>"http://irl.cs.tamu.edu/people/gabriel/",
@@ -78,7 +84,7 @@ foreach($options as $option) {
   $to = $option['to'];
   $icon = $option['icon'];
   echo "
-    <div class=\"col s12 m4\">
+    <div class=\"col s12 m6 l3\">
       <a href=$to>
         <div class=\"center $secondaryText\">
           <i class=\"$icon\" style=\"font-size: 120px\"></i>
