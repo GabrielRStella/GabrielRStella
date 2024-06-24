@@ -21,13 +21,13 @@ make_nav();
           <h1>Games and Toys</h1>
         </div>
         <p>
-          These games were all written from scratch in JavaScript using the HTML5 canvas.
-          They are meant for desktop browsers, though some may partially work on mobile devices.
-          I hope you enjoy playing them!
-          
-          Toys are mini-projects that I don't consider complete enough to call games.
-          Still, they may be interesting to you.
+          This page contains my HTML5 games and toys. They were all written from scratch in JavaScript using the HTML5 canvas API.
+
+          You can find some of my newer games, variously made with SDL, Godot, and Unity, on my itch.io page.
         </p>
+        <!-- <p>
+          I've been making games since around 2012. The first game I put on this site, Tetris Matcher, was made in 2017.
+        </p> -->
       </div>
       
       <?php
@@ -152,6 +152,11 @@ foreach($toys as $toydata) {
   <div class="section">
     <div class="row">
       <div class="col s12 l6">
+        <h3 class="center-align">Games</h3>
+        <p>
+          These are meant for desktop browsers, though some may partially work on mobile devices.
+          I hope you enjoy playing them!
+        </p>
         <div class="row">
           <?php
             foreach($all_games as $obj) {
@@ -161,6 +166,11 @@ foreach($toys as $toydata) {
         </div>
       </div>
       <div class="col s12 l6">
+        <h3 class="center-align">Toys</h3>
+        <p>
+          Toys are mini-projects that I don't consider complete enough to call games.
+          Still, they may be interesting to you.
+        </p>
         <div class="row">
           <?php
             foreach($all_toys as $obj) {

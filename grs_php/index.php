@@ -66,9 +66,9 @@ $options = array(
       "icon"=>"fab fa-github"
     ),
     array(
-      "title"=>"itch.io",
-      "to"=>"https://gabrielrstella.itch.io/",
-      "icon"=>"fas fa-gamepad"
+      "title"=>"LinkedIn",
+      "to"=>"https://www.linkedin.com/in/gabrielrstella/",
+      "icon"=>"fab fa-linkedin"
     )
 //others: google scholar/papers?
 );
