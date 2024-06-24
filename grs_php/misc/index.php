@@ -10,30 +10,89 @@ include '../helpers/files.php';
 <?php
 make_nav();
 ?>
+
+
+<div class="container center-align">
+  <div class="section">
+    <div class="row">
+      <div class="col s12">
+        <h1>Miscellaneous</h1>
+        <p>
+          An assortment of various things I have made.
+        </p>
+      </div>
+    </div>
+    <div class="row">
 <?php
+
+$projects = array(
+  array(
+    "to"=>"/CSCE641/index.php",
+    "title"=>"CSCE 641 Project",
+    "description"=>"My course project for CSCE 641: Computer Graphics."
+  ),
+  // array(
+  //   "to"=>"/buckets.php",
+  //   "title"=>"Bucket Game D<sub>1</sub>",
+  //   "description"=>"A bucket-game simulator."
+  // ),
+  // array(
+  //   "to"=>"/timer.php",
+  //   "title"=>"Timer",
+  //   "description"=>"A simple timer."
+  // ),
+  // array(
+  //   "to"=>"/CSCE645/index.php",
+  //   "title"=>"CSCE 645 Project",
+  //   "description"=>"My research project for CSCE 645: Geometric Modeling."
+  // ),
+  array(
+    "to"=>"/CSCE452/index.php",
+    "title"=>"CSCE 452 Robots",
+    "description"=>"A set of projects done for CSCE 452: Robotics and Spatial Intelligence."
+  ),
+  // array(
+  //   "to"=>"/github.php",
+  //   "title"=>"GitHub Tracker",
+  //   "description"=>"A client-side GitHub interface. Built using React."
+  // ),
+  // array(
+  //   "to"=>"/webstorage.php",
+  //   "title"=>"Browser Storage Interface",
+  //   "description"=>"An interactive viewer/editor for your browser's local storage."
+  // ),
+  // array(
+  //   "to"=>"",
+  //   "title"=>"",
+  //   "description"=>""
+  // )
+);
+
+foreach($projects as $proj) {
+  $to = $proj['to'];
+  $title = $proj['title'];
+  $description = $proj['description'];
+  if(!$to) {
+    continue;
+  }
+  $to = "/misc".$to;
+  echo "
+    <div class=\"col s12 m6\">
+      <div class=\"card\">
+        <div class=\"card-content\">
+          <a href=\"$to\"><span class=\"card-title\">$title</span></a>
+          <p>$description</p>
+        </div>
+      </div>
+    </div>";
+}
+
 ?>
-<div class="container">
-  <div class="section">
-    <div class="center-align">
-        <h1>Projects</h1>
     </div>
-    <p>
-        Hi!
-        This is placeholder text, present while I work on reorganizing my site.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-    </p>
-  </div>
-  <div class="section">
-    <div class="center-align">
-        <h1>Publications</h1>
-    </div>
-    <p>
-        Hi!
-        This is placeholder text, present while I work on reorganizing my site.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-    </p>
   </div>
 </div>
+
+
 <?php
 make_footer();
 ?>

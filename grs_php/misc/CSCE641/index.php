@@ -2,9 +2,9 @@
 <html>
 <?php
 $title = 'CSCE641';
-include '../helpers/util.php';
-include '../helpers/header.php';
-include '../helpers/files.php';
+include '../../helpers/util.php';
+include '../../helpers/header.php';
+include '../../helpers/files.php';
 ?>
 <body>
 <?php
@@ -73,7 +73,7 @@ make_nav();
 					The data flow of the interactive sandbox is shown below:
 				</p>
 				<br/>
-				<img src="/CSCE641/data_flow.png" alt="Dataflow diagram of the interactive sandbox." title="Sandbox Dataflow" class="responsive-img"/>
+				<img src="data_flow.png" alt="Dataflow diagram of the interactive sandbox." title="Sandbox Dataflow" class="responsive-img"/>
 				<br/>
 				<br/>
 				<p style="text-indent: 36px;">
@@ -81,8 +81,8 @@ make_nav();
 					The below images are screenshots taken from the sandbox program; the first shows the ground-truth view, while the second shows estimated depth using PatchMatch-Multi.
 			  	</p>
 				<br/>
-				<img src="/CSCE641/screenshot.png" alt="Screenshot of MVDES, containing ground truth images for the measurement views" title="MVDES Screenshot 1" class="responsive-img"/>
-				<img src="/CSCE641/screenshot2.png" alt="Screenshot of MVDES, containing a view of the estimated depth using PatchMatch-Multi" title="MVDES Screenshot 2" class="responsive-img"/>
+				<img src="screenshot.png" alt="Screenshot of MVDES, containing ground truth images for the measurement views" title="MVDES Screenshot 1" class="responsive-img"/>
+				<img src="screenshot2.png" alt="Screenshot of MVDES, containing a view of the estimated depth using PatchMatch-Multi" title="MVDES Screenshot 2" class="responsive-img"/>
 			</div>
 		  </div>
 		</div>
@@ -98,16 +98,16 @@ make_nav();
 				</p>
 				<div class="row">
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_textures_0.png" alt="Result image 1.1: textured vs. textureless surfaces, 320x180 untextured" title="Estimation performance on textured vs. textureless surfaces, 320x180 untextured" class="responsive-img"/>
+						<img src="result_textures_0.png" alt="Result image 1.1: textured vs. textureless surfaces, 320x180 untextured" title="Estimation performance on textured vs. textureless surfaces, 320x180 untextured" class="responsive-img"/>
 					</div>
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_textures_1.png" alt="Result image 1.2: textured vs. textureless surfaces, 320x180 textured" title="Estimation performance on textured vs. textureless surfaces, 320x180 textured" class="responsive-img"/>
+						<img src="result_textures_1.png" alt="Result image 1.2: textured vs. textureless surfaces, 320x180 textured" title="Estimation performance on textured vs. textureless surfaces, 320x180 textured" class="responsive-img"/>
 					</div>
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_textures_2.png" alt="Result image 1.3: textured vs. textureless surfaces, 960x540 untextured" title="Estimation performance on textured vs. textureless surfaces, 960x540 untextured" class="responsive-img"/>
+						<img src="result_textures_2.png" alt="Result image 1.3: textured vs. textureless surfaces, 960x540 untextured" title="Estimation performance on textured vs. textureless surfaces, 960x540 untextured" class="responsive-img"/>
 					</div>
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_textures_3.png" alt="Result image 1.4: textured vs. textureless surfaces, 960x540 textured" title="Estimation performance on textured vs. textureless surfaces, 960x540 textured" class="responsive-img"/>
+						<img src="result_textures_3.png" alt="Result image 1.4: textured vs. textureless surfaces, 960x540 textured" title="Estimation performance on textured vs. textureless surfaces, 960x540 textured" class="responsive-img"/>
 					</div>
 				</div>
 				<p>
@@ -115,16 +115,16 @@ make_nav();
 				</p>
 				<div class="row">
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_resolution_0.png" alt="Result image 2.1: PatchMatch multi-res" title="Estimation performance on varying resolution, PatchMatch" class="responsive-img"/>
+						<img src="result_resolution_0.png" alt="Result image 2.1: PatchMatch multi-res" title="Estimation performance on varying resolution, PatchMatch" class="responsive-img"/>
 					</div>
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_resolution_1.png" alt="Result image 2.2: PatchMatch-Multi multi-res" title="Estimation performance on varying resolution, PatchMatch-Multi" class="responsive-img"/>
+						<img src="result_resolution_1.png" alt="Result image 2.2: PatchMatch-Multi multi-res" title="Estimation performance on varying resolution, PatchMatch-Multi" class="responsive-img"/>
 					</div>
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_resolution_2.png" alt="Result image 2.3: Cost Volume multi-res" title="Estimation performance on varying resolution, Cost Volume" class="responsive-img"/>
+						<img src="result_resolution_2.png" alt="Result image 2.3: Cost Volume multi-res" title="Estimation performance on varying resolution, Cost Volume" class="responsive-img"/>
 					</div>
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_resolution_3.png" alt="Result image 2.4: Mieloch multi-res" title="Estimation performance on varying resolution, Mieloch" class="responsive-img"/>
+						<img src="result_resolution_3.png" alt="Result image 2.4: Mieloch multi-res" title="Estimation performance on varying resolution, Mieloch" class="responsive-img"/>
 					</div>
 				</div>
 				<p>
@@ -132,10 +132,10 @@ make_nav();
 				</p>
 				<div class="row">
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_nviews_0.png" alt="Result image 3.1: Stereo" title="Estimation performance on 1080p stereo" class="responsive-img"/>
+						<img src="result_nviews_0.png" alt="Result image 3.1: Stereo" title="Estimation performance on 1080p stereo" class="responsive-img"/>
 					</div>
 					<div class="col s12 m6">
-						<img src="/CSCE641/result_nviews_1.png" alt="Result image 3.2: 4-view" title="Estimation performance on 1080p 4-view" class="responsive-img"/>
+						<img src="result_nviews_1.png" alt="Result image 3.2: 4-view" title="Estimation performance on 1080p 4-view" class="responsive-img"/>
 					</div>
 				</div>
 				<p style="text-indent: 36px;">
@@ -172,6 +172,6 @@ make_nav();
 <?php
 make_footer();
 ?>
-<?php include '../helpers/materialize.php'; ?>
+<?php include '../../helpers/materialize.php'; ?>
 </body>
 </html>

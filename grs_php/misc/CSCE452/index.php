@@ -2,9 +2,9 @@
 <html>
 <?php
 $title = 'CSCE452';
-include '../helpers/util.php';
-include '../helpers/header.php';
-include '../helpers/files.php';
+include '../../helpers/util.php';
+include '../../helpers/header.php';
+include '../../helpers/files.php';
 ?>
 <body>
 <?php
@@ -36,7 +36,7 @@ $files = array(
 
 foreach($files as $idx=>$desc) {
   $num = $idx + 1;  
-  $link = "/CSCE452/P$num/page.html";
+  $link = "/misc/CSCE452/P$num/page.html";
   $title = "Project $num";
   echo "
     <div class=\"col s12 m6 l4\">
@@ -56,6 +56,6 @@ foreach($files as $idx=>$desc) {
 <?php
 make_footer();
 ?>
-<?php include '../helpers/materialize.php'; ?>
+<?php include '../../helpers/materialize.php'; ?>
 </body>
 </html>
