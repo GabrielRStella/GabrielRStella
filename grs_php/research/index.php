@@ -25,34 +25,38 @@ make_nav();
     <div class="center-align">
         <h2>Projects</h2>
     </div>
-    <p>
-        Hi!
-        This is placeholder text, present while I work on reorganizing my site.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
-    </p>
+
+    <!-- <div class="collection flow-text center-align"> -->
     <div class="row">
 
       <?php
       $projects = array(
         array(
           "title"=>"Object-Oriented Reinforcement Learning",
+          "abstract"=>"todo abstract",
           "name"=>"oorl",
         ),
         array(
           "title"=>"External-Memory Streaming",
+          "abstract"=>"todo abstract",
           "name"=>"em",
         ),
       );
       foreach($projects as $project) {
         $ptitle = $project['title'];
         $pname = $project['name'];
+        $pabstract = $project['abstract'];
         $plink = "research/".$pname.".php";
         echo "
-          <div class=\"col s12 m6 l12\">
-            <div class=\"card-panel center-align\">
-              <a href=\"$plink\">$ptitle</a>
+          <div class=\"col s12\">
+            <div class=\"card\">
+              <div class=\"card-content\">
+                <a href=\"$plink\" class=\"$primaryText card-title\">$ptitle</a>
+                <p>$pabstract</p>
+              </div>
             </div>
           </div>";
+          // echo "<a href=\"$plink\" class=\"$primaryText collection-item\">$ptitle</a>";
       }
 
       ?>
@@ -85,7 +89,7 @@ make_nav();
 
         //links 
         foreach($pub["links"] as $lkey => $lvalue) {
-          echo "<a class=\"blue-text text-accent-4\" href=\"$lvalue\">$lkey</a>";
+          echo "<a class=\"$primaryText\" href=\"$lvalue\">$lkey</a>";
         }
         //end
         echo "

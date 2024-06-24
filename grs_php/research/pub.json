@@ -7,7 +7,7 @@
         "links": {
             "PDF": "research/files/qora.pdf",
             "Poster": "#",
-            "Project": "#",
+            "Project": "research/oorl.php",
             "OpenReview": "https://openreview.net/forum?id=pAzDdYzEva",
             "Code": "https://github.com/GabrielRStella/QORA"
         }
