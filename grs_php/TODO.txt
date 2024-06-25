@@ -10,6 +10,8 @@ reorganization:
 
 -new bio on home page
 -research statement
+-link to google scholar https://scholar.google.com/citations?user=06nh5FYAAAAJ
 -research project pages? [oorl, em, others]
 --each page can just be an abstract, publication list, then more specific description/links as needed
 -push to actual site and make sure all the relative links still work :)
+-in helpers/util.php, put my name in navbar?

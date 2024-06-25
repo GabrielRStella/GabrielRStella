@@ -30,21 +30,10 @@ make_nav();
     <div class="row">
 
       <?php
-      $projects = array(
-        array(
-          "title"=>"Object-Oriented Reinforcement Learning",
-          "abstract"=>"todo abstract",
-          "name"=>"oorl",
-        ),
-        array(
-          "title"=>"External-Memory Streaming",
-          "abstract"=>"todo abstract",
-          "name"=>"em",
-        ),
-      );
-      foreach($projects as $project) {
+      $projects = json_decode(file_get_contents("projects.json"), true);
+
+      foreach($projects as $pname => $project) {
         $ptitle = $project['title'];
-        $pname = $project['name'];
         $pabstract = $project['abstract'];
         $plink = "research/".$pname.".php";
         echo "

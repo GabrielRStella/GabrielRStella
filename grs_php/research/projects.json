@@ -1,0 +1,12 @@
+{
+    "oorl": {
+        "title": "Object-Oriented Reinforcement Learning",
+        "abstract": "todo abstract",
+        "papers": ["qora"]
+    },
+    "em": {
+        "title": "External-Memory Streaming",
+        "abstract": "Interaction with external-memory devices, such as hard disk drives (HDDs), is a significant challenge for modern applications due to the large delays incurred by random access. In this project, we develop and study a new model for external-memory applications called <i>bowtie streaming</i>. Our optimized I/O scheduling algorithms are able to maintain throughputs several times higher than the fastest prior methods.",
+        "papers": ["bowtie"]
+    }
+}
