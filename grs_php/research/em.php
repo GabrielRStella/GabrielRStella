@@ -8,14 +8,23 @@ include 'project_begin.php';
     <div class="center-align">
         <h2>Tuxedo</h2>
     </div>
-    <div class="row">
-        <p>Tuxedo is the reference implementation of our bowtie streaming and multi-pass optimization algorithms. Its major features are:</p>
+    <div class="row flow-text">
+        <p>
+            Tuxedo is a software suite containing the reference implementation of our bowtie streaming algorithms. It contains the following components:
+        </p>
         <ol>
-        <li>hitting near theoretical optimal run lengths</li>
-        <li>Optimized overlapped io</li>
-        <li>extreme-speed em sort, tested up to 40tb on a single machine [sorted 40tb using 20gb ram in 24 hrs; the next-fastest system took more than a week]</li>
+            <li>I/O scheduling algorithms capable of achieving theoretically-optimal (minimal) seek counts</li>
+            <!-- <li>Optimized overlapped io</li> -->
+            <li>Dynamic algorithm for multi-pass bowtie optimization</li>
+            <li>Hardware benchmarking tools for collecting single-pass and multi-pass rate tables</li>
+            <li>The <i>Block File System</i>, a simulated filesystem that reduces native filesystem overhead during complex tasks</li>
+            <li>The <i>Hook System</i>, a tool that can trace, process, and replay the I/Os of any Windows application</li>
         </ol>
-        <p>Tuxedo's source code will be released on GitHub soon. For now, a copy can be requested via email.</p>
+        <p>
+            The software package also implements an efficient external-memory distribution sort, <i>TuxedoSort</i>, which has been tested on single-machine sorts up to 40TB using only 20GB of memory.
+            On this challenging task, TuxedoSort was over 8x faster than the next-fastest system, finishing the sort in only 24 hours.
+        </p>
+        <p>Tuxedo's source code can be requested via email.</p>
     </div>
     <!-- <div class="divider"></div> -->
 </div>
