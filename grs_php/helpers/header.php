@@ -14,7 +14,7 @@
 
   <!-- FontAwesome icons -->
   <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous"> -->
-  <link rel="stylesheet" href="files/fontawesome/css/all.css">
+  <link rel="stylesheet" href="/files/fontawesome/css/all.css">
 
   <!--Let browser know website is optimized for mobile-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
