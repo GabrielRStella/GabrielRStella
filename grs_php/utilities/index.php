@@ -44,7 +44,7 @@ $projects = array(
   array(
     "to"=>"/dice.php",
     "title"=>"Dice",
-    "description"=>"Create and roll custom dice (or select from a user-specified set of choices)."
+    "description"=>"Create and roll custom dice (i.e., select from a user-specified set of choices)."
   ),
   // array(
   //   "to"=>"",

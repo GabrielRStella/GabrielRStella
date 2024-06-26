@@ -1,15 +1,27 @@
-reorganization:
--research
---brief research statement
---projects [list and links to individual pages]
----model-based reinforcement learning
---publications []
----bowtie
----qora
 
 -new bio on home page
+
 -research statement
+
+--understanding+creating intelligence
+---understanding and creating are linked through the design of algorithms as testable models of intelligent systems
+---natural intelligence
+----what are the fundamental mechanisms of human intelligence?
+----how can intelligence be broken down and quantified?
+----what are the limits of human intelligence?
+---machine intelligence
+---evaluating intelligence with games
+
+-other stuff
+--artificial life
+--game theory
+---evolution of cooperation and competition
+---evolution of ethics and morality
+--computational models of physics
+
+-cv
 -link to google scholar https://scholar.google.com/citations?user=06nh5FYAAAAJ
--oorl research project page
 -push to actual site and make sure all the relative links still work :)
 -in helpers/util.php, put my name in navbar?
+-qora description
+-use flow-text more consistently

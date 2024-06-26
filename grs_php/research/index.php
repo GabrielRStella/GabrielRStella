@@ -17,8 +17,12 @@ make_nav();
     <div class="center-align">
         <h1>Research</h1>
     </div>
-    <p>
-      This research statement is WIP. :)
+    <p class="flow-text center-align">
+      The overarching goal of my work is to understand and create intelligent systems.
+    </p>
+    <div class="divider"></div>
+    <p class="flow-text">
+      aaa
     </p>
   </div>
   <div class="section">

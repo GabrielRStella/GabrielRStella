@@ -25,7 +25,7 @@ make_nav();
         <div class="center-align">
           <h1>Gabriel Stella</h1>
         </div>
-        <p>
+        <p class="flow-text">
           Hi!
           I'm a computer science PhD student at Texas A&M University.
           I'm currently researching new methods for reinforcement learning.
