@@ -30,7 +30,7 @@ make_nav();
           I'm a computer science PhD student at Texas A&M University.
           I'm currently researching new methods for reinforcement learning.
           Previously I worked on theory and algorithms for high-performance Big Data systems.
-          I also do game development in my free time.
+          I also develop games in my free time.
           Thanks for checking out my website!
 
           <!-- I'm currently working on writing a new bio. :) In the meantime, go ahead and explore the site! -->

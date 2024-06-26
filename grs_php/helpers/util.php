@@ -16,7 +16,7 @@ function make_nav() {
       "title"=>"Home"
     ),
     array(
-      "to"=>"/research",
+      "to"=>"/research/",
       "title"=>"Research"
     ),
     // array(
@@ -24,15 +24,15 @@ function make_nav() {
     //   "title"=>"Teaching"
     // ),
     array(
-      "to"=>"/games_toys",
+      "to"=>"/games_toys/",
       "title"=>"Games+Toys"
     ),
     array(
-      "to"=>"/utilities",
+      "to"=>"/utilities/",
       "title"=>"Utilities"
     ),
     array(
-      "to"=>"/misc",
+      "to"=>"/misc/",
       "title"=>"Misc"
     )
   );

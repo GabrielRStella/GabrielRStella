@@ -1,5 +1,4 @@
 -new bio on home page
--push to actual site and make sure all the relative links still work :)
 
 -qora description
 -cv
