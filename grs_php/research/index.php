@@ -22,7 +22,63 @@ make_nav();
     </p>
     <div class="divider"></div>
     <p class="flow-text">
-      aaa
+      What are the fundamental mechanisms of human intelligence?
+      <!-- What aspects of human cognition are "built-in" and what parts are learned? -->
+      How can intelligence be broken down and quantified?
+      What are the limits of human intelligence and of intelligent systems in general?
+    </p>
+    <p class="flow-text">
+      I believe that many of the most amazing abilities we observe in humans and animals emerge naturally from simple yet incredibly powerful processes based on effective representations of the world.
+      Thus, rather than explicitly working towards systems capable of highly sophisticated behaviors,
+      my approach focuses on understanding the foundations of intelligence with the hope that interesting abilities will follow naturally.
+
+      To pursue this goal, I build functional models in the form of computer algorithms.
+      I then evaluate the models in the same way that humans evaluate themselves and each other: by placing them in games carefully designed to test their various capabilities.
+
+      <!-- --alignment, interpretability, understanding the methods we use -->
+    </p>
+    <div class="divider"></div>
+    <p class="flow-text">
+      How did intelligence arise in this universe?
+      Was the emergence of intelligence guaranteed?
+      Under what conditions <i>can</i> and <i>will</i> intelligence come about?
+      How does the computational model of <i>the universe itself</i> relate to the potential for intelligence?
+    </p>
+    <p class="flow-text">
+      As I study models of intelligence in virtual worlds, it occurs to me that my research is a bit... recursive.
+
+      I wonder how we came to be here, studying ourselves, in a universe we know little about.
+      Although I may not be able to peek <i>outside</i>, I can certainly look deeper <i>inwards</i>.
+
+      I believe that simulated models of reality, both simple and complex, can shed light on a number of interesting and important topics.
+      Two topics are of particular interest to me: complexity and ethics.
+
+      Thus, I am very interested in <i>artificial life</i> experiments 
+
+      In particular, 
+      
+      I am interested in studies of artificial life that examine the conditions balancing intelligence vs. simplicity, cooperation vs. competition, etc.
+
+      In addition, I [computational models of physics and their implications for the structure of intelligent systems]
+
+
+      <!--
+      --artificial life
+      ---emergence of complexity
+      ---how environmental characteristics affect the viability of intelligent life
+      --game theory
+      ---evolution of cooperation and competition
+      ---evolution of ethics and morality
+      --relationship between the physical laws of the universe and the theory of computability
+      --- -->
+    </p>
+    <div class="divider"></div>
+    <p class="flow-text">
+      Clearly, the above is only a high-level view.
+      More specific information about each of my public projects can be found below.
+
+      Although I have many other projects planned for the future,
+      I prefer to keep the details of each private until I have concrete results to share.
     </p>
   </div>
   <div class="section">

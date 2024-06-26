@@ -10,9 +10,9 @@ include 'project_begin.php';
     </div>
     <div class="row flow-text">
         <p>
-            QORA (Quantified Object Relation Aggregator) is a novel model-learning algorithm.
+            QORA (Quantified Object Relation Aggregator) is a novel model-learning algorithm for reinforcement learning.
 
-            More info coming soon; for now, check out the paper below. :)
+            More info coming soon; for now, check out the paper and other resources below. :)
         </p>
     </div>
     <!-- <div class="divider"></div> -->
