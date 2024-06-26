@@ -30,7 +30,7 @@ make_nav();
     <p class="flow-text">
       I believe that many of the most amazing abilities we observe in humans and animals emerge naturally from simple yet incredibly powerful processes based on effective representations of the world.
       Thus, rather than explicitly working towards systems capable of highly sophisticated behaviors,
-      my approach focuses on understanding the foundations of intelligence with the expectation that interesting abilities and insights will follow naturally.
+      my approach focuses on understanding the foundations of intelligence with the expectation that interesting insights and abilities will follow naturally.
 
       To pursue this goal, I build functional models in the form of computer algorithms.
       I then evaluate the models in the same way that humans evaluate themselves and each other: by placing them in games carefully designed to test their various capabilities.
@@ -40,7 +40,7 @@ make_nav();
     <div class="divider"></div>
     <p class="flow-text">
       How did intelligence arise in this universe?
-      Was the emergence of intelligence guaranteed?
+      Was the emergence of intelligence inevitable?
       Under what conditions <i>can</i> and <i>will</i> intelligence come about?
       Under what conditions will <i>social, cooperating agents</i> arise?
       How does the computational model <i>of the universe itself</i> relate to the potential for intelligence?
