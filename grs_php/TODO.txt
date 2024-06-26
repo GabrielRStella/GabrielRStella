@@ -1,7 +1,7 @@
-TODO:
 -new bio on home page
--cv
--link to google scholar https://scholar.google.com/citations?user=06nh5FYAAAAJ
 -push to actual site and make sure all the relative links still work :)
+
 -qora description
+-cv
 -use flow-text more consistently
+-update fontawesome version so i can use google scholar icon :)

@@ -16,12 +16,12 @@ make_nav();
 <div class="container">
   <div class="section">
     <div class="row">
-      <div class="col s12 m4 push-m8">
+      <div class="col s12 l4 push-l8">
         <!-- <img src="files/img/avatars/<?php echo selectRandomFile('files/img/avatars/'); ?>" alt="A collection of colliding circles." title="Circles" class="responsive-img"></img> -->
         <canvas id="circles" style="width: 100%; cursor: pointer; aspect-ratio: 1 / 1;"/> <!-- https://stackoverflow.com/a/3088012 -->
         <script src="files/scripts/circles.js"></script>
       </div>
-      <div class="col s12 m8 pull-m4">
+      <div class="col s12 l8 pull-l4">
         <div class="center-align">
           <h1>Gabriel Stella</h1>
         </div>
@@ -43,7 +43,6 @@ make_nav();
   </div>
   <div class="divider"></div>
   <div class="section">
-    <br/>
     <div class="row">
 
 <?php
@@ -61,15 +60,20 @@ $options = array(
     ),
     */
     
-    array(
-      "title"=>"CV",
-      "to"=>"/files/resume.pdf",
-      "icon"=>"fas fa-file"
-    ),
+    // array(
+    //   "title"=>"CV",
+    //   "to"=>"/files/resume.pdf",
+    //   "icon"=>"fas fa-file"
+    // ),
     array(
       "title"=>"IRL@TAMU",
       "to"=>"http://irl.cs.tamu.edu/people/gabriel/",
       "icon"=>"fas fa-network-wired"
+    ),
+    array(
+      "title"=>"Google Scholar",
+      "to"=>"https://scholar.google.com/citations?user=06nh5FYAAAAJ",
+      "icon"=>"fas fa-book-reader"
     ),
     array(
       "title"=>"GitHub",
@@ -81,7 +85,6 @@ $options = array(
       "to"=>"https://www.linkedin.com/in/gabrielrstella/",
       "icon"=>"fab fa-linkedin"
     )
-//others: google scholar/papers?
 );
 
 foreach($options as $option) {
@@ -90,6 +93,7 @@ foreach($options as $option) {
   $icon = $option['icon'];
   echo "
     <div class=\"col s12 m6 l3\">
+      <br/>
       <a href=$to>
         <div class=\"center $secondaryText\">
           <i class=\"$icon\" style=\"font-size: 120px\"></i>
