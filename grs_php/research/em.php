@@ -23,6 +23,8 @@ include 'project_begin.php';
         <p>
             The software package also implements an efficient external-memory distribution sort, <i>TuxedoSort</i>, which has been tested on single-machine sorts up to 40TB using only 20GB of memory.
             On this challenging task, TuxedoSort was over 8x faster than the next-fastest system, finishing the sort in only 24 hours.
+            Note that the RAID system on our test machine has 4 GB/s sequential throughput,
+            meaning that the theoretical minimum time just to read and write 40TB of data is roughly six hours.
         </p>
         <p>Tuxedo's source code can be requested via email.</p>
     </div>

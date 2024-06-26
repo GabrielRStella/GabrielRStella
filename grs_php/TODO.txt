@@ -1,11 +1,3 @@
--research statement
-
-
-
-
-
-
-
 TODO:
 -new bio on home page
 -cv
