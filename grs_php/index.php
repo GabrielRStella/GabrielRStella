@@ -28,6 +28,7 @@ make_nav();
         <p class="flow-text">
           Hi!
           I'm a computer science PhD student at Texas A&M University.
+          <!-- I research various aspects of artificial intelligence: perception, representation, learning, planning, etc. -->
           I'm currently researching new methods for reinforcement learning.
           Previously I worked on theory and algorithms for high-performance Big Data systems.
           I also develop games in my free time.

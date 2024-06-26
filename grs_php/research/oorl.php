@@ -5,7 +5,7 @@ include 'project_begin.php';
 
 <div class="section">
     <!-- <div class="divider"></div> -->
-    <div class="center-align">
+    <div class="center-align" id="qora">
         <h2>QORA</h2>
     </div>
     <div class="row flow-text">
