@@ -5,9 +5,9 @@
         "authors": "Gabriel Stella, Dmitri Loguinov",
         "venue": "ICML, July 2024",
         "links": {
-            "PDF": "research/files/qora.pdf",
+            "PDF": "files/qora.pdf",
             "Poster": "#",
-            "Project": "research/oorl.php",
+            "Project": "oorl.php",
             "OpenReview": "https://openreview.net/forum?id=pAzDdYzEva",
             "Code": "https://github.com/GabrielRStella/QORA"
         }
@@ -18,9 +18,9 @@
         "authors": "Gabriel Stella, Dmitri Loguinov",
         "venue": "IEEE BigData, December 2022",
         "links": {
-            "PDF": "research/files/bigdata2022.pdf",
-            "Presentation": "research/files/bigdata2022-ppt.pdf",
-            "Project": "#",
+            "PDF": "files/bigdata2022.pdf",
+            "Presentation": "files/bigdata2022-ppt.pdf",
+            "Project": "em.php",
             "IEEE": "https://ieeexplore.ieee.org/document/10020231"
         }
     }

@@ -74,10 +74,10 @@ foreach(listFilesAndDirs($basedir_games) as $dir) {
 usort($games, "cmp");
 foreach($games as $gamedata) {
   //
-  $game_img = 'games_toys/games/'.$gamedata['dir'].'/'.$gamedata['thumbnail'];
+  $game_img = 'games/'.$gamedata['dir'].'/'.$gamedata['thumbnail'];
   $game_text = $gamedata['text'];
   $game_title = $gamedata['title'];
-  $game_link = '/games_toys/game.php?game='.$gamedata['dir'];
+  $game_link = 'game.php?game='.$gamedata['dir'];
   $game_caption = $gamedata['caption'];
   //
   $game_card_data = "

@@ -81,7 +81,7 @@ make_nav();
       foreach($projects as $pname => $project) {
         $ptitle = $project['title'];
         $pabstract = $project['abstract'];
-        $plink = "research/".$pname.".php";
+        $plink = $pname.".php";
         echo "
           <div class=\"col s12\">
             <div class=\"card\">
