@@ -26,7 +26,7 @@
 
         //links 
         foreach($pub["links"] as $lkey => $lvalue) {
-          echo "<a class=\"$primaryText\" href=\"$lvalue\">$lkey</a>";
+          echo "<a class=\"$primaryText\" style=\"display:inline-block\" href=\"$lvalue\">$lkey</a>";
         }
         //end
         echo "

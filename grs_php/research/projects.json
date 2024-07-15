@@ -1,6 +1,6 @@
 {
     "oorl": {
-        "title": "Object-Oriented Reinforcement Learning",
+        "title": "Object-Oriented Re&shy;inforce&shy;ment Learning",
         "abstract": "Reinforcement learning offers a promising path towards the creation of intelligent agents, but state-of-the-art methods are woefully incapable when compared to even simple biological organisms. One of the reasons for this is the lack of <i>object-based, compositional reasoning</i> in deep-learning systems. In this project, we use the principle of object-oriented (i.e., <i>relational</i>) reasoning to design algorithms that learn and act more effectively.",
         "papers": ["qora"]
     },

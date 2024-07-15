@@ -1,4 +1,5 @@
 -new bio on home page
+-team picker
 
 -qora description
 -cv
