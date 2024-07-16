@@ -6,7 +6,7 @@
         "venue": "ICML, July 2024",
         "links": {
             "PDF": "files/qora.pdf",
-            "Poster": "#",
+            "Poster": "files/qora-poster.pdf",
             "Project": "oorl.php",
             "OpenReview": "https://openreview.net/forum?id=pAzDdYzEva",
             "Code": "https://github.com/GabrielRStella/QORA"
