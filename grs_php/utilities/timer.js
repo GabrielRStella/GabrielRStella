@@ -56,6 +56,10 @@ class Options extends React.Component {
             React.createElement('input', {type: "checkbox", className: "filled-in", id: "field_showpercent", checked: this.props.showPercent, onChange: this.props.onShowPercentChange}),
             React.createElement('span', {}, "Show Percentage")
           ),
+          React.createElement('div', {className: "input-field col l2 s4"},
+            React.createElement('input', {type: "number", step:"1", id: "field_pace", value: this.props.pace, onChange: this.props.onPaceChange}),
+            React.createElement('label', {"for": "field_pace"}, "Pace")
+          ),
         )
       );
     } else {
@@ -76,6 +80,10 @@ class Options extends React.Component {
         React.createElement('label', {className: "input-field col l4 s8"},
           React.createElement('input', {type: "checkbox", className: "filled-in", id: "field_showpercent", checked: this.props.showPercent, onChange: this.props.onShowPercentChange}),
           React.createElement('span', {}, "Show Percentage")
+        ),
+        React.createElement('div', {className: "input-field col l2 s4"},
+            React.createElement('input', {type: "number", step:"1", id: "field_pace", value: this.props.pace, onChange: this.props.onPaceChange}),
+            React.createElement('label', {"for": "field_pace"}, "Pace")
         )
       );
     }
@@ -98,7 +106,8 @@ class Page extends React.Component {
       timeCurrent: timeToString(currentDate), //is actually just a placeholder to let us setState on tick
 	  //
 	  fontSize: 72,
-	  showPercent: false
+	  showPercent: false,
+      pace: 0
     };
     //
     this.onTimeBeginChange = this.onTimeBeginChange.bind(this); //when user updates start time
@@ -106,6 +115,7 @@ class Page extends React.Component {
     this.onTimeChange = this.onTimeChange.bind(this); //when the clock ticks
     this.onFontSizeChange = this.onFontSizeChange.bind(this); //when the clock ticks
     this.onShowPercentChange = this.onShowPercentChange.bind(this); //when the clock ticks
+    this.onPaceChange = this.onPaceChange.bind(this); //when the clock ticks
     
     setInterval(this.onTimeChange, 500);
   }
@@ -126,13 +136,17 @@ class Page extends React.Component {
   onShowPercentChange(event) {
 	  this.setState({showPercent: !this.state.showPercent});
   }
+  onPaceChange(event) {
+	  this.setState({pace: event.target.value});
+  }
 
   render() {
 	  var options = React.createElement(Options, {
 			onTimeBeginChange: this.onTimeBeginChange, onTimeEndChange: this.onTimeEndChange,
 			timeBegin: this.state.timeBegin, timeEnd: this.state.timeEnd,
 			onFontSizeChange: this.onFontSizeChange, onShowPercentChange: this.onShowPercentChange,
-			fontSize: this.state.fontSize, showPercent: this.state.showPercent
+			fontSize: this.state.fontSize, showPercent: this.state.showPercent,
+            onPaceChange: this.onPaceChange, pace: this.state.pace
 		});
     
     var tBegin = this.state.timeBegin;
@@ -146,7 +160,7 @@ class Page extends React.Component {
     var sElapsed = Math.round((dCurrent - dBegin) / 1000);
     var sRemaining = Math.round((dEnd - dCurrent) / 1000);
     
-	  var msg = "...";
+	var msg = "...";
     
     if(sTotal < 0) {
       msg = "Invalid interval";
@@ -186,6 +200,11 @@ class Page extends React.Component {
       if(this.state.showPercent) {
         var percentElapsed = Math.floor(100 * sElapsed / sTotal);
         msg += " (" + percentElapsed + "%)";
+      }
+      if(this.state.pace > 0) {
+        var percentElapsed = sElapsed / sTotal;
+        var progress = Math.ceil(percentElapsed * this.state.pace);
+        msg += " (" + progress + "/" + this.state.pace + ")";
       }
     }
 	var body = React.createElement(Message, {message: msg, fontSize: this.state.fontSize});
