@@ -66,6 +66,11 @@ $projects = array(
   //   "title"=>"",
   //   "description"=>""
   // )
+  array(
+    "to"=>"/cspace/index.php",
+    "title"=>"Configuration Space",
+    "description"=>"Visualizations of the configuration space for some 2-dof robots."
+  ),
 );
 
 foreach($projects as $proj) {
