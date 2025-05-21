@@ -33,10 +33,10 @@ class VizRow extends React.Component {
         return React.createElement('div', { className: "row" },
             React.createElement('div', {className: "col s12 m6"},
                 //<canvas id="bucket-canvas" style="width: 100%; aspect-ratio: 1;"></canvas>
-                React.createElement('canvas', {id: "canvas-robot-" + this.props.id, style: {width: "100%", aspectRatio: "1"}})
+                React.createElement('canvas', {id: "canvas-robot-" + this.props.id, style: {width: "100%", background: "#808080"}})
             ),
             React.createElement('div', {className: "col s12 m6"},
-                React.createElement('canvas', {id: "canvas-cspace-" + this.props.id, style: {width: "100%", aspectRatio: "1"}})
+                React.createElement('canvas', {id: "canvas-cspace-" + this.props.id, style: {width: "100%", background: "#808080"}})
             ),
         );
     }
