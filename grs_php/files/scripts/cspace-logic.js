@@ -338,9 +338,9 @@ class Rectangle {
     //take a line segment (two points, a-b) and return the segment intersects with the rectangle's boundary
     intersectBoundaryWithLine(a, b) {
         var topleft = new Point(this.point.x, this.point.y);
-        var topright = new Point(this.point.x + this.w, this.point.y);
-        var bottomleft = new Point(this.point.x, this.point.y + this.h);
-        var bottomright = new Point(this.point.x + this.w, this.point.y + this.h);
+        var topright = new Point(this.point.x + this.width, this.point.y);
+        var bottomleft = new Point(this.point.x, this.point.y + this.height);
+        var bottomright = new Point(this.point.x + this.width, this.point.y + this.height);
         return lineIntersect(a, b, topleft, topright)
             || lineIntersect(a, b, topleft, bottomleft)
             || lineIntersect(a, b, bottomleft, bottomright)
