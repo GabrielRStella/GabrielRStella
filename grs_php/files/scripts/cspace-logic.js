@@ -11,307 +11,345 @@
 Math.TAU = Math.TAU || (Math.PI * 2);
 
 class Point {
-  constructor(x, y) {
-    this.x = x || 0;
-    this.y = y || 0;
-  }
+    constructor(x, y) {
+        this.x = x || 0;
+        this.y = y || 0;
+    }
 
-  get magnitudeSquared() {
-    var m = this.x * this.x + this.y * this.y;
-    return m;
-  }
+    get magnitudeSquared() {
+        var m = this.x * this.x + this.y * this.y;
+        return m;
+    }
 
-  get magnitude() {
-    var m = this.x * this.x + this.y * this.y;
-    return Math.sqrt(m);
-  }
+    get magnitude() {
+        var m = this.x * this.x + this.y * this.y;
+        return Math.sqrt(m);
+    }
 
-  set magnitude(len) {
-    var m = this.magnitude;
-    if(m == 0) return;
-    len /= m;
-    this.x *= len;
-    this.y *= len;
-  }
+    set magnitude(len) {
+        var m = this.magnitude;
+        if (m == 0) return;
+        len /= m;
+        this.x *= len;
+        this.y *= len;
+    }
 
-  get zero() {
-    return (this.x == 0) && (this.y == 0);
-  }
+    get zero() {
+        return (this.x == 0) && (this.y == 0);
+    }
 
-  distanceSquared(other) {
-    var dx = this.x - other.x;
-    var dy = this.y - other.y;
-    var m = dx * dx + dy * dy;
-    return m;
-  }
+    distanceSquared(other) {
+        var dx = this.x - other.x;
+        var dy = this.y - other.y;
+        var m = dx * dx + dy * dy;
+        return m;
+    }
 
-  distance(other) {
-    var dx = this.x - other.x;
-    var dy = this.y - other.y;
-    var m = dx * dx + dy * dy;
-    return Math.sqrt(m);
-  }
+    distance(other) {
+        var dx = this.x - other.x;
+        var dy = this.y - other.y;
+        var m = dx * dx + dy * dy;
+        return Math.sqrt(m);
+    }
 
-  multiply(d) {
-    this.x *= d;
-    this.y *= d;
-  }
+    multiply(d) {
+        this.x *= d;
+        this.y *= d;
+    }
 
-  add(other) {
-    this.x += other.x;
-    this.y += other.y;
-  }
+    add(other) {
+        this.x += other.x;
+        this.y += other.y;
+    }
 
-  sub(other) {
-    this.x -= other.x;
-    this.y -= other.y;
-  }
+    sub(other) {
+        this.x -= other.x;
+        this.y -= other.y;
+    }
 
-  get angle() {
-    return Math.atan2(this.y, this.x);
-  }
+    get angle() {
+        return Math.atan2(this.y, this.x);
+    }
 
-  set angle(r) {
-    var m = this.magnitude;
-    this.x = Math.cos(r) * m;
-    this.y = Math.sin(r) * m;
-  }
+    set angle(r) {
+        var m = this.magnitude;
+        this.x = Math.cos(r) * m;
+        this.y = Math.sin(r) * m;
+    }
 
-  slope() {
-    return this.y / this.x;
-  }
+    slope() {
+        return this.y / this.x;
+    }
 
-  slopeFrom(p) {
-    return (this.y - p.y) / (this.x - p.x);
-  }
+    slopeFrom(p) {
+        return (this.y - p.y) / (this.x - p.x);
+    }
 
-  rotate(dr) {
-    var cos = Math.cos(dr);
-    var sin = Math.sin(dr);
-    var xP = cos * this.x - sin * this.y;
-    var yP = sin * this.x + cos * this.y;
-    this.x = xP;
-    this.y = yP;
-  }
+    rotate(dr) {
+        var cos = Math.cos(dr);
+        var sin = Math.sin(dr);
+        var xP = cos * this.x - sin * this.y;
+        var yP = sin * this.x + cos * this.y;
+        this.x = xP;
+        this.y = yP;
+    }
 
-  rotateAround(p, dr) {
-    this.sub(p);
-    this.rotate(dr);
-    this.add(p);
-  }
-  
-  dot(other) {
-	return this.x*other.x + this.y*other.y;
-  }
-  
-  //vector projection
-  project(other) {
-	  var N = this.copy();
-	  N.magnitude = 1;
-	  N.multiply(N.dot(other));
-	  return N;
-  }
-  
-  //vector rejection
-  reject(other) {
-	  var projection = this.project(other);
-	  projection.sub(other);
-	  projection.multiply(-1);
-	  return projection;
-  }
+    rotateAround(p, dr) {
+        this.sub(p);
+        this.rotate(dr);
+        this.add(p);
+    }
 
-  angleTo(other) {
-    return Math.atan2(other.y - this.y, other.x - this.x);
-  }
-  
-  angleBetween(other) {
-	  //this has numerical stability issues...
-	// var dot = (this.x * other.x + this.y * other.y);
-	// var mags = this.magnitude * other.magnitude;
-	// console.log(this, other, dot / mags);
-	// if(mags == 0) return 0;
-	// return Math.acos(dot / mags);
-	//https://stackoverflow.com/a/55510185
-	var dot = this.x*other.x + this.y*other.y;
-    var cross = this.x*other.y - this.y*other.x;
-    return Math.atan2(cross, dot);
-  }
+    dot(other) {
+        return this.x * other.x + this.y * other.y;
+    }
 
-  floor() {
-    this.x = Math.floor(this.x);
-    this.y = Math.floor(this.y);
-  }
+    //vector projection
+    project(other) {
+        var N = this.copy();
+        N.magnitude = 1;
+        N.multiply(N.dot(other));
+        return N;
+    }
 
-  round() {
-    this.x = Math.round(this.x);
-    this.y = Math.round(this.y);
-  }
+    //vector rejection
+    reject(other) {
+        var projection = this.project(other);
+        projection.sub(other);
+        projection.multiply(-1);
+        return projection;
+    }
 
-  apply(f) {
-    this.x = f(this.x);
-    this.y = f(this.y);
-  }
+    angleTo(other) {
+        return Math.atan2(other.y - this.y, other.x - this.x);
+    }
 
-  copy() {
-    return new Point(this.x, this.y);
-  }
+    angleBetween(other) {
+        //this has numerical stability issues...
+        // var dot = (this.x * other.x + this.y * other.y);
+        // var mags = this.magnitude * other.magnitude;
+        // console.log(this, other, dot / mags);
+        // if(mags == 0) return 0;
+        // return Math.acos(dot / mags);
+        //https://stackoverflow.com/a/55510185
+        var dot = this.x * other.x + this.y * other.y;
+        var cross = this.x * other.y - this.y * other.x;
+        return Math.atan2(cross, dot);
+    }
+
+    floor() {
+        this.x = Math.floor(this.x);
+        this.y = Math.floor(this.y);
+    }
+
+    round() {
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+    }
+
+    apply(f) {
+        this.x = f(this.x);
+        this.y = f(this.y);
+    }
+
+    copy() {
+        return new Point(this.x, this.y);
+    }
 
 }
 
+//return whether two lines intersect
+/*
+//https://stackoverflow.com/a/9997374
+//https://bryceboe.com/2006/10/23/line-segment-intersection-algorithm/
+def ccw(A,B,C):
+    return (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x)
+
+# Return true if line segments AB and CD intersect
+def intersect(A,B,C,D):
+    return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
+*/
+
+function pointsCCW(A, B, C) {
+    return (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x);
+}
+
+function lineIntersect(A, B, C, D) {
+    return pointsCCW(A,C,D) != pointsCCW(B,C,D) && pointsCCW(A,B,C) != pointsCCW(A,B,D);
+}
+
 class Rectangle {
-  constructor(x, y, w, h) {
-    this.point = new Point(x, y);
-    this.width = w;
-    this.height = h;
-  }
-
-  get center() {
-    return new Point(this.point.x + (this.width / 2), this.point.y + (this.height / 2));
-  }
-
-  get minX() {
-    return this.point.x;
-  }
-
-  get minY() {
-    return this.point.y;
-  }
-
-  get maxX() {
-    return this.point.x + this.width;
-  }
-
-  get maxY() {
-    return this.point.y + this.height;
-  }
-
-  set center(p) {
-    this.point = p.copy();
-    this.point.x -= this.width / 2;
-    this.point.y -= this.height / 2;
-  }
-
-  set minX(x) {
-    this.point.x = x;
-  }
-
-  set minY(y) {
-    this.point.y = y;
-  }
-
-  set maxX(x) {
-    this.point.x = x - this.width;
-  }
-
-  set maxY(y) {
-    this.point.y = y - this.height;
-  }
-
-  contains(p) {
-    return (p.x >= this.minX) && (p.x <= this.maxX) && (p.y >= this.minY) && (p.y <= this.maxY);
-  }
-
-  distance(p) {
-    var x = p.x;
-    var y = p.y;
-    var dx = 0;
-    var dy = 0;
-    if(x < this.minX) dx = this.minX - x;
-    else if(x > this.maxX) dx = x - this.maxX;
-    if(y < this.minY) dy = this.minY - y;
-    else if(y > this.maxY) dy = y - this.maxY;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  //https://gamedev.stackexchange.com/questions/586/what-is-the-fastest-way-to-work-out-2d-bounding-box-intersection
-  //do the two rectangles intersect?
-  intersects(r) {
-    var c = this.center;
-    var rc = r.center;
-    var x = c.x;
-    var y = c.y;
-    var rx = rc.x;
-    var ry = rc.y;
-    return (Math.abs(x - rx) * 2 < (this.width + r.width))
-      && (Math.abs(y - ry) * 2 < (this.height + r.height));
-  }
-
-  pushPoint(p) {
-    if(p.x < this.point.x) {
-      p.x = this.point.x;
+    constructor(x, y, w, h) {
+        this.point = new Point(x, y);
+        this.width = w;
+        this.height = h;
     }
-    if(p.x > this.point.x + this.width) {
-      p.x = this.point.x + this.width;
-    }
-    if(p.y < this.point.y) {
-      p.y = this.point.y;
-    }
-    if(p.y > this.point.y + this.height) {
-      p.y = this.point.y + this.height;
-    }
-  }
 
-  //push rectangle r out of this rectangle's bounds
-  push(r) {
-    var center = r.center;
-    var w2 = r.width / 2;
-    var h2 = r.height / 2;
-    //first: check if it's inside and push it out
-    if (this.intersects(r)) {
-      //TODO: this jumps slightly when it touches a corner.
-      //maybe I can make it smoother?
-      var cx = this.point.x + this.width / 2;
-      var cy = this.point.y + this.height / 2;
-      var dist_inset_x = Math.min(center.x - this.point.x, (this.point.x + this.width) - center.x);
-      var dist_inset_y = Math.min(center.y - this.point.y, (this.point.y + this.height) - center.y);
-      if (dist_inset_x <= dist_inset_y) {
-        //inset horizontally (or on corner)
-        if (center.x < cx) {
-          //left
-          center.x = this.point.x - w2;
+    get center() {
+        return new Point(this.point.x + (this.width / 2), this.point.y + (this.height / 2));
+    }
+
+    get minX() {
+        return this.point.x;
+    }
+
+    get minY() {
+        return this.point.y;
+    }
+
+    get maxX() {
+        return this.point.x + this.width;
+    }
+
+    get maxY() {
+        return this.point.y + this.height;
+    }
+
+    set center(p) {
+        this.point = p.copy();
+        this.point.x -= this.width / 2;
+        this.point.y -= this.height / 2;
+    }
+
+    set minX(x) {
+        this.point.x = x;
+    }
+
+    set minY(y) {
+        this.point.y = y;
+    }
+
+    set maxX(x) {
+        this.point.x = x - this.width;
+    }
+
+    set maxY(y) {
+        this.point.y = y - this.height;
+    }
+
+    contains(p) {
+        return (p.x >= this.minX) && (p.x <= this.maxX) && (p.y >= this.minY) && (p.y <= this.maxY);
+    }
+
+    distance(p) {
+        var x = p.x;
+        var y = p.y;
+        var dx = 0;
+        var dy = 0;
+        if (x < this.minX) dx = this.minX - x;
+        else if (x > this.maxX) dx = x - this.maxX;
+        if (y < this.minY) dy = this.minY - y;
+        else if (y > this.maxY) dy = y - this.maxY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    //https://gamedev.stackexchange.com/questions/586/what-is-the-fastest-way-to-work-out-2d-bounding-box-intersection
+    //do the two rectangles intersect?
+    intersects(r) {
+        var c = this.center;
+        var rc = r.center;
+        var x = c.x;
+        var y = c.y;
+        var rx = rc.x;
+        var ry = rc.y;
+        return (Math.abs(x - rx) * 2 < (this.width + r.width))
+            && (Math.abs(y - ry) * 2 < (this.height + r.height));
+    }
+
+    pushPoint(p) {
+        if (p.x < this.point.x) {
+            p.x = this.point.x;
         }
+        if (p.x > this.point.x + this.width) {
+            p.x = this.point.x + this.width;
+        }
+        if (p.y < this.point.y) {
+            p.y = this.point.y;
+        }
+        if (p.y > this.point.y + this.height) {
+            p.y = this.point.y + this.height;
+        }
+    }
+
+    //push rectangle r out of this rectangle's bounds
+    push(r) {
+        var center = r.center;
+        var w2 = r.width / 2;
+        var h2 = r.height / 2;
+        //first: check if it's inside and push it out
+        if (this.intersects(r)) {
+            //TODO: this jumps slightly when it touches a corner.
+            //maybe I can make it smoother?
+            var cx = this.point.x + this.width / 2;
+            var cy = this.point.y + this.height / 2;
+            var dist_inset_x = Math.min(center.x - this.point.x, (this.point.x + this.width) - center.x);
+            var dist_inset_y = Math.min(center.y - this.point.y, (this.point.y + this.height) - center.y);
+            if (dist_inset_x <= dist_inset_y) {
+                //inset horizontally (or on corner)
+                if (center.x < cx) {
+                    //left
+                    center.x = this.point.x - w2;
+                }
+                else {
+                    //right
+                    center.x = this.point.x + this.width + w2;
+                }
+            }
+            if (dist_inset_y <= dist_inset_x) {
+                //inset vertically (or on corner)
+                if (center.y < cy) {
+                    //"bottom"
+                    center.y = this.point.y - h2;
+                }
+                else {
+                    //"top"
+                    center.y = this.point.y + this.height + h2;
+                }
+            }
+        }
+        //else: it's outside, grab it
         else {
-          //right
-          center.x = this.point.x + this.width + w2;
+            if (center.x < this.point.x - w2) {
+                //left (outside)
+                center.x = this.point.x - w2;
+            }
+            else if (center.x > this.point.x + this.width + w2) {
+                //right (outside)
+                center.x = this.point.x + this.width + w2;
+            }
+            if (center.y < this.point.y - h2) {
+                //"bottom" (outside)
+                center.y = this.point.y - h2;
+            }
+            else if (center.y > this.point.y + this.height + h2) {
+                //"top" (outside)
+                center.y = this.point.y + this.height + h2;
+            }
         }
-      }
-      if (dist_inset_y <= dist_inset_x) {
-        //inset vertically (or on corner)
-        if (center.y < cy) {
-          //"bottom"
-          center.y = this.point.y - h2;
-        }
-        else {
-          //"top"
-          center.y = this.point.y + this.height + h2;
-        }
-      }
+        r.center = center;
     }
-    //else: it's outside, grab it
-    else {
-      if (center.x < this.point.x - w2) {
-        //left (outside)
-        center.x = this.point.x - w2;
-      }
-      else if (center.x > this.point.x + this.width + w2) {
-        //right (outside)
-        center.x = this.point.x + this.width + w2;
-      }
-      if (center.y < this.point.y - h2) {
-        //"bottom" (outside)
-        center.y = this.point.y - h2;
-      }
-      else if (center.y > this.point.y + this.height + h2) {
-        //"top" (outside)
-        center.y = this.point.y + this.height + h2;
-      }
-    }
-    r.center = center;
-  }
 
-  copy() {
-    return new Rectangle(this.point.x, this.point.y, this.width, this.height);
-  }
+    copy() {
+        return new Rectangle(this.point.x, this.point.y, this.width, this.height);
+    }
+
+    //new stuff
+
+    //take a line segment (two points, a-b) and return the segment intersects with the rectangle's boundary
+    intersectBoundaryWithLine(a, b) {
+        var topleft = new Point(this.point.x, this.point.y);
+        var topright = new Point(this.point.x + this.w, this.point.y);
+        var bottomleft = new Point(this.point.x, this.point.y + this.h);
+        var bottomright = new Point(this.point.x + this.w, this.point.y + this.h);
+        return lineIntersect(a, b, topleft, topright)
+            || lineIntersect(a, b, topleft, bottomleft)
+            || lineIntersect(a, b, bottomleft, bottomright)
+            || lineIntersect(a, b, topright, bottomright);
+    }
+
+    intersectWithLine(a, b) {
+        return this.contains(a) || this.contains(b) || this.intersectBoundaryWithLine(a, b);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -321,33 +359,33 @@ class Rectangle {
 //helpers, copied from The Flea
 RenderHelper = {};
 //
-RenderHelper.drawRect = function(ctx, r, fill, stroke) {
-  if(fill) ctx.fillStyle = fill;
-  if(stroke) ctx.strokeStyle = stroke;
-  ctx.beginPath();
-  ctx.rect(r.minX, r.minY, r.width, r.height);
-  ctx.closePath();
-  if(fill) ctx.fill();
-  if(stroke) ctx.stroke();
+RenderHelper.drawRect = function (ctx, r, fill, stroke) {
+    if (fill) ctx.fillStyle = fill;
+    if (stroke) ctx.strokeStyle = stroke;
+    ctx.beginPath();
+    ctx.rect(r.minX, r.minY, r.width, r.height);
+    ctx.closePath();
+    if (fill) ctx.fill();
+    if (stroke) ctx.stroke();
 }
-RenderHelper.drawPoint = function(ctx, p, fill, stroke, radius) {
-  if(fill) ctx.fillStyle = fill;
-  if(stroke) ctx.strokeStyle = stroke;
-  ctx.beginPath();
-  ctx.arc(p.x, p.y, radius, 0, Math.TAU);
-  ctx.closePath();
-  if(fill) ctx.fill();
-  if(stroke) ctx.stroke();
+RenderHelper.drawPoint = function (ctx, p, fill, stroke, radius) {
+    if (fill) ctx.fillStyle = fill;
+    if (stroke) ctx.strokeStyle = stroke;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius, 0, Math.TAU);
+    ctx.closePath();
+    if (fill) ctx.fill();
+    if (stroke) ctx.stroke();
 }
-RenderHelper.drawLine = function(ctx, a, b, color) {
-  if(color) ctx.strokeStyle = color;
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(a.x, a.y);
-  ctx.lineTo(b.x, b.y);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.restore();
+RenderHelper.drawLine = function (ctx, a, b, color) {
+    if (color) ctx.strokeStyle = color;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -368,8 +406,8 @@ class RTPoint {
         var p = new Point(t0, t1);
 
         var collisions = 0;
-        for(var i = 0; i < obstacles.length; i++) {
-            if(obstacles[i].contains(p)) collisions++;
+        for (var i = 0; i < obstacles.length; i++) {
+            if (obstacles[i].contains(p)) collisions++;
         }
         return collisions;
     }
@@ -392,8 +430,8 @@ class RTCircle {
         var p = new Point(t0, t1);
 
         var collisions = 0;
-        for(var i = 0; i < obstacles.length; i++) {
-            if(obstacles[i].distance(p) <= this.radius) collisions++;
+        for (var i = 0; i < obstacles.length; i++) {
+            if (obstacles[i].distance(p) <= this.radius) collisions++;
         }
         return collisions;
     }
@@ -408,22 +446,46 @@ class RTCircle {
 //arm with 2 revolute joints
 //TODO
 class RArm {
+    constructor() {
+        this.l0 = 0.2; //length of upper arm
+        this.l1 = 0.2; //length of lower arm
+        //
+        this.root = new Point(0.5, 0.5); //fixed at the center of the c-space
+    }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
     testCollisions(obstacles, t0, t1) {
-        var p = new Point(t0, t1);
+        //
+        var p0 = this.root;
+        var p1 = new Point(this.l0, 0);
+        p1.rotate(t0 * Math.TAU);
+        p1.add(p0);
+        var p2 = new Point(this.l1, 0);
+        p2.rotate((t0 + t1) * Math.TAU);
+        p2.add(p1);
+        //
 
         var collisions = 0;
         for(var i = 0; i < obstacles.length; i++) {
-            if(obstacles[i].contains(p)) collisions++;
+            if(obstacles[i].intersectWithLine(p0, p1) || obstacles[i].intersectWithLine(p1, p2)) collisions++;
         }
         return collisions;
     }
 
     //ctx is pre-transformed to the [0, 1]^2 c-space coordinate system
     render(ctx, t0, t1) {
-        // console.log("hi", t0, t1);
-        RenderHelper.drawPoint(ctx, new Point(t0, t1), "#ffffff", null, 0.01);
+        //
+        var p0 = this.root;
+        var p1 = new Point(this.l0, 0);
+        p1.rotate(t0 * Math.TAU);
+        p1.add(p0);
+        var p2 = new Point(this.l1, 0);
+        p2.rotate((t0 + t1) * Math.TAU);
+        p2.add(p1);
+        //
+        ctx.lineWidth = 0.01;
+        RenderHelper.drawLine(ctx, p0, p1, "#ffffff");
+        RenderHelper.drawLine(ctx, p1, p2, "#ffffff");
     }
 }
 
@@ -436,8 +498,8 @@ class RSlider {
         var p = new Point(t0, t1);
 
         var collisions = 0;
-        for(var i = 0; i < obstacles.length; i++) {
-            if(obstacles[i].contains(p)) collisions++;
+        for (var i = 0; i < obstacles.length; i++) {
+            if (obstacles[i].contains(p)) collisions++;
         }
         return collisions;
     }
@@ -455,8 +517,8 @@ class RSlider {
 
 //https://stackoverflow.com/a/74622706
 function decToHex(dec) {
-  const part = Math.floor(dec * 255).toString(16)
-  return `#${part}${part}${part}`
+    const part = Math.floor(dec * 255).toString(16)
+    return `#${part}${part}${part}`
 }
 
 //a set of rectangular obstacles + a robot
@@ -481,32 +543,32 @@ class World {
 
     process() {
         //update c-space render, if necessary
-        if(this.canvas_robot == null) {
+        if (this.canvas_robot == null) {
             this.canvas_robot = document.getElementById("canvas-robot-" + this.id);
         }
-        if(this.canvas_cspace == null) {
+        if (this.canvas_cspace == null) {
             this.canvas_cspace = document.getElementById("canvas-cspace-" + this.id);
             this.canvas_cspace.onmousemove = this.onMouseMove.bind(this);
             this.canvas_cspace.onmousedown = this.onMouseDown.bind(this);
             this.canvas_cspace.onmouseup = this.onMouseUp.bind(this);
         }
-        if(this.canvas_robot != null && this.canvas_cspace != null) {
+        if (this.canvas_robot != null && this.canvas_cspace != null) {
 
-            if(this.resolution_x != this.canvas_cspace.width || this.resolution_y != this.canvas_cspace.height) {
+            if (this.resolution_x != this.canvas_cspace.width || this.resolution_y != this.canvas_cspace.height) {
                 this.resolution_x = this.canvas_cspace.width;
                 this.resolution_y = this.canvas_cspace.height;
                 this.offset = 0;
                 this.data = this.canvas_cspace.getContext("2d").createImageData(this.resolution_x, this.resolution_y);
             }
-            
+
             var w = this.data.width;
             var h = this.data.height;
             var n = w * h;
-            for(var i = 0; i < this.pixels_per_batch && this.offset < n; i++) {
+            for (var i = 0; i < this.pixels_per_batch && this.offset < n; i++) {
                 //calc pixel coords
                 var x = (this.offset) % w;
                 var y = (this.offset - x) / w;
-                console.log(x, y);
+                // console.log(x, y);
                 //calc normalized c-space coords
                 var p0 = x / w;
                 var p1 = y / h;
@@ -528,7 +590,7 @@ class World {
 
     render() {
         //render robot
-        if(this.canvas_robot != null) {
+        if (this.canvas_robot != null) {
             this.canvas_robot.width = this.canvas_robot.clientWidth;
             this.canvas_robot.height = this.canvas_robot.clientWidth;
 
@@ -540,7 +602,7 @@ class World {
 
             ctx.scale(this.canvas_robot.width, this.canvas_robot.height)
 
-            for(var i = 0; i < this.obstacles.length; i++) {
+            for (var i = 0; i < this.obstacles.length; i++) {
                 RenderHelper.drawRect(ctx, this.obstacles[i], "#000000");
             }
 
@@ -549,7 +611,7 @@ class World {
             ctx.restore();
         }
         //render c-space
-        if(this.canvas_cspace != null) {
+        if (this.canvas_cspace != null) {
             this.canvas_cspace.width = this.canvas_cspace.clientWidth;
             this.canvas_cspace.height = this.canvas_cspace.clientWidth;
 
@@ -564,7 +626,7 @@ class World {
             ctx.scale(this.canvas_robot.width, this.canvas_robot.height)
 
             // ctx.drawImage(this.data_draw, 0, 0, 1, 1);
-            
+
             RenderHelper.drawPoint(ctx, new Point(this.t0, this.t1), this.robot.testCollisions(this.obstacles, this.t0, this.t1) == 0 ? "#0000ff" : "#ff0000", null, 0.008);
 
             ctx.restore();
@@ -578,10 +640,10 @@ class World {
 
         // console.log(this.id, x, y, mouseDown);
 
-        if(mouseDown) {
+        if (mouseDown) {
             this.onMouse(x, y);
         }
-        
+
     }
 
     onMouseDown(e) {
@@ -592,7 +654,7 @@ class World {
 
         // console.log(this.id, x, y, mouseDown);
 
-        if(mouseDown) {
+        if (mouseDown) {
             this.onMouse(x, y);
         }
     }
@@ -631,13 +693,13 @@ class Runner {
     run(t) {
         //multiple processing passes to fill in c-space visualizations (up to a limit of 3ms per frame)
         var time_start = Date.now();
-        while(Date.now() - time_start < 3) {
-            for(var i = 0; i < this.worlds.length; i++) {
+        while (Date.now() - time_start < 3) {
+            for (var i = 0; i < this.worlds.length; i++) {
                 this.worlds[i].process();
             }
         }
         //render
-        for(var i = 0; i < this.worlds.length; i++) {
+        for (var i = 0; i < this.worlds.length; i++) {
             this.worlds[i].render();
         }
         // console.log(t);
@@ -653,18 +715,18 @@ class Runner {
 
 //https://stackoverflow.com/a/322650
 var mouseDown = 0;
-document.body.onmousedown = function() { 
+document.body.onmousedown = function () {
     mouseDown = 1;
 }
-document.body.onmouseup = function() {
+document.body.onmouseup = function () {
     mouseDown = 0;
 }
 
 var worlds = [
     new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)], new RTPoint(), "tpoint"),
     new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.5, 0.3, 0.3), new Rectangle(0.55, 0.7, 0.1, 0.1)], new RTCircle(), "tcircle"),
-    // new World(o, new RArm(), "arm"),
-    // new World(o, new RSlider(), "slider")
+    new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)], new RArm(), "arm"),
+    new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)], new RSlider(), "slider")
 ];
 
 var runner = new Runner(worlds);
