@@ -212,8 +212,14 @@ class Rectangle {
   }
 
   distance(p) {
-    var dx = Math.min(this.minX - p.x, 0, p.x - this.maxX);
-    var dy = Math.min(this.minY - p.y, 0, p.y - this.maxY);
+    var x = p.x;
+    var y = p.y;
+    var dx = 0;
+    var dy = 0;
+    if(x < this.minX) dx = this.minX - x;
+    else if(x > this.maxX) dx = x - this.maxX;
+    if(y < this.minY) dy = this.minY - y;
+    else if(y > this.maxY) dy = y - this.maxY;
     return Math.sqrt(dx * dx + dy * dy);
   }
 
@@ -371,7 +377,74 @@ class RTPoint {
     //ctx is pre-transformed to the [0, 1]^2 c-space coordinate system
     render(ctx, t0, t1) {
         // console.log("hi", t0, t1);
-        //TODO
+        RenderHelper.drawPoint(ctx, new Point(t0, t1), "#ffffff", null, 0.01);
+    }
+}
+
+//translating circle robot
+class RTCircle {
+    constructor() {
+        this.radius = 0.05;
+    }
+
+    //return the number of obstacles that are in collision at configuration (t0, t1)
+    testCollisions(obstacles, t0, t1) {
+        var p = new Point(t0, t1);
+
+        var collisions = 0;
+        for(var i = 0; i < obstacles.length; i++) {
+            if(obstacles[i].distance(p) <= this.radius) collisions++;
+        }
+        return collisions;
+    }
+
+    //ctx is pre-transformed to the [0, 1]^2 c-space coordinate system
+    render(ctx, t0, t1) {
+        // console.log("hi", t0, t1);
+        RenderHelper.drawPoint(ctx, new Point(t0, t1), "#ffffff", null, this.radius);
+    }
+}
+
+//arm with 2 revolute joints
+//TODO
+class RArm {
+
+    //return the number of obstacles that are in collision at configuration (t0, t1)
+    testCollisions(obstacles, t0, t1) {
+        var p = new Point(t0, t1);
+
+        var collisions = 0;
+        for(var i = 0; i < obstacles.length; i++) {
+            if(obstacles[i].contains(p)) collisions++;
+        }
+        return collisions;
+    }
+
+    //ctx is pre-transformed to the [0, 1]^2 c-space coordinate system
+    render(ctx, t0, t1) {
+        // console.log("hi", t0, t1);
+        RenderHelper.drawPoint(ctx, new Point(t0, t1), "#ffffff", null, 0.01);
+    }
+}
+
+//rotating line on a slider
+//TODO
+class RSlider {
+
+    //return the number of obstacles that are in collision at configuration (t0, t1)
+    testCollisions(obstacles, t0, t1) {
+        var p = new Point(t0, t1);
+
+        var collisions = 0;
+        for(var i = 0; i < obstacles.length; i++) {
+            if(obstacles[i].contains(p)) collisions++;
+        }
+        return collisions;
+    }
+
+    //ctx is pre-transformed to the [0, 1]^2 c-space coordinate system
+    render(ctx, t0, t1) {
+        // console.log("hi", t0, t1);
         RenderHelper.drawPoint(ctx, new Point(t0, t1), "#ffffff", null, 0.01);
     }
 }
@@ -418,7 +491,6 @@ class World {
             this.canvas_cspace.onmouseup = this.onMouseUp.bind(this);
         }
         if(this.canvas_robot != null && this.canvas_cspace != null) {
-            //TODO: sample some points and fill in the c-space
 
             if(this.resolution_x != this.canvas_cspace.width || this.resolution_y != this.canvas_cspace.height) {
                 this.resolution_x = this.canvas_cspace.width;
@@ -451,22 +523,6 @@ class World {
                 //
                 this.offset++;
             }
-
-            
-            // var resolution = 10; //number of samples per side of the c-space canvas
-            // //
-            // for(var x = 0; x < resolution; x++) {
-            //     for(var y = 0; y < resolution; y++) {
-            //         var p0 = x / (resolution);
-            //         var p1 = y / (resolution);
-            //         var c = 1 - this.robot.testCollisions(this.obstacles, p0, p1) / (this.obstacles.length - 1);
-            //         ctx.fillStyle = decToHex(c);
-            //         ctx.beginPath();
-            //         ctx.rect(p0, p1, 1/resolution, 1/resolution);
-            //         ctx.closePath();
-            //         ctx.fill();
-            //     }
-            // }
         }
     }
 
@@ -497,7 +553,6 @@ class World {
             this.canvas_cspace.width = this.canvas_cspace.clientWidth;
             this.canvas_cspace.height = this.canvas_cspace.clientWidth;
 
-            //TODO
             var ctx = this.canvas_cspace.getContext("2d");
 
             ctx.clearRect(0, 0, this.canvas_cspace.width, this.canvas_cspace.height);
@@ -605,12 +660,12 @@ document.body.onmouseup = function() {
     mouseDown = 0;
 }
 
-
-var o = [new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)];
-var r = new RTPoint();
-var w = new World(o, r, "tpoint");
-
-var worlds = [w];
+var worlds = [
+    new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)], new RTPoint(), "tpoint"),
+    new World([new Rectangle(0.2, 0.2, 0.2, 0.1), new Rectangle(0.7, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.5, 0.3, 0.3), new Rectangle(0.55, 0.7, 0.1, 0.1)], new RTCircle(), "tcircle"),
+    // new World(o, new RArm(), "arm"),
+    // new World(o, new RSlider(), "slider")
+];
 
 var runner = new Runner(worlds);
 
