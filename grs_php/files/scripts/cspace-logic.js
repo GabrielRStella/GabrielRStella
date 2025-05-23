@@ -399,19 +399,11 @@ class World {
         this.canvas_robot = null;
         this.canvas_cspace = null;
         //visualization stuff
-        // this.resolution = 10; //number of samples per side of the c-space canvas
-        // this.data_collisions = new Array(this.resolution * this.resolution);
-        // this.data_draw = new Image(this.resolution, this.resolution);
-        // //
-        // for(var x = 0; x < this.resolution; x++) {
-        //     for(var y = 0; y < this.resolution; y++) {
-        //         var p0 = x / (this.resolution - 1);
-        //         var p1 = y / (this.resolution - 1);
-        //         var c = this.robot.testCollisions(this.obstacles, p0, p1);
-        //         this.data_collisions[x * this.resolution + y] = c;
-        //         // this.data_draw.
-        //     }
-        // }
+        this.pixels_per_batch = 100; //number of pixels to be updated per call to process()
+        this.resolution_x = 0;
+        this.resolution_y = 0;
+        this.offset = 0; //next pixel index to start processing at
+        this.data = null; //ImageData from the canvas, at its current resolution
     }
 
     process() {
@@ -427,6 +419,54 @@ class World {
         }
         if(this.canvas_robot != null && this.canvas_cspace != null) {
             //TODO: sample some points and fill in the c-space
+
+            if(this.resolution_x != this.canvas_cspace.width || this.resolution_y != this.canvas_cspace.height) {
+                this.resolution_x = this.canvas_cspace.width;
+                this.resolution_y = this.canvas_cspace.height;
+                this.offset = 0;
+                this.data = this.canvas_cspace.getContext("2d").createImageData(this.resolution_x, this.resolution_y);
+            }
+            
+            var w = this.data.width;
+            var h = this.data.height;
+            var n = w * h;
+            for(var i = 0; i < this.pixels_per_batch && this.offset < n; i++) {
+                //calc pixel coords
+                var x = (this.offset) % w;
+                var y = (this.offset - x) / w;
+                console.log(x, y);
+                //calc normalized c-space coords
+                var p0 = x / w;
+                var p1 = y / h;
+                //check collision
+                // var c = 1 - this.robot.testCollisions(this.obstacles, p0, p1) / (this.obstacles.length - 1); //1 = no collision, 0 = all collisions
+                var c = 1 - (this.robot.testCollisions(this.obstacles, p0, p1) + 1) / (this.obstacles.length); //1 = no collision, 0 = all collisions
+                c = Math.floor(c * 255);
+                // console.log(c);
+                //set pixel value
+                this.data.data[(this.offset) * 4] = c;
+                this.data.data[(this.offset) * 4 + 1] = c;
+                this.data.data[(this.offset) * 4 + 2] = c;
+                this.data.data[(this.offset) * 4 + 3] = 255;
+                //
+                this.offset++;
+            }
+
+            
+            // var resolution = 10; //number of samples per side of the c-space canvas
+            // //
+            // for(var x = 0; x < resolution; x++) {
+            //     for(var y = 0; y < resolution; y++) {
+            //         var p0 = x / (resolution);
+            //         var p1 = y / (resolution);
+            //         var c = 1 - this.robot.testCollisions(this.obstacles, p0, p1) / (this.obstacles.length - 1);
+            //         ctx.fillStyle = decToHex(c);
+            //         ctx.beginPath();
+            //         ctx.rect(p0, p1, 1/resolution, 1/resolution);
+            //         ctx.closePath();
+            //         ctx.fill();
+            //     }
+            // }
         }
     }
 
@@ -436,7 +476,6 @@ class World {
             this.canvas_robot.width = this.canvas_robot.clientWidth;
             this.canvas_robot.height = this.canvas_robot.clientWidth;
 
-            //TODO
             var ctx = this.canvas_robot.getContext("2d");
 
             ctx.clearRect(0, 0, this.canvas_robot.width, this.canvas_robot.height);
@@ -461,28 +500,13 @@ class World {
             //TODO
             var ctx = this.canvas_cspace.getContext("2d");
 
-            ctx.clearRect(0, 0, this.canvas_robot.width, this.canvas_robot.height);
+            ctx.clearRect(0, 0, this.canvas_cspace.width, this.canvas_cspace.height);
+
+            ctx.putImageData(this.data, 0, 0);
 
             ctx.save();
 
             ctx.scale(this.canvas_robot.width, this.canvas_robot.height)
-
-            
-            var resolution = 10; //number of samples per side of the c-space canvas
-            //
-            for(var x = 0; x < resolution; x++) {
-                for(var y = 0; y < resolution; y++) {
-                    var p0 = x / (resolution);
-                    var p1 = y / (resolution);
-                    var c = 1 - this.robot.testCollisions(this.obstacles, p0, p1) / (this.obstacles.length - 1);
-                    ctx.fillStyle = decToHex(c);
-                    ctx.beginPath();
-                    ctx.rect(p0, p1, 1/resolution, 1/resolution);
-                    ctx.closePath();
-                    ctx.fill();
-                }
-            }
-
 
             // ctx.drawImage(this.data_draw, 0, 0, 1, 1);
             
@@ -550,8 +574,15 @@ class Runner {
     }
 
     run(t) {
+        //multiple processing passes to fill in c-space visualizations (up to a limit of 3ms per frame)
+        var time_start = Date.now();
+        while(Date.now() - time_start < 3) {
+            for(var i = 0; i < this.worlds.length; i++) {
+                this.worlds[i].process();
+            }
+        }
+        //render
         for(var i = 0; i < this.worlds.length; i++) {
-            this.worlds[i].process(); //TODO: maybe multiple processing passes (up to some time limit, eg, 1ms, to fill in the c-space viz)
             this.worlds[i].render();
         }
         // console.log(t);
