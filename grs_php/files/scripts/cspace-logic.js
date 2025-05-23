@@ -565,7 +565,7 @@ class World {
 
             // ctx.drawImage(this.data_draw, 0, 0, 1, 1);
             
-            RenderHelper.drawPoint(ctx, new Point(this.t0, this.t1), "#0000ff", null, 0.01);
+            RenderHelper.drawPoint(ctx, new Point(this.t0, this.t1), this.robot.testCollisions(this.obstacles, this.t0, this.t1) == 0 ? "#0000ff" : "#ff0000", null, 0.008);
 
             ctx.restore();
         }
@@ -662,7 +662,7 @@ document.body.onmouseup = function() {
 
 var worlds = [
     new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)], new RTPoint(), "tpoint"),
-    new World([new Rectangle(0.2, 0.2, 0.2, 0.1), new Rectangle(0.7, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.5, 0.3, 0.3), new Rectangle(0.55, 0.7, 0.1, 0.1)], new RTCircle(), "tcircle"),
+    new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.5, 0.3, 0.3), new Rectangle(0.55, 0.7, 0.1, 0.1)], new RTCircle(), "tcircle"),
     // new World(o, new RArm(), "arm"),
     // new World(o, new RSlider(), "slider")
 ];
