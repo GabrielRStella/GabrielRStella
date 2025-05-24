@@ -499,20 +499,35 @@ class RArm {
         } else {
             //reach the point
 
+            //compute both flips (lower arm left or right) and do the one that requires moving the upper arm the least
+
             //1. rotate upper arm so that it is at distance d from the root
             a1 = Math.acos((d * d - this.l0 * this.l0 - this.l1 * this.l1) / (2 * this.l0 * this.l1)); //returns in [0, pi]
-            if(t1 > 0.5) a1 = Math.TAU - a1; //if we're already tilted one way, keep that
+            var a1_ = Math.TAU - a1; //other way of tilting
 
             //2. rotate lower arm so that the endpoint is at p=(x, y)
             //we can just figure out where the endpoint is right now, then turn as much as necessary
             var endpoint = this.getPoints(t0, a1 / Math.TAU)[2];
             var angle_from = this.root.angleTo(endpoint);
             var angle_to = this.root.angleTo(p);
-            a0 += (angle_to - angle_from);
+            var delta_angle = angle_to - angle_from;
+            //
+            var endpoint_ = this.getPoints(t0, a1_ / Math.TAU)[2];
+            var angle_from_ = this.root.angleTo(endpoint_);
+            var angle_to_ = this.root.angleTo(p);
+            var delta_angle_ = angle_to_ - angle_from_;
+            //angle wrapping sucks
+            if(Math.min(Math.abs(delta_angle_), Math.abs(Math.abs(delta_angle_) - Math.TAU)) < Math.min(Math.abs(delta_angle), Math.abs(Math.abs(delta_angle) - Math.TAU))) {
+                a1 = a1_;
+                delta_angle = delta_angle_;
+            }
+            //
+            a0 += delta_angle;
             if(a0 < 0) a0 = a0 + Math.TAU;
             if(a0 > Math.TAU) a0 = a0 - Math.TAU;
+
         }
-        return [a0 / Math.TAU, a1 / Math.TAU]; //TODO
+        return [a0 / Math.TAU, a1 / Math.TAU];
     }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
