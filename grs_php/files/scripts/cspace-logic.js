@@ -499,8 +499,8 @@ class RArm {
         } else {
             //reach the point
 
-            //1. rotate upper arm so that it is at distance d from the root: l0 + l1*cos(theta) = d -> theta = acos((d-l0) / l1)
-            a1 = Math.acos((d - this.l0) / this.l1); //returns in [0, pi]
+            //1. rotate upper arm so that it is at distance d from the root
+            a1 = Math.acos((d * d - this.l0 * this.l0 - this.l1 * this.l1) / (2 * this.l0 * this.l1)); //returns in [0, pi]
             if(t1 > 0.5) a1 = Math.TAU - a1; //if we're already tilted one way, keep that
 
             //2. rotate lower arm so that the endpoint is at p=(x, y)
