@@ -1,8 +1,6 @@
-//translating point robot, translating circle robot, 2-dof arm with fixed base, arm that rotates on a prismatic joint
 //tpoint, tcircle, arm, slider
-//canvas ids: canvas-robot-x and canvas-cspace-x
 //TODO: expanding point/circle robot on a slider, ...
-//TODO: allow robot-specific behavior when clicking on the left panel (e.g. move end-affector to cursor)
+//TODO: add dat.gui menu to modify obstacles
 
 ////////////////////////////////////////////////////////////////////////////////
 //geometry (point and rect copied from toys)
@@ -169,11 +167,9 @@ def ccw(A,B,C):
 def intersect(A,B,C,D):
     return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
 */
-
 function pointsCCW(A, B, C) {
     return (C.y-A.y) * (B.x-A.x) > (B.y-A.y) * (C.x-A.x);
 }
-
 function lineIntersect(A, B, C, D) {
     return pointsCCW(A,C,D) != pointsCCW(B,C,D) && pointsCCW(A,B,C) != pointsCCW(A,B,D);
 }
@@ -401,6 +397,11 @@ class Robot {
 //translating point robot
 class RTPoint {
 
+    //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
+    solveIK(x, y, t0, t1) {
+        return [x, y];
+    }
+
     //return the number of obstacles that are in collision at configuration (t0, t1)
     testCollisions(obstacles, t0, t1) {
         var p = new Point(t0, t1);
@@ -425,6 +426,22 @@ class RTCircle {
         this.radius = 0.05;
     }
 
+    //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
+    solveIK(x, y, t0, t1) {
+        //
+        var p_from = new Point(t0, t1);
+        var p_to = new Point(x, y);
+        var d = p_to.distance(p_from);
+        if(d > this.radius) {
+            //move shortest distance so cursor is on edge of circle
+            var p_delta = p_to.copy();
+            p_delta.sub(p_from);
+            p_delta.multiply((d - this.radius) / d);
+            return [t0 + p_delta.x, t1 + p_delta.y];
+        }
+        else return [t0, t1]; //don't move, cursor inside circle already
+    }
+
     //return the number of obstacles that are in collision at configuration (t0, t1)
     testCollisions(obstacles, t0, t1) {
         var p = new Point(t0, t1);
@@ -444,25 +461,67 @@ class RTCircle {
 }
 
 //arm with 2 revolute joints
-//TODO
 class RArm {
     constructor() {
         this.l0 = 0.2; //length of upper arm
-        this.l1 = 0.2; //length of lower arm
+        this.l1 = this.l0; //length of lower arm
         //
         this.root = new Point(0.5, 0.5); //fixed at the center of the c-space
     }
 
-    //return the number of obstacles that are in collision at configuration (t0, t1)
-    testCollisions(obstacles, t0, t1) {
-        //
-        var p0 = this.root;
+    getPoints(t0, t1) {
+        var p0 = this.root.copy();
         var p1 = new Point(this.l0, 0);
         p1.rotate(t0 * Math.TAU);
         p1.add(p0);
         var p2 = new Point(this.l1, 0);
         p2.rotate((t0 + t1) * Math.TAU);
         p2.add(p1);
+        //
+        return [p0, p1, p2];
+    }
+
+    //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
+    solveIK(x, y, t0, t1) {
+        //angles, in radians
+        var a0 = t0 * Math.TAU;
+        var a1 = t1 * Math.TAU;
+        //
+        var p = new Point(x, y);
+        var d = p.distance(this.root);
+        if(d > this.l0 + this.l1) {
+            //can't reach this point
+            var angle = this.root.angleTo(p);
+            if(angle < 0) angle = angle + Math.TAU;
+            //
+            a0 = angle;
+            a1 = 0;
+        } else {
+            //reach the point
+
+            //1. rotate upper arm so that it is at distance d from the root: l0 + l1*cos(theta) = d -> theta = acos((d-l0) / l1)
+            a1 = Math.acos((d - this.l0) / this.l1); //returns in [0, pi]
+            if(t1 > 0.5) a1 = Math.TAU - a1; //if we're already tilted one way, keep that
+
+            //2. rotate lower arm so that the endpoint is at p=(x, y)
+            //we can just figure out where the endpoint is right now, then turn as much as necessary
+            var endpoint = this.getPoints(t0, a1 / Math.TAU)[2];
+            var angle_from = this.root.angleTo(endpoint);
+            var angle_to = this.root.angleTo(p);
+            a0 += (angle_to - angle_from);
+            if(a0 < 0) a0 = a0 + Math.TAU;
+            if(a0 > Math.TAU) a0 = a0 - Math.TAU;
+        }
+        return [a0 / Math.TAU, a1 / Math.TAU]; //TODO
+    }
+
+    //return the number of obstacles that are in collision at configuration (t0, t1)
+    testCollisions(obstacles, t0, t1) {
+        //
+        var ps = this.getPoints(t0, t1);
+        var p0 = ps[0];
+        var p1 = ps[1];
+        var p2 = ps[2];
         //
 
         var collisions = 0;
@@ -492,6 +551,14 @@ class RArm {
 //rotating line on a slider
 //TODO
 class RSlider {
+    constructor() {
+
+    }
+
+    //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
+    solveIK(x, y, t0, t1) {
+        return [t0, t1]; //TODO
+    }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
     testCollisions(obstacles, t0, t1) {
@@ -545,12 +612,15 @@ class World {
         //update c-space render, if necessary
         if (this.canvas_robot == null) {
             this.canvas_robot = document.getElementById("canvas-robot-" + this.id);
+            this.canvas_robot.onmousemove = this.onMouseMoveRobot.bind(this);
+            this.canvas_robot.onmousedown = this.onMouseDownRobot.bind(this);
+            this.canvas_robot.onmouseup = this.onMouseUpRobot.bind(this);
         }
         if (this.canvas_cspace == null) {
             this.canvas_cspace = document.getElementById("canvas-cspace-" + this.id);
-            this.canvas_cspace.onmousemove = this.onMouseMove.bind(this);
-            this.canvas_cspace.onmousedown = this.onMouseDown.bind(this);
-            this.canvas_cspace.onmouseup = this.onMouseUp.bind(this);
+            this.canvas_cspace.onmousemove = this.onMouseMoveCspace.bind(this);
+            this.canvas_cspace.onmousedown = this.onMouseDownCspace.bind(this);
+            this.canvas_cspace.onmouseup = this.onMouseUpCspace.bind(this);
         }
         if (this.canvas_robot != null && this.canvas_cspace != null) {
 
@@ -633,7 +703,7 @@ class World {
         }
     }
 
-    onMouseMove(e) {
+    onMouseMoveRobot(e) {
         // https://stackoverflow.com/a/10109204
         const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
@@ -641,12 +711,12 @@ class World {
         // console.log(this.id, x, y, mouseDown);
 
         if (mouseDown) {
-            this.onMouse(x, y);
+            this.onMouseRobot(x, y);
         }
 
     }
 
-    onMouseDown(e) {
+    onMouseDownRobot(e) {
         mouseDown = 1;
         //
         const x = e.pageX - e.currentTarget.offsetLeft;
@@ -655,11 +725,11 @@ class World {
         // console.log(this.id, x, y, mouseDown);
 
         if (mouseDown) {
-            this.onMouse(x, y);
+            this.onMouseRobot(x, y);
         }
     }
 
-    onMouseUp(e) {
+    onMouseUpRobot(e) {
         mouseDown = 0;
         //
         // const x = e.pageX - e.currentTarget.offsetLeft;
@@ -672,8 +742,58 @@ class World {
         // }
     }
 
-    //use this to set the robot's configuration
-    onMouse(x, y) {
+    //use this to set the robot's configuration (using ik)
+    onMouseRobot(x, y) {
+        // console.log(x, y, this.canvas_cspace.clientWidth, this.canvas_cspace.clientHeight)
+        x = x / this.canvas_cspace.clientWidth;
+        y = y / this.canvas_cspace.clientHeight;
+        // console.log(x, y);
+        var ts = this.robot.solveIK(x, y, this.t0, this.t1);
+        this.t0 = ts[0];
+        this.t1 = ts[1];
+    }
+
+    onMouseMoveCspace(e) {
+        // https://stackoverflow.com/a/10109204
+        const x = e.pageX - e.currentTarget.offsetLeft;
+        const y = e.pageY - e.currentTarget.offsetTop;
+
+        // console.log(this.id, x, y, mouseDown);
+
+        if (mouseDown) {
+            this.onMouseCspace(x, y);
+        }
+
+    }
+
+    onMouseDownCspace(e) {
+        mouseDown = 1;
+        //
+        const x = e.pageX - e.currentTarget.offsetLeft;
+        const y = e.pageY - e.currentTarget.offsetTop;
+
+        // console.log(this.id, x, y, mouseDown);
+
+        if (mouseDown) {
+            this.onMouseCspace(x, y);
+        }
+    }
+
+    onMouseUpCspace(e) {
+        mouseDown = 0;
+        //
+        // const x = e.pageX - e.currentTarget.offsetLeft;
+        // const y = e.pageY - e.currentTarget.offsetTop;
+
+        // console.log(this.id, x, y, mouseDown);
+
+        // if(mouseDown) {
+        //     this.onMouse(x, y);
+        // }
+    }
+
+    //use this to set the robot's configuration (directly to specified pose)
+    onMouseCspace(x, y) {
         // console.log(x, y, this.canvas_cspace.clientWidth, this.canvas_cspace.clientHeight)
         x = x / this.canvas_cspace.clientWidth;
         y = y / this.canvas_cspace.clientHeight;
@@ -722,11 +842,14 @@ document.body.onmouseup = function () {
     mouseDown = 0;
 }
 
+//[new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)]
+var o = [new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.15, 0.55, 0.3, 0.3), new Rectangle(0.5, 0.75, 0.1, 0.1)];
+
 var worlds = [
-    new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)], new RTPoint(), "tpoint"),
-    new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.5, 0.3, 0.3), new Rectangle(0.55, 0.7, 0.1, 0.1)], new RTCircle(), "tcircle"),
-    new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)], new RArm(), "arm"),
-    new World([new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)], new RSlider(), "slider")
+    new World(o, new RTPoint(), "tpoint"),
+    new World(o, new RTCircle(), "tcircle"),
+    new World(o, new RArm(), "arm"),
+    new World(o, new RSlider(), "slider")
 ];
 
 var runner = new Runner(worlds);
