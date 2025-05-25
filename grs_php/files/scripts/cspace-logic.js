@@ -739,6 +739,9 @@ class World {
         this.resolution_y = 0;
         this.offset = 0; //next pixel index to start processing at
         this.data = null; //ImageData from the canvas, at its current resolution
+        //
+        this.mouseDownRobot = 0;
+        this.mouseDownCspace = 0;
     }
 
     process() {
@@ -843,27 +846,27 @@ class World {
 
         // console.log(this.id, x, y, mouseDown);
 
-        if (mouseDown) {
+        if (this.mouseDownRobot) {
             this.onMouseRobot(x, y);
         }
 
     }
 
     onMouseDownRobot(e) {
-        mouseDown = 1;
+        this.mouseDownRobot = 1;
         //
         const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
 
         // console.log(this.id, x, y, mouseDown);
 
-        if (mouseDown) {
+        if (this.mouseDownRobot) {
             this.onMouseRobot(x, y);
         }
     }
 
     onMouseUpRobot(e) {
-        mouseDown = 0;
+        this.mouseDownRobot = 0;
         //
         // const x = e.pageX - e.currentTarget.offsetLeft;
         // const y = e.pageY - e.currentTarget.offsetTop;
@@ -893,27 +896,27 @@ class World {
 
         // console.log(this.id, x, y, mouseDown);
 
-        if (mouseDown) {
+        if (this.mouseDownCspace) {
             this.onMouseCspace(x, y);
         }
 
     }
 
     onMouseDownCspace(e) {
-        mouseDown = 1;
+        this.mouseDownCspace = 1;
         //
         const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
 
         // console.log(this.id, x, y, mouseDown);
 
-        if (mouseDown) {
+        if (this.mouseDownCspace) {
             this.onMouseCspace(x, y);
         }
     }
 
     onMouseUpCspace(e) {
-        mouseDown = 0;
+        this.mouseDownCspace = 0;
         //
         // const x = e.pageX - e.currentTarget.offsetLeft;
         // const y = e.pageY - e.currentTarget.offsetTop;
@@ -965,15 +968,6 @@ class Runner {
 ////////////////////////////////////////////////////////////////////////////////
 //setup
 ////////////////////////////////////////////////////////////////////////////////
-
-//https://stackoverflow.com/a/322650
-var mouseDown = 0;
-document.body.onmousedown = function () {
-    mouseDown = 1;
-}
-document.body.onmouseup = function () {
-    mouseDown = 0;
-}
 
 //[new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)]
 var o = [new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.15, 0.55, 0.3, 0.3), new Rectangle(0.5, 0.75, 0.1, 0.1)];
