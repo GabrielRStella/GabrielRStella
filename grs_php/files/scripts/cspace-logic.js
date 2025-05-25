@@ -389,14 +389,12 @@ RenderHelper.drawLine = function (ctx, a, b, color) {
 //robots
 ////////////////////////////////////////////////////////////////////////////////
 
-//a robot with 2 degrees of freedom
-class Robot {
-    constructor() {
-    }
-}
-
 //translating point robot
 class RTPoint {
+
+    getEndpoint(t0, t1) {
+        return new Point(t0, t1);
+    }
 
     //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
     solveIK(x, y, t0, t1) {
@@ -425,6 +423,10 @@ class RTPoint {
 class RTCircle {
     constructor() {
         this.radius = 0.05;
+    }
+
+    getEndpoint(t0, t1) {
+        return new Point(t0, t1);
     }
 
     //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
@@ -468,6 +470,10 @@ class RArm {
         this.l1 = this.l0; //length of lower arm
         //
         this.root = new Point(0.5, 0.5); //fixed at the center of the c-space
+    }
+
+    getEndpoint(t0, t1) {
+        return this.getPoints(t0, t1)[2];
     }
 
     getPoints(t0, t1) {
@@ -570,6 +576,17 @@ class RSlider {
     constructor() {
         this.l0 = 0.5; //length of the slider (centered at 0.5, 0.5)
         this.l1 = 0.2; //length of the arm (one end on slider)
+    }
+
+    getEndpoint(t0, t1) {
+        var p0 = new Point(0.5 - this.l0 / 2, 0.5);
+        p0.x += t0 * this.l0;
+        //point at end
+        var p1 = new Point(this.l1, 0);
+        p1.rotate(t1 * Math.TAU);
+        p1.add(p0);
+        //
+        return p1;
     }
 
     //convert an x position to a t0 on the slider
@@ -742,6 +759,10 @@ class World {
         //
         this.mouseDownRobot = 0;
         this.mouseDownCspace = 0;
+        //pose and endpoint tracking
+        this.pts_robot = [];
+        this.pts_pose = [];
+        this.pts_resolution = 0.01; //dist through c-space between pose points
     }
 
     process() {
@@ -751,12 +772,14 @@ class World {
             this.canvas_robot.onmousemove = this.onMouseMoveRobot.bind(this);
             this.canvas_robot.onmousedown = this.onMouseDownRobot.bind(this);
             this.canvas_robot.onmouseup = this.onMouseUpRobot.bind(this);
+            this.canvas_robot.onmouseleave = this.onMouseUpRobot.bind(this); //no dragging if leave
         }
         if (this.canvas_cspace == null) {
             this.canvas_cspace = document.getElementById("canvas-cspace-" + this.id);
             this.canvas_cspace.onmousemove = this.onMouseMoveCspace.bind(this);
             this.canvas_cspace.onmousedown = this.onMouseDownCspace.bind(this);
             this.canvas_cspace.onmouseup = this.onMouseUpCspace.bind(this);
+            this.canvas_cspace.onmouseleave = this.onMouseUpCspace.bind(this); //no dragging if leave
         }
         if (this.canvas_robot != null && this.canvas_cspace != null) {
 
@@ -812,6 +835,10 @@ class World {
                 RenderHelper.drawRect(ctx, this.obstacles[i], "#000000");
             }
 
+            for (var i = 0; i < this.pts_robot.length; i++) {
+                RenderHelper.drawPoint(ctx, this.pts_robot[i], "#00ff00", null, 0.005);
+            }
+
             this.robot.render(ctx, this.t0, this.t1);
 
             ctx.restore();
@@ -832,6 +859,10 @@ class World {
             ctx.scale(this.canvas_robot.width, this.canvas_robot.height)
 
             // ctx.drawImage(this.data_draw, 0, 0, 1, 1);
+
+            for (var i = 0; i < this.pts_pose.length; i++) {
+                RenderHelper.drawPoint(ctx, this.pts_pose[i], "#00ff00", null, 0.005);
+            }
 
             RenderHelper.drawPoint(ctx, new Point(this.t0, this.t1), this.robot.testCollisions(this.obstacles, this.t0, this.t1) == 0 ? "#0000ff" : "#ff0000", null, 0.008);
 
@@ -859,6 +890,10 @@ class World {
         const y = e.pageY - e.currentTarget.offsetTop;
 
         // console.log(this.id, x, y, mouseDown);
+
+        //reset path
+        this.pts_robot = [];
+        this.pts_pose = [];
 
         if (this.mouseDownRobot) {
             this.onMouseRobot(x, y);
@@ -910,6 +945,10 @@ class World {
 
         // console.log(this.id, x, y, mouseDown);
 
+        //reset path
+        this.pts_robot = [];
+        this.pts_pose = [];
+
         if (this.mouseDownCspace) {
             this.onMouseCspace(x, y);
         }
@@ -934,6 +973,25 @@ class World {
         x = x / this.canvas_cspace.clientWidth;
         y = y / this.canvas_cspace.clientHeight;
         // console.log(x, y);
+        if(this.pts_pose.length > 0) {
+            //interpolate path
+            var p = this.pts_pose[this.pts_pose.length - 1].copy();
+            var ep = new Point(x, y);
+            var delta = ep.copy();
+            delta.sub(p);
+            delta.magnitude = this.pts_resolution;;
+            while(p.distance(ep) > this.pts_resolution) {
+                p.add(delta);
+                this.pts_pose.push(p);
+                this.pts_robot.push(this.robot.getEndpoint(p.x, p.y));
+                p = p.copy();
+            }
+        } else {
+            //new path
+            this.pts_pose.push(new Point(x, y));
+            this.pts_robot.push(this.robot.getEndpoint(x, y));
+        }
+        //
         this.t0 = x;
         this.t1 = y;
     }
