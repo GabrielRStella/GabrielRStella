@@ -397,8 +397,21 @@ class RTPoint {
     }
 
     //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
-    solveIK(x, y, t0, t1) {
-        return [x, y];
+    solveIK(x, y, t0, t1, res) {
+        var sp = new Point(t0, t1);
+        var ep = new Point(x, y);
+        var delta = ep.copy();
+        delta.sub(sp);
+        delta.magnitude = res;
+        //
+        var ps = [];
+        while(sp.distance(ep) > res) {
+            ps.push(sp);
+            sp.add(delta);
+            sp = sp.copy();
+        }
+        ps.push(ep);
+        return ps;
     }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
@@ -430,19 +443,34 @@ class RTCircle {
     }
 
     //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
-    solveIK(x, y, t0, t1) {
+    solveIK(x, y, t0, t1, res) {
         //
         var p_from = new Point(t0, t1);
         var p_to = new Point(x, y);
         var d = p_to.distance(p_from);
+        //
+        var ep = new Point(t0, t1); //don't move, cursor inside circle already
         if(d > this.radius) {
             //move shortest distance so cursor is on edge of circle
             var p_delta = p_to.copy();
             p_delta.sub(p_from);
             p_delta.multiply((d - this.radius) / d);
-            return [t0 + p_delta.x, t1 + p_delta.y];
+            ep = new Point(t0 + p_delta.x, t1 + p_delta.y);
         }
-        else return [t0, t1]; //don't move, cursor inside circle already
+        //
+        var sp = new Point(t0, t1);
+        var delta = ep.copy();
+        delta.sub(sp);
+        delta.magnitude = res;
+        //
+        var ps = [];
+        while(sp.distance(ep) > res) {
+            ps.push(sp);
+            sp.add(delta);
+            sp = sp.copy();
+        }
+        ps.push(ep);
+        return ps;
     }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
@@ -534,7 +562,7 @@ class RArm {
             if(a0 > Math.TAU) a0 = a0 - Math.TAU;
 
         }
-        return [a0 / Math.TAU, a1 / Math.TAU];
+        return [new Point(a0 / Math.TAU, a1 / Math.TAU)];
     }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
@@ -571,7 +599,6 @@ class RArm {
 }
 
 //rotating line on a slider
-//TODO
 class RSlider {
     constructor() {
         this.l0 = 0.5; //length of the slider (centered at 0.5, 0.5)
@@ -615,22 +642,22 @@ class RSlider {
                 var x2 = p.x - this.l1 * Math.cos(a_);
                 if((x1 < 0.5 - this.l0 / 2) || (x1 > 0.5 + this.l0 / 2)) {
                     //have to do x2
-                    return [this.invertX(x2), a_ / Math.TAU];
+                    return [new Point(this.invertX(x2), a_ / Math.TAU)];
                 } else if((x2 < 0.5 - this.l0 / 2) || (x2 > 0.5 + this.l0 / 2)) {
                     //have to do x1
-                    return [this.invertX(x1), a / Math.TAU];
+                    return [new Point(this.invertX(x1), a / Math.TAU)];
                 }
                 if ((Math.abs(x1 - x0) < Math.abs(x2 - x0))) {
                     //preferable to do x1
-                    return [this.invertX(x1), a / Math.TAU];
+                    return [new Point(this.invertX(x1), a / Math.TAU)];
                 } else {
                     //preferable to do x2
-                    return [this.invertX(x2), a_ / Math.TAU];
+                    return [new Point(this.invertX(x2), a_ / Math.TAU)];
                 }
                 //
             } else {
                 //1.2: not reachable; stick straight up/down
-                return [this.invertX(x), y > 0.5 ? (1/4) : (3/4)];
+                return [new Point(this.invertX(x), y > 0.5 ? (1/4) : (3/4))];
             }
         }
         //case 2: point is reachable from near one end of the slider
@@ -647,17 +674,17 @@ class RSlider {
             var x2 = p.x - this.l1 * Math.cos(a_);
             if((x1 < 0.5 - this.l0 / 2) || (x1 > 0.5 + this.l0 / 2)) {
                 //have to do x2
-                return [this.invertX(x2), a_ / Math.TAU];
+                return [new Point(this.invertX(x2), a_ / Math.TAU)];
             } else if((x2 < 0.5 - this.l0 / 2) || (x2 > 0.5 + this.l0 / 2)) {
                 //have to do x1
-                return [this.invertX(x1), a / Math.TAU];
+                return [new Point(this.invertX(x1), a / Math.TAU)];
             }
             if ((Math.abs(x1 - x0) < Math.abs(x2 - x0))) {
                 //preferable to do x1
-                return [this.invertX(x1), a / Math.TAU];
+                return [new Point(this.invertX(x1), a / Math.TAU)];
             } else {
                 //preferable to do x2
-                return [this.invertX(x2), a_ / Math.TAU];
+                return [new Point(this.invertX(x2), a_ / Math.TAU)];
             }
 
         }
@@ -666,11 +693,11 @@ class RSlider {
             if(x < slider_left.x) {
                 var a = slider_left.angleTo(p) / Math.TAU;
                 if(a < 0) a = a + 1;
-                return [0, a];
+                return [new Point(0, a)];
             } else {
                 var a = slider_right.angleTo(p) / Math.TAU;
                 if(a < 0) a = a + 1;
-                return [1, a];
+                return [new Point(1, a)];
             }
         }
         
@@ -727,6 +754,7 @@ class RSlider {
         RenderHelper.drawLine(ctx, p0, p1, "#ffffff");
     }
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //running
@@ -919,9 +947,15 @@ class World {
         x = x / this.canvas_cspace.clientWidth;
         y = y / this.canvas_cspace.clientHeight;
         // console.log(x, y);
-        var ts = this.robot.solveIK(x, y, this.t0, this.t1);
-        this.t0 = ts[0];
-        this.t1 = ts[1];
+        var ps = this.robot.solveIK(x, y, this.t0, this.t1, this.pts_resolution);
+        for(var i = 0; i < ps.length; i++) {
+            var p = ps[i];
+            this.pts_pose.push(p);
+            this.pts_robot.push(this.robot.getEndpoint(p.x, p.y));
+        }
+        var p = ps[ps.length - 1];
+        this.t0 = p.x;
+        this.t1 = p.y;
     }
 
     onMouseMoveCspace(e) {
