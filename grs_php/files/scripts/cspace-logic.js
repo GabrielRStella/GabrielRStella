@@ -1,6 +1,7 @@
 //tpoint, tcircle, arm, slider
 //TODO: expanding point/circle robot on a slider, ...
 //TODO: add dat.gui menu to modify obstacles
+//TODO: plot current trajectory (since mouse was clicked) in c-space window
 
 ////////////////////////////////////////////////////////////////////////////////
 //geometry (point and rect copied from toys)
@@ -567,29 +568,146 @@ class RArm {
 //TODO
 class RSlider {
     constructor() {
+        this.l0 = 0.5; //length of the slider (centered at 0.5, 0.5)
+        this.l1 = 0.2; //length of the arm (one end on slider)
+    }
 
+    //convert an x position to a t0 on the slider
+    invertX(x) {
+        var x0 = 0.5 - this.l0 / 2;
+        return (x - x0) / this.l0;
     }
 
     //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
     solveIK(x, y, t0, t1) {
+        var slider_left = new Point(0.5 - this.l0 / 2, 0.5);
+        var slider_right = new Point(0.5 + this.l0 / 2, 0.5);
+        var p = new Point(x, y);
+
+        //case 1: point is perpendicular to slider segment (between endpoints)
+        if(slider_left.x <= x && x <= slider_right.x) {
+            if(Math.abs(y - 0.5) <= this.l1) {
+                //1.1: reachable; rotate arm and slide
+                var a = Math.asin((y - 0.5) / this.l1);
+                var a_ = Math.PI - a; //other tilt
+                if(a < 0) a = a + Math.TAU;
+                if(a_ < 0) a_ = a_ + Math.TAU;
+                //figure out which tilt is closer to current settings (and makes endpoint reachable)
+                var x0 = (0.5 - this.l0 / 2) + this.l0 * t0; //current point on x axis
+                var x1 = p.x - this.l1 * Math.cos(a);
+                var x2 = p.x - this.l1 * Math.cos(a_);
+                if((x1 < 0.5 - this.l0 / 2) || (x1 > 0.5 + this.l0 / 2)) {
+                    //have to do x2
+                    return [this.invertX(x2), a_ / Math.TAU];
+                } else if((x2 < 0.5 - this.l0 / 2) || (x2 > 0.5 + this.l0 / 2)) {
+                    //have to do x1
+                    return [this.invertX(x1), a / Math.TAU];
+                }
+                if ((Math.abs(x1 - x0) < Math.abs(x2 - x0))) {
+                    //preferable to do x1
+                    return [this.invertX(x1), a / Math.TAU];
+                } else {
+                    //preferable to do x2
+                    return [this.invertX(x2), a_ / Math.TAU];
+                }
+                //
+            } else {
+                //1.2: not reachable; stick straight up/down
+                return [this.invertX(x), y > 0.5 ? (1/4) : (3/4)];
+            }
+        }
+        //case 2: point is reachable from near one end of the slider
+        else if(p.distance(slider_left) <= this.l1 || p.distance(slider_right) <= this.l1) {
+            //duplicate code from above :) TODO clean
+
+            var a = Math.asin((y - 0.5) / this.l1);
+            var a_ = Math.PI - a; //other tilt
+            if(a < 0) a = a + Math.TAU;
+            if(a_ < 0) a_ = a_ + Math.TAU;
+            //figure out which tilt is closer to current settings (and makes endpoint reachable)
+            var x0 = (0.5 - this.l0 / 2) + this.l0 * t0; //current point on x axis
+            var x1 = p.x - this.l1 * Math.cos(a);
+            var x2 = p.x - this.l1 * Math.cos(a_);
+            if((x1 < 0.5 - this.l0 / 2) || (x1 > 0.5 + this.l0 / 2)) {
+                //have to do x2
+                return [this.invertX(x2), a_ / Math.TAU];
+            } else if((x2 < 0.5 - this.l0 / 2) || (x2 > 0.5 + this.l0 / 2)) {
+                //have to do x1
+                return [this.invertX(x1), a / Math.TAU];
+            }
+            if ((Math.abs(x1 - x0) < Math.abs(x2 - x0))) {
+                //preferable to do x1
+                return [this.invertX(x1), a / Math.TAU];
+            } else {
+                //preferable to do x2
+                return [this.invertX(x2), a_ / Math.TAU];
+            }
+
+        }
+        //case 3: point is not reachable, go to end of slider and aim towards it
+        else {
+            if(x < slider_left.x) {
+                var a = slider_left.angleTo(p) / Math.TAU;
+                if(a < 0) a = a + 1;
+                return [0, a];
+            } else {
+                var a = slider_right.angleTo(p) / Math.TAU;
+                if(a < 0) a = a + 1;
+                return [1, a];
+            }
+        }
+        
+        // //point on slider
+        // var p0 = slider_left.copy();
+        // p0.x += t0 * this.l0;
+        // //point at end
+        // var p1 = new Point(this.l1, 0);
+        // p1.rotate(t1 * Math.TAU);
+        // p1.add(p0);
+        // //
+
+        //rotate arm the min amount to get to the necessary y offset
+
+        //slide to get close to point
         return [t0, t1]; //TODO
     }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
     testCollisions(obstacles, t0, t1) {
-        var p = new Point(t0, t1);
-
+        //point on slider
+        var p0 = new Point(0.5 - this.l0 / 2, 0.5);
+        p0.x += t0 * this.l0;
+        //point at end
+        var p1 = new Point(this.l1, 0);
+        p1.rotate(t1 * Math.TAU);
+        p1.add(p0);
+        //
         var collisions = 0;
         for (var i = 0; i < obstacles.length; i++) {
-            if (obstacles[i].contains(p)) collisions++;
+            if(obstacles[i].intersectWithLine(p0, p1)) collisions++;
         }
         return collisions;
     }
 
     //ctx is pre-transformed to the [0, 1]^2 c-space coordinate system
     render(ctx, t0, t1) {
-        // console.log("hi", t0, t1);
-        RenderHelper.drawPoint(ctx, new Point(t0, t1), "#ffffff", null, 0.01);
+        var slider_left = new Point(0.5 - this.l0 / 2, 0.5);
+        var slider_right = new Point(0.5 + this.l0 / 2, 0.5);
+        //point on slider
+        var p0 = slider_left.copy();
+        p0.x += t0 * this.l0;
+        //point at end
+        var p1 = new Point(this.l1, 0);
+        p1.rotate(t1 * Math.TAU);
+        p1.add(p0);
+        //
+
+        //draw slider
+        ctx.lineWidth = 0.01;
+        RenderHelper.drawLine(ctx, slider_left, slider_right, "#a0a0a0");
+        //draw arm
+        ctx.lineWidth = 0.01;
+        RenderHelper.drawLine(ctx, p0, p1, "#ffffff");
     }
 }
 
