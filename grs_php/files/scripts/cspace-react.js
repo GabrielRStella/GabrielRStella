@@ -68,12 +68,13 @@ class VizList extends React.Component {
 //translating point robot, translating circle robot, 2-dof arm with fixed base, arm that rotates on a prismatic joint
 //tpoint, tcircle, arm, slider
 root_props = {
-    robots: ["tpoint", "tcircle", "arm", "slider"],
+    robots: ["tpoint", "tcircle", "arm", "slider", "sliderball"],
     titles: [
         "A point robot translating in the plane",
         "A circular robot (no orientation) translating in the plane",
         "A robot arm with two revolute joints",
-        "A rotating arm on a prismatic (sliding) joint"
+        "A rotating arm on a prismatic (sliding) joint",
+        "An expanding circle on a prismatic (sliding) joint"
     ]
 };
 ReactDOM.render(React.createElement(VizList, root_props), document.getElementById('react-root'))

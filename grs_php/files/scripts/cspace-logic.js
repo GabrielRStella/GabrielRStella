@@ -1,7 +1,4 @@
-//tpoint, tcircle, arm, slider
-//TODO: expanding point/circle robot on a slider, ...
-//TODO: add dat.gui menu to modify obstacles
-//TODO: plot current trajectory (since mouse was clicked) in c-space window
+//TODO: add dat.gui menu to modify obstacles (or switch to other preset layouts)
 
 ////////////////////////////////////////////////////////////////////////////////
 //geometry (point and rect copied from toys)
@@ -517,7 +514,7 @@ class RArm {
     }
 
     //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
-    solveIK(x, y, t0, t1) {
+    solveIK(x, y, t0, t1, res) {
         //angles, in radians
         var a0 = t0 * Math.TAU;
         var a1 = t1 * Math.TAU;
@@ -623,7 +620,7 @@ class RSlider {
     }
 
     //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
-    solveIK(x, y, t0, t1) {
+    solveIK(x, y, t0, t1, res) {
         var slider_left = new Point(0.5 - this.l0 / 2, 0.5);
         var slider_right = new Point(0.5 + this.l0 / 2, 0.5);
         var p = new Point(x, y);
@@ -755,6 +752,92 @@ class RSlider {
     }
 }
 
+//rotating line on a slider
+class RSliderBall {
+    constructor() {
+        this.l0 = 0.5; //length of the slider (centered at 0.5, 0.5)
+        this.r0 = 0.01; //minimum radius
+        this.r1 = 0.25; //maximum radius
+    }
+
+    getX(t0) {
+        return (0.5 - this.l0 / 2) + (t0 * this.l0);
+    }
+
+    //convert an x position to a t0 on the slider
+    invertX(x) {
+        var x0 = 0.5 - this.l0 / 2;
+        return (x - x0) / this.l0;
+    }
+
+    getR(t1) {
+        return this.r0 + t1 * (this.r1 - this.r0);
+    }
+
+    invertR(r) {
+        return (r - this.r0) / (this.r1 - this.r0);
+    }
+
+    //move the robot from pose (t0, t1) in c-space to position (x, y) in world space [in whatever way is reasonable for this robot]
+    solveIK(x, y, t0, t1, res) {
+        //ez pz simply squeezy
+        var t0_ = this.invertX(x);
+        t0_ = Math.min(Math.max(0, t0_), 1);
+        //
+        var r = Math.abs(y - 0.5);
+        var t1_ = this.invertR(r);
+        t1_ = Math.min(Math.max(0, t1_), 1);
+        //
+        var sp = new Point(t0, t1);
+        var ep = new Point(t0_, t1_);
+        var delta = ep.copy();
+        delta.sub(sp);
+        delta.magnitude = res;
+        //
+        // var ps = [];
+        // while(sp.distance(ep) > res) {
+        //     ps.push(sp);
+        //     sp.add(delta);
+        //     sp = sp.copy();
+        // }
+        // ps.push(ep);
+        // return ps;
+        return [new Point(t0_, t1_)]; //TODO
+    }
+
+    getEndpoint(t0, t1) {
+        return new Point(this.getX(t0), 0.5 + this.getR(t1));
+    }
+
+    //return the number of obstacles that are in collision at configuration (t0, t1)
+    testCollisions(obstacles, t0, t1) {
+        //center on slider
+        var p = new Point(this.getX(t0), 0.5);
+        var r = this.getR(t1);
+        //
+        var collisions = 0;
+        for (var i = 0; i < obstacles.length; i++) {
+            if(obstacles[i].distance(p) <= r) collisions++;
+        }
+        return collisions;
+    }
+
+    //ctx is pre-transformed to the [0, 1]^2 c-space coordinate system
+    render(ctx, t0, t1) {
+        var slider_left = new Point(0.5 - this.l0 / 2, 0.5);
+        var slider_right = new Point(0.5 + this.l0 / 2, 0.5);
+        //center on slider
+        var p = new Point(this.getX(t0), 0.5);
+        var r = this.getR(t1);
+
+        //draw slider
+        ctx.lineWidth = 0.01;
+        RenderHelper.drawLine(ctx, slider_left, slider_right, "#a0a0a0");
+        //draw circle
+        ctx.lineWidth = 0.01;
+        RenderHelper.drawPoint(ctx, p, "#ffffff", null, r);
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //running
@@ -800,14 +883,14 @@ class World {
             this.canvas_robot.onmousemove = this.onMouseMoveRobot.bind(this);
             this.canvas_robot.onmousedown = this.onMouseDownRobot.bind(this);
             this.canvas_robot.onmouseup = this.onMouseUpRobot.bind(this);
-            this.canvas_robot.onmouseleave = this.onMouseUpRobot.bind(this); //no dragging if leave
+            // this.canvas_robot.onmouseleave = this.onMouseUpRobot.bind(this); //no dragging if leave
         }
         if (this.canvas_cspace == null) {
             this.canvas_cspace = document.getElementById("canvas-cspace-" + this.id);
             this.canvas_cspace.onmousemove = this.onMouseMoveCspace.bind(this);
             this.canvas_cspace.onmousedown = this.onMouseDownCspace.bind(this);
             this.canvas_cspace.onmouseup = this.onMouseUpCspace.bind(this);
-            this.canvas_cspace.onmouseleave = this.onMouseUpCspace.bind(this); //no dragging if leave
+            // this.canvas_cspace.onmouseleave = this.onMouseUpCspace.bind(this); //no dragging if leave
         }
         if (this.canvas_robot != null && this.canvas_cspace != null) {
 
@@ -1061,6 +1144,17 @@ class Runner {
 //setup
 ////////////////////////////////////////////////////////////////////////////////
 
+// var mouseDown = 0;
+// document.body.onmousedown = function () {
+//     mouseDown = 1;
+// }
+document.body.onmouseup = function (e) {
+    for(var i = 0; i < worlds.length; i++) {
+        worlds[i].onMouseUpRobot(e);
+        worlds[i].onMouseUpCspace(e);
+    }
+}
+
 //[new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.2, 0.6, 0.3, 0.3)]
 var o = [new Rectangle(0.1, 0.1, 0.2, 0.1), new Rectangle(0.8, 0.3, 0.1, 0.2), new Rectangle(0.15, 0.55, 0.3, 0.3), new Rectangle(0.5, 0.75, 0.1, 0.1)];
 
@@ -1068,7 +1162,8 @@ var worlds = [
     new World(o, new RTPoint(), "tpoint"),
     new World(o, new RTCircle(), "tcircle"),
     new World(o, new RArm(), "arm"),
-    new World(o, new RSlider(), "slider")
+    new World(o, new RSlider(), "slider"),
+    new World(o, new RSliderBall(), "sliderball")
 ];
 
 var runner = new Runner(worlds);
