@@ -401,14 +401,15 @@ class RTPoint {
         delta.sub(sp);
         delta.magnitude = res;
         //
-        var ps = [];
-        while(sp.distance(ep) > res) {
-            ps.push(sp);
-            sp.add(delta);
-            sp = sp.copy();
-        }
-        ps.push(ep);
-        return ps;
+        return [ep];
+        // var ps = [];
+        // while(sp.distance(ep) > res) {
+        //     ps.push(sp);
+        //     sp.add(delta);
+        //     sp = sp.copy();
+        // }
+        // ps.push(ep);
+        // return ps;
     }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
@@ -454,20 +455,21 @@ class RTCircle {
             p_delta.multiply((d - this.radius) / d);
             ep = new Point(t0 + p_delta.x, t1 + p_delta.y);
         }
-        //
-        var sp = new Point(t0, t1);
-        var delta = ep.copy();
-        delta.sub(sp);
-        delta.magnitude = res;
-        //
-        var ps = [];
-        while(sp.distance(ep) > res) {
-            ps.push(sp);
-            sp.add(delta);
-            sp = sp.copy();
-        }
-        ps.push(ep);
-        return ps;
+        return [ep];
+        // //
+        // var sp = new Point(t0, t1);
+        // var delta = ep.copy();
+        // delta.sub(sp);
+        // delta.magnitude = res;
+        // //
+        // var ps = [];
+        // while(sp.distance(ep) > res) {
+        //     ps.push(sp);
+        //     sp.add(delta);
+        //     sp = sp.copy();
+        // }
+        // ps.push(ep);
+        // return ps;
     }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
@@ -1076,24 +1078,24 @@ class World {
         x = x / this.canvas_cspace.clientWidth;
         y = y / this.canvas_cspace.clientHeight;
         // console.log(x, y);
-        if(this.pts_pose.length > 0) {
-            //interpolate path
-            var p = this.pts_pose[this.pts_pose.length - 1].copy();
-            var ep = new Point(x, y);
-            var delta = ep.copy();
-            delta.sub(p);
-            delta.magnitude = this.pts_resolution;;
-            while(p.distance(ep) > this.pts_resolution) {
-                p.add(delta);
-                this.pts_pose.push(p);
-                this.pts_robot.push(this.robot.getEndpoint(p.x, p.y));
-                p = p.copy();
-            }
-        } else {
+        // if(this.pts_pose.length > 0) {
+        //     //interpolate path
+        //     var p = this.pts_pose[this.pts_pose.length - 1].copy();
+        //     var ep = new Point(x, y);
+        //     var delta = ep.copy();
+        //     delta.sub(p);
+        //     delta.magnitude = this.pts_resolution;;
+        //     while(p.distance(ep) > this.pts_resolution) {
+        //         p.add(delta);
+        //         this.pts_pose.push(p);
+        //         this.pts_robot.push(this.robot.getEndpoint(p.x, p.y));
+        //         p = p.copy();
+        //     }
+        // } else {
             //new path
             this.pts_pose.push(new Point(x, y));
             this.pts_robot.push(this.robot.getEndpoint(x, y));
-        }
+        // }
         //
         this.t0 = x;
         this.t1 = y;
