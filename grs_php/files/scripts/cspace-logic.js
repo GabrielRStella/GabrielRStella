@@ -697,20 +697,6 @@ class RSlider {
                 return [new Point(1, a)];
             }
         }
-        
-        // //point on slider
-        // var p0 = slider_left.copy();
-        // p0.x += t0 * this.l0;
-        // //point at end
-        // var p1 = new Point(this.l1, 0);
-        // p1.rotate(t1 * Math.TAU);
-        // p1.add(p0);
-        // //
-
-        //rotate arm the min amount to get to the necessary y offset
-
-        //slide to get close to point
-        return [t0, t1]; //TODO
     }
 
     //return the number of obstacles that are in collision at configuration (t0, t1)
