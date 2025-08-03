@@ -46,6 +46,11 @@ $projects = array(
     "title"=>"Dice",
     "description"=>"Create and roll custom dice (i.e., select from a user-specified set of choices)."
   ),
+  array(
+    "to"=>"/habits.php",
+    "title"=>"Habits",
+    "description"=>"A simple habit tracker"
+  )
   // array(
   //   "to"=>"",
   //   "title"=>"",

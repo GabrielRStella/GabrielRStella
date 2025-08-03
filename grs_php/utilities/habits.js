@@ -46,7 +46,7 @@ class HabitTracking extends React.Component {
 
         var clicked = {};
         //https://stackoverflow.com/a/3390426
-        if(typeof this.props.values !== 'undefined') {
+        if (typeof this.props.values !== 'undefined') {
             //https://dev.to/devtronic/javascript-map-an-array-of-objects-to-a-dictionary-3f42#comment-22poe
             //let dictionary = Object.fromEntries(data.map(x => [x.id, x.country]));
             var values = this.props.values;
@@ -76,7 +76,7 @@ class HabitTracking extends React.Component {
                 this.props.habits.map((habit) => {
                     return React.createElement('tr', {},
                         React.createElement("td", {}, habit),
-                        React.createElement("td", {}, 
+                        React.createElement("td", {},
                             React.createElement('label', {},
                                 React.createElement("input", { name: "habit_group_" + this.props.date + "_" + habit, type: "radio", checked: (clicked[habit] == 0), id: "radio_" + this.props.date + "_" + habit + "_0", onChange: this.onClick.bind(this, habit, 0) }),
                                 React.createElement('span', {},
@@ -84,7 +84,7 @@ class HabitTracking extends React.Component {
                                 )
                             ),
                         ),
-                        React.createElement("td", {}, 
+                        React.createElement("td", {},
                             React.createElement('label', {},
                                 React.createElement("input", { name: "habit_group_" + this.props.date + "_" + habit, type: "radio", checked: (clicked[habit] == 1), id: "radio_" + this.props.date + "_" + habit + "_1", onChange: this.onClick.bind(this, habit, 1) }),
                                 React.createElement('span', {},
@@ -92,7 +92,7 @@ class HabitTracking extends React.Component {
                                 )
                             ),
                         ),
-                        React.createElement("td", {}, 
+                        React.createElement("td", {},
                             React.createElement('label', {},
                                 React.createElement("input", { name: "habit_group_" + this.props.date + "_" + habit, type: "radio", checked: (clicked[habit] == 2), id: "radio_" + this.props.date + "_" + habit + "_1", onChange: this.onClick.bind(this, habit, 2) }),
                                 React.createElement('span', {},
@@ -157,22 +157,44 @@ class HabitMaker extends React.Component {
         this.setState({ habit_name: event.target.value });
     }
 
+    onKey(event) {
+        //https://stackoverflow.com/a/20998671
+        if(event.key === 'Enter') {
+            this.onEnter();
+        }
+    }
+
     onEnter(event) {
         this.props.cbNew(this.state.habit_name);
         this.setState({ habit_name: "" });
     }
 
+    onDel(habit) {
+        this.props.cbDel(habit);
+    }
+
     render() {
         //TODO: also add buttons to delete existing habits
 
-        return React.createElement('div', { className: "row valign-wrapper" },
-            React.createElement('div', { className: "input-field col l6" },
-                React.createElement('input', { type: "text", id: "field_habit_name", value: this.state.habit_name, onChange: this.onNameChange.bind(this) }),
-                React.createElement('label', { "for": "field_habit_name" }, "New Habit Name")
+        return React.createElement("div", {},
+            React.createElement('div', { className: "row valign-wrapper" },
+                React.createElement('div', { className: "input-field col l10 s6" },
+                    React.createElement('input', { type: "text", id: "field_habit_name", value: this.state.habit_name, onChange: this.onNameChange.bind(this), onKeyDown: this.onKey.bind(this) }),
+                    React.createElement('label', { "for": "field_habit_name" }, "New Habit Name")
+                ),
+                React.createElement('div', { className: "btn col l2 s6 blue accent-4", onClick: this.onEnter.bind(this) },
+                    "Add"
+                )
             ),
-            React.createElement('div', { className: "btn col l2 s12 blue accent-4", onClick: this.onEnter.bind(this) },
-                "Add"
-            )
+            this.props.habits.map(
+                (habit) => React.createElement('div', { className: "row valign-wrapper" },
+                    React.createElement('p', { className: "col  s6 l10" },
+                        habit
+                    ),
+                    React.createElement('div', { className: "btn col s6 l2 red", onClick: this.onDel.bind(this, habit) },
+                        "Delete"
+                    )
+                ),)
         );
     }
 }
@@ -211,15 +233,15 @@ class Habits extends React.Component {
                 this.state["history"] = JSON.parse(history_data);
             }
         } else {
-            this.state["habits"] = ["example 1", "example 2"]
+            this.state["habits"] = ["eating", "sleeping"]
             //also fill in example data
-            this.state["history"] = {
-                "03aug2025": { "example 1": 1, "example 2": 0 },
-                "02aug2025": { "example 1": 2, "example 2": 1 },
-                "01aug2025": { "example 1": 2, "example 2": 0 },
-                "31jul2025": { "example 1": 1, "example 2": 2 },
-                "29jul2025": { "example 1": 0, "example 2": 1 }
-            };
+            // this.state["history"] = {
+            //     "03aug2025": { "eating": 1, "sleeping": 0 },
+            //     "02aug2025": { "eating": 2, "sleeping": 1 },
+            //     "01aug2025": { "eating": 2, "sleeping": 0 },
+            //     "31jul2025": { "eating": 1, "sleeping": 2 },
+            //     "29jul2025": { "eating": 0, "sleeping": 1 }
+            // };
         }
 
         //find the last_date missing data, starting from yesterday
@@ -280,11 +302,16 @@ class Habits extends React.Component {
         this.setState({ habits: habits, last_date: this.findLastDate(day_before(today()), habits, this.state.history) });
 
         //
-        window.localStorage.setItem("habits", JSON.stringify(this.state.habits));
+        window.localStorage.setItem("habits", JSON.stringify(habits));
     }
 
     onDelHabit(name) {
-        //TODO
+        var idx = this.state.habits.indexOf(name);
+        if(idx >= 0) {
+            var habits = this.state.habits.toSpliced(idx, 1);
+            this.setState({habits: habits, last_date: this.findLastDate(day_before(today()), habits, this.state.history)});
+            window.localStorage.setItem("habits", JSON.stringify(habits));
+        }
     }
 
     render() {
