@@ -108,6 +108,9 @@ class HabitTracking extends React.Component {
 }
 
 function get_color(val) {
+    if(val < 0) {
+        return "#b0b0b0"; //data missing
+    }
     var r = Math.sqrt(Math.cos(val * Math.PI / 2));
     var g = Math.sqrt(Math.sin(val * Math.PI / 2));
     return "rgb(" + Math.round(r * 255) + "," + Math.round(g * 255) + ",0)";
@@ -116,24 +119,44 @@ function get_color(val) {
 class HabitHistory extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            clicked: {}
+        };
+
+        for (var idx in this.props.habits) {
+            this.state.clicked[this.props.habits[idx]] = true;
+        }
+    }
+
+    onSelect(habit) {
+        var clicked = this.state.clicked;
+        clicked[habit] = !clicked[habit];
+        this.setState({ clicked: clicked });
     }
 
     render() {
         //the habits that we are visualizing (just average all of them together)
-        var habits = this.props.habits; //TODO: selection
+        // var habits = [];
+        // for (var habit in this.state.clicked) {
+        //     if (this.state.clicked[habit]) habits.push(habit);
+        // }
+        // console.log(habits);
 
         //average the data together to get just one value for each day, in [0, 1]
         var data = {};
         var n = 0;
-        for(var day in this.props.history) {
+        for (var day in this.props.history) {
             var vals = this.props.history[day];
             var total = 0;
             var denom = 0;
-            for(var key in vals) {
+            for (var key in vals) {
+                if(!this.state.clicked[key]) continue;
                 total += vals[key];
                 denom += 2;
             }
-            data[day] = total / denom;
+            if(denom == 0) data[day] = null;
+            else data[day] = total / denom;
             n++;
         }
 
@@ -142,9 +165,9 @@ class HabitHistory extends React.Component {
         var days = [];
         //
         var d = today();
-        while(n > 0) {
+        while (n > 0) {
             var s = date_string(d);
-            if(s in data) {
+            if (s in data) {
                 days.push(data[s]);
                 n--;
             } else {
@@ -153,8 +176,9 @@ class HabitHistory extends React.Component {
             d = day_before(d);
         }
         //
-        var sz = (100 / days.length) + "%";
-        var bg = days.map((val) => get_color(val));
+        // var sz = (100 / days.length) + "%";
+        // var bg = days.map((val) => get_color(val));
+        // days = days.reverse();
 
         //the time-spans to visualize, plus the number of datapoints that gets averaged for each
         //each is only displayed if there is enough data to make more than one span (e.g., 8 items necessary to display weeks)
@@ -167,49 +191,79 @@ class HabitHistory extends React.Component {
 
         // construct the data series
         var series = [];
-        for(var span in spans) {
+        for (var span in spans) {
             var n_items = spans[span];
             //
             var row = [];
+            // for (var i = 0; i < days.length - n_items + 1; i++) {
+            //     var total = 0;
+            //     for (var j = 0; j < n_items; j++) {
+            //         total += days[i + j];
+            //     }
+            //     row.push(total / n_items);
+            // }
             var i = 0;
             while(i < days.length) {
                 var total = 0;
                 var n = 0;
-                for(var j = 0; j < n_items && i < days.length; j++) {
-                    total += days[i];
-                    n++;
+                for (var j = 0; j < n_items && i < days.length; j++) {
+                    if(days[i] != null) {
+                        total += days[i];
+                        n++;
+                    }
                     i++;
                 }
-                row.push(total / n);
+                if(n > 0) 
+                    row.push(total / n);
+                else
+                    row.push(-1);
             }
-            if(row.length > 1)
-                series.push([span, row.reverse()]);
+            //
+            if (row.length > 1) {
+                row = row.reverse();
+                if(row.length > 100) {
+                    row = row.slice(0, 100);
+                }
+                series.push([span, row]);
+                //TODO: cut off at 100 elements (but also, that'll require changing how the longer ones like weekd and months work, since right now they display an average for each day)
+            }
         }
 
-        if(series.length == 0) {
-
-            return React.createElement('div', { className: "row" },
-                React.createElement('p', { className: "flow-text center-align" },
-                    "Not enough data"
-                ),
-            );
-        }
-
-        return React.createElement('div', { className: "row" },
-            // React.createElement('p', { className: "flow-text center-align" },
-            //     "text text text"
-            // ),
-            series.map(
-                (pair) => React.createElement('div', { className: "row valign-wrapper" },
-                    React.createElement('p', { className: "col  s2" },
-                        pair[0]
-                    ),
-                    React.createElement('div', { className: "col s10" },
-                        // "\u00A0",
-                        pair[1].map((val, idx) => React.createElement('span', {style: {width: (100 / pair[1].length) + "%", background: get_color(val), display: "inline-block"}}, "\u00A0"))
+        return React.createElement('div', {},
+            React.createElement('div', { className: "row center" },
+                this.props.habits.map(
+                    // (habit) => React.createElement('label', { className: "col s6 l4"},
+                    //     React.createElement("input", { type: "checkbox", className: "filled-in", checked: this.state.clicked[habit], onChange: this.onSelect.bind(this, habit) }),
+                    //     React.createElement('span', {},
+                    //         habit
+                    //     )
+                    // )
+                    (habit) => React.createElement("div", {className: "col l2 s6 center"},
+                        React.createElement('div', { className: "btn " + (this.state.clicked[habit] ? "blue accent-4" : "grey"), onClick: this.onSelect.bind(this, habit) },
+                            habit
+                        )
                     )
-                ),
-            )
+                )
+            ),
+            (series.length == 0) ?
+                React.createElement('div', { className: "row" },
+                    React.createElement('p', { className: "flow-text center-align" },
+                        "Not enough data"
+                    ),
+                ) :
+                React.createElement('div', { className: "row" },
+                    series.map(
+                        (pair) => React.createElement('div', { className: "row valign-wrapper" },
+                            React.createElement('p', { className: "col  s2" },
+                                pair[0]
+                            ),
+                            React.createElement('div', { className: "col s10" },
+                                // "\u00A0",
+                                pair[1].map((val, idx) => React.createElement('span', { style: { width: (100 / pair[1].length) + "%", background: get_color(val), display: "inline-block" } }, "\u00A0"))
+                            )
+                        ),
+                    )
+                )
         );
     }
 }
@@ -229,13 +283,13 @@ class HabitMaker extends React.Component {
 
     onKey(event) {
         //https://stackoverflow.com/a/20998671
-        if(event.key === 'Enter') {
+        if (event.key === 'Enter') {
             this.onEnter();
         }
     }
 
     onEnter(event) {
-        if(this.state.habit_name != "")
+        if (this.state.habit_name != "")
             this.props.cbNew(this.state.habit_name);
         this.setState({ habit_name: "" });
     }
@@ -377,9 +431,9 @@ class Habits extends React.Component {
 
     onDelHabit(name) {
         var idx = this.state.habits.indexOf(name);
-        if(idx >= 0) {
+        if (idx >= 0) {
             var habits = this.state.habits.toSpliced(idx, 1);
-            this.setState({habits: habits, last_date: this.findLastDate(day_before(today()), habits, this.state.history)});
+            this.setState({ habits: habits, last_date: this.findLastDate(day_before(today()), habits, this.state.history) });
             window.localStorage.setItem("habits", JSON.stringify(habits));
         }
     }

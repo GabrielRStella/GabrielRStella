@@ -16,7 +16,7 @@ make_nav();
         <h1>Habits</h1>
     </div>
     <p class="flow-text center-align">
-      A simple page for tracking the consistency of your habits.
+      A simple page for tracking the consistency of daily habits.
     </p>
   </div>
   <div id="react-app"></div>
