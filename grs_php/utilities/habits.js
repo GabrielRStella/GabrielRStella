@@ -104,30 +104,13 @@ class HabitTracking extends React.Component {
                 })
             )
         );
-
-        /*
-                React.createElement('form', { action: "#" },
-                    React.createElement('label', {},
-                        React.createElement("input", { name: "habit_group_" + this.props.date, type: "radio", checked: false }),
-                        React.createElement('span', {},
-                            "hi"
-                        )
-                    ),
-                    React.createElement('label', {},
-                        React.createElement("input", { name: "habit_group_" + this.props.date, type: "radio", checked: false }),
-                        React.createElement('span', {},
-                            "bye"
-                        )
-                    ),
-                    React.createElement('label', {},
-                        React.createElement("input", { name: "habit_group_" + this.props.date, type: "radio", checked: false }),
-                        React.createElement('span', {},
-                            "test"
-                        )
-                    ),
-                )
-        */
     }
+}
+
+function get_color(val) {
+    var r = Math.sqrt(Math.cos(val * Math.PI / 2));
+    var g = Math.sqrt(Math.sin(val * Math.PI / 2));
+    return "rgb(" + Math.round(r * 255) + "," + Math.round(g * 255) + ",0)";
 }
 
 class HabitHistory extends React.Component {
@@ -136,10 +119,97 @@ class HabitHistory extends React.Component {
     }
 
     render() {
+        //the habits that we are visualizing (just average all of them together)
+        var habits = this.props.habits; //TODO: selection
+
+        //average the data together to get just one value for each day, in [0, 1]
+        var data = {};
+        var n = 0;
+        for(var day in this.props.history) {
+            var vals = this.props.history[day];
+            var total = 0;
+            var denom = 0;
+            for(var key in vals) {
+                total += vals[key];
+                denom += 2;
+            }
+            data[day] = total / denom;
+            n++;
+        }
+
+        //convert that to a list, indexed by "number of days ago"
+        //with value=null if there is no data for a given day
+        var days = [];
+        //
+        var d = today();
+        while(n > 0) {
+            var s = date_string(d);
+            if(s in data) {
+                days.push(data[s]);
+                n--;
+            } else {
+                days.push(null);
+            }
+            d = day_before(d);
+        }
+        //
+        var sz = (100 / days.length) + "%";
+        var bg = days.map((val) => get_color(val));
+
+        //the time-spans to visualize, plus the number of datapoints that gets averaged for each
+        //each is only displayed if there is enough data to make more than one span (e.g., 8 items necessary to display weeks)
+        var spans = {
+            "Days": 1,
+            "Weeks": 7,
+            "Months": 30,
+            "Years": 365
+        };
+
+        // construct the data series
+        var series = [];
+        for(var span in spans) {
+            var n_items = spans[span];
+            //
+            var row = [];
+            var i = 0;
+            while(i < days.length) {
+                var total = 0;
+                var n = 0;
+                for(var j = 0; j < n_items && i < days.length; j++) {
+                    total += days[i];
+                    n++;
+                    i++;
+                }
+                row.push(total / n);
+            }
+            if(row.length > 1)
+                series.push([span, row.reverse()]);
+        }
+
+        if(series.length == 0) {
+
+            return React.createElement('div', { className: "row" },
+                React.createElement('p', { className: "flow-text center-align" },
+                    "Not enough data"
+                ),
+            );
+        }
+
         return React.createElement('div', { className: "row" },
-            React.createElement('p', { className: "flow-text center-align" },
-                "text text text"
-            ),
+            // React.createElement('p', { className: "flow-text center-align" },
+            //     "text text text"
+            // ),
+            series.map(
+                (pair) => React.createElement('div', { className: "row valign-wrapper" },
+                    React.createElement('p', { className: "col  s2" },
+                        pair[0]
+                    ),
+                    React.createElement('div', { className: "col s10" },
+                        // "\u00A0",
+                        pair[1].map((val, idx) => React.createElement('span', {style: {width: (100 / pair[1].length) + "%", background: get_color(val), display: "inline-block"}}, "\u00A0"))
+                    )
+                ),
+            )
         );
     }
 }
@@ -165,7 +235,8 @@ class HabitMaker extends React.Component {
     }
 
     onEnter(event) {
-        this.props.cbNew(this.state.habit_name);
+        if(this.state.habit_name != "")
+            this.props.cbNew(this.state.habit_name);
         this.setState({ habit_name: "" });
     }
 
@@ -174,8 +245,6 @@ class HabitMaker extends React.Component {
     }
 
     render() {
-        //TODO: also add buttons to delete existing habits
-
         return React.createElement("div", {},
             React.createElement('div', { className: "row valign-wrapper" },
                 React.createElement('div', { className: "input-field col l10 s6" },
@@ -194,7 +263,8 @@ class HabitMaker extends React.Component {
                     React.createElement('div', { className: "btn col s6 l2 red", onClick: this.onDel.bind(this, habit) },
                         "Delete"
                     )
-                ),)
+                ),
+            )
         );
     }
 }
@@ -349,7 +419,7 @@ class Habits extends React.Component {
                         "History"
                     ),
                 ),
-                React.createElement(HabitHistory, { habits: this.state.habits, history: this.history })
+                React.createElement(HabitHistory, { habits: this.state.habits, history: this.state.history })
             ),
             React.createElement('div', { className: "divider" }),
             React.createElement('div', { className: "section" },
