@@ -19,6 +19,17 @@ function pretty_string(date) {
     return dd + ' ' + mm + ' ' + yyyy;
 }
 
+function date_format(date) {
+    //date picker wants yyyy-mm-dd
+    //https://stackoverflow.com/a/4929629
+    var dd = String(date.getDate()).padStart(2, '0');
+    var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = date.getFullYear();
+    //
+    var f = yyyy + '-' + mm + '-' + dd
+    return f;
+}
+
 function day_before(date) {
     //https://stackoverflow.com/a/16401836
     var d = new Date(date.getTime());
@@ -108,7 +119,7 @@ class HabitTracking extends React.Component {
 }
 
 function get_color(val) {
-    if(val < 0) {
+    if (val < 0) {
         return "#b0b0b0"; //data missing
     }
     var r = Math.sqrt(Math.cos(val * Math.PI / 2));
@@ -151,11 +162,11 @@ class HabitHistory extends React.Component {
             var total = 0;
             var denom = 0;
             for (var key in vals) {
-                if(!this.state.clicked[key]) continue;
+                if (!this.state.clicked[key]) continue;
                 total += vals[key];
                 denom += 2;
             }
-            if(denom == 0) data[day] = null;
+            if (denom == 0) data[day] = null;
             else data[day] = total / denom;
             n++;
         }
@@ -203,17 +214,17 @@ class HabitHistory extends React.Component {
             //     row.push(total / n_items);
             // }
             var i = 0;
-            while(i < days.length) {
+            while (i < days.length) {
                 var total = 0;
                 var n = 0;
                 for (var j = 0; j < n_items && i < days.length; j++) {
-                    if(days[i] != null) {
+                    if (days[i] != null) {
                         total += days[i];
                         n++;
                     }
                     i++;
                 }
-                if(n > 0) 
+                if (n > 0)
                     row.push(total / n);
                 else
                     row.push(-1);
@@ -221,7 +232,7 @@ class HabitHistory extends React.Component {
             //
             if (row.length > 1) {
                 row = row.reverse();
-                if(row.length > 100) {
+                if (row.length > 100) {
                     row = row.slice(0, 100);
                 }
                 series.push([span, row]);
@@ -238,7 +249,7 @@ class HabitHistory extends React.Component {
                     //         habit
                     //     )
                     // )
-                    (habit) => React.createElement("div", {className: "col l2 s6 center"},
+                    (habit) => React.createElement("div", { className: "col l2 s6 center" },
                         React.createElement('div', { className: "btn " + (this.state.clicked[habit] ? "blue accent-4" : "grey"), onClick: this.onSelect.bind(this, habit) },
                             habit
                         )
@@ -344,7 +355,9 @@ class Habits extends React.Component {
             //a dictionary of dictionaries, from [date] -> {habit: number, habit: number, ...}
             history: {},
             //the last date that is missing data
-            last_date: null
+            last_date: null,
+            custom_date: day_before(today()),
+            backtrack_last: true
         };
 
         //load data
@@ -438,12 +451,29 @@ class Habits extends React.Component {
         }
     }
 
+    onBacktrackMode(mode) {
+        this.setState({ backtrack_last: mode });
+    }
+
+    onCustomDate(evt) {
+        var f = evt.target.value; //yyyy-mm-dd
+        // console.log("value:", f);
+        if (f == "") {
+            this.setState({ custom_date: day_before(today()) });
+        } else {
+            var parts = f.split('-'); //[y, m, d]
+            var d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            // console.log(evt.target.value, d);
+            this.setState({ custom_date: d });
+        }
+    }
+
     render() {
-        console.log(this.state.habits);
+        // console.log(this.state.habits);
 
         var store = window.localStorage;
         // store.setItem("dice_info", JSON.stringify(this.state.dice));
-        var last_date = this.state.last_date;
+        var last_date = this.state.backtrack_last ? this.state.last_date : this.state.custom_date;
         //
         return React.createElement('div', { className: "container" },
             React.createElement('div', { className: "divider" }),
@@ -465,6 +495,33 @@ class Habits extends React.Component {
                 (last_date == null) ?
                     React.createElement('p', { className: "flow-text center-align" }, "Loading...") :
                     React.createElement(HabitTracking, { habits: this.state.habits, values: this.state.history[date_string(last_date)], cb: this.onTrack.bind(this), date: date_string(last_date), msg: "For: " + pretty_string(last_date) })
+            ),
+            React.createElement('div', { className: "section" },
+                React.createElement('div', { className: "row center-align" },
+                    React.createElement('div', { className: "col s6" },
+                        React.createElement('label', {},
+                            React.createElement("input", { name: "radio_group_date_type", type: "radio", checked: this.state.backtrack_last, id: "radio_date_type_last", onChange: this.onBacktrackMode.bind(this, true) }),
+                            React.createElement('span', {},
+                                "Last date"
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: "col s6" },
+                        React.createElement('label', {},
+                            React.createElement("input", { name: "radio_group_date_type", type: "radio", checked: !this.state.backtrack_last, id: "radio_date_type_manual", onChange: this.onBacktrackMode.bind(this, false) }),
+                            React.createElement('span', {},
+                                "Manual"
+                            )
+                        )
+                    )
+                ),
+                !this.state.backtrack_last ?
+                    React.createElement('div', { className: "row center-align" },
+                        React.createElement('div', { className: "col s12" },
+                            React.createElement("input", { id: "manual_date_entry", type: "date", value: date_format(this.state.custom_date), onChange: this.onCustomDate.bind(this) }),
+                            React.createElement('label', { "for": "manual_date_entry" }, "Date to Track")
+                        ),
+                    ) : " "
             ),
             React.createElement('div', { className: "divider" }),
             React.createElement('div', { className: "section" },
@@ -489,6 +546,11 @@ class Habits extends React.Component {
 
     componentDidUpdate() {
         M.AutoInit();
+
+        // document.addEventListener('DOMContentLoaded', function () {
+        var elems = document.querySelectorAll('.datepicker');
+        var instances = M.Datepicker.init(elems, {});
+        // });
     }
 }
 
