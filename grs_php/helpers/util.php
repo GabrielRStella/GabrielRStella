@@ -20,7 +20,7 @@ function make_nav() {
       "title"=>"Research"
     ),
     // array(
-    //   "to"=>"/teaching",
+    //   "to"=>"/teaching/",
     //   "title"=>"Teaching"
     // ),
     array(
